@@ -1,4 +1,4 @@
-#include "render/canvas.hpp"
+#include "graphics/canvas.hpp"
 
 #include <algorithm>
 #include <utility>
@@ -6,7 +6,7 @@
 
 #include "platform/glut.hpp"
 
-namespace robot::render {
+namespace robot::graphics {
 namespace {
 
 // 中點畫圓法：依序回傳第二個八分圓 (0 <= x <= y) 上的整數點，其餘七個八分圓由呼叫端以對稱取得。
@@ -165,4 +165,4 @@ void Canvas::strokeRoundedRect(int x, int y, int width, int height, int radius, 
     glPopAttrib();
 }
 
-}  // namespace robot::render
+}  // namespace robot::graphics

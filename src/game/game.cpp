@@ -3,8 +3,8 @@
 #include <memory>
 #include <utility>
 
-#include "render/canvas.hpp"
-#include "render/stage.hpp"
+#include "graphics/canvas.hpp"
+#include "graphics/stage.hpp"
 #include "screen/pause_screen.hpp"
 #include "screen/title_screen.hpp"
 
@@ -87,8 +87,8 @@ void Game::render() {
         _session->renderWorld(_engine.width(), _engine.height());
     }
 
-    render::begin2D(_engine.width(), _engine.height());
-    render::Canvas canvas;
+    graphics::begin2D(_engine.width(), _engine.height());
+    graphics::Canvas canvas;
 
     // HUD 只在遊玩時顯示：選單打開時世界已暫停，HUD 的資訊沒有意義，也會干擾選單
     if (_screen) {

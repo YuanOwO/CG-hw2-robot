@@ -1,7 +1,7 @@
 #pragma once
 
-#include "render/camera.hpp"
-#include "render/canvas.hpp"
+#include "graphics/camera.hpp"
+#include "graphics/canvas.hpp"
 #include "view/hud.hpp"
 #include "view/world_renderer.hpp"
 #include "world/world.hpp"
@@ -16,15 +16,15 @@ class Session {
 
     // 分成兩段，讓 Game 能在 HUD 之上接著用同一個 2D 階段畫選單。
     void renderWorld(int width, int height) const;
-    void renderHud(render::Canvas& canvas, int framesPerSecond, int ticksPerSecond) const;
+    void renderHud(graphics::Canvas& canvas, int framesPerSecond, int ticksPerSecond) const;
 
    private:
     world::World _world;
 
     view::WorldRenderer _worldRenderer;
     view::Hud _hud;
-    render::Camera _camera;
-    render::OrthoProjection _projection;
+    graphics::Camera _camera;
+    graphics::OrthoProjection _projection;
 };
 
 }  // namespace robot::game

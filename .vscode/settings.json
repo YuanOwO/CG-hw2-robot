@@ -18,7 +18,7 @@
         { "name": "src-input", "base": "input", "color": "indigo-400", "folderNames": ["input"] },
 
         // 繪圖與字型：紫色
-        { "name": "render", "base": "shader", "color": "deep-purple-400", "folderNames": ["render"] },
+        { "name": "graphics", "base": "shader", "color": "deep-purple-400", "folderNames": ["graphics"] },
         { "name": "src-font", "base": "font", "color": "purple-400", "folderNames": ["font"] },
         { "name": "data", "base": "database", "color": "purple-300", "folderNames": ["data"] },
         { "name": "raster", "base": "images", "color": "purple-300", "folderNames": ["raster"] },

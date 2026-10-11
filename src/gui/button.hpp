@@ -7,7 +7,7 @@
 #include "common/color.hpp"
 #include "common/point.hpp"
 #include "font/font.hpp"
-#include "render/canvas.hpp"
+#include "graphics/canvas.hpp"
 
 namespace robot::gui {
 
@@ -37,7 +37,7 @@ class Button {
 
     void press();
 
-    void render(render::Canvas& canvas, bool focused) const;
+    void render(graphics::Canvas& canvas, bool focused) const;
 
    private:
     BoundingBox _bounds;

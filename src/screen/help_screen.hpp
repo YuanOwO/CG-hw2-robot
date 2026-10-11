@@ -11,7 +11,7 @@ class HelpScreen : public Screen {
 
    protected:
     void build() override;
-    void renderContent(render::Canvas& canvas) const override;
+    void renderContent(graphics::Canvas& canvas) const override;
 };
 
 }  // namespace robot::screen

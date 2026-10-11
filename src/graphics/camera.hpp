@@ -2,7 +2,7 @@
 
 #include "math/vec3.hpp"
 
-namespace robot::render {
+namespace robot::graphics {
 
 // 眼睛座標系：eye 為眼睛位置 E、focus 為注視點 F、up 為上方向 Vup，對應 gluLookAt 的三組參數。
 struct Camera {
@@ -25,4 +25,4 @@ struct OrthoProjection {
     OrthoProjection fittedTo(float aspect) const;
 };
 
-}  // namespace robot::render
+}  // namespace robot::graphics

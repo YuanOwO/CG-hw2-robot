@@ -11,7 +11,7 @@ class TitleScreen : public Screen {
 
    protected:
     void build() override;
-    void renderContent(render::Canvas& canvas) const override;
+    void renderContent(graphics::Canvas& canvas) const override;
     bool closesOnEscape() const override { return false; }
 };
 

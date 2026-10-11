@@ -29,12 +29,12 @@ void Screen::init(int width, int height) {
     }
 }
 
-void Screen::render(render::Canvas& canvas) const {
+void Screen::render(graphics::Canvas& canvas) const {
     renderBackground(canvas);
 
     if (!_title.empty()) {
         canvas.drawText(_title, style::HeadingFont, style::Text, Point(_width / 2.0f, _height / 4.0f),
-                        {render::TextAlign::CENTER, render::TextAlign::START});
+                        {graphics::TextAlign::CENTER, graphics::TextAlign::START});
     }
 
     renderContent(canvas);
@@ -44,7 +44,7 @@ void Screen::render(render::Canvas& canvas) const {
     }
 }
 
-void Screen::renderBackground(render::Canvas& canvas) const {
+void Screen::renderBackground(graphics::Canvas& canvas) const {
     // 有世界時半透明，讓暫停的場景仍看得到；沒有世界時後面什麼都沒畫，必須完全蓋住
     canvas.fillRect(0, 0, _width, _height, _host.hasWorld() ? style::PauseOverlay : style::MenuBackground);
 }

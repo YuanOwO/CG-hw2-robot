@@ -14,7 +14,7 @@ const FontStyle HUD_FONT = GlyphFontStyle{GlyphFont::UNIFONT, 16};
 
 }  // namespace
 
-void Hud::render(render::Canvas& canvas, int framesPerSecond, int ticksPerSecond) const {
+void Hud::render(graphics::Canvas& canvas, int framesPerSecond, int ticksPerSecond) const {
     const std::string text = "FPS " + std::to_string(framesPerSecond) + " · TPS " + std::to_string(ticksPerSecond);
     const int textWidth = static_cast<int>(std::ceil(getFontWidth(HUD_FONT, text)));
     const int textHeight = static_cast<int>(std::ceil(getFontHeight(HUD_FONT, text)));

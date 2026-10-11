@@ -1,6 +1,6 @@
 # 字型
 
-提供文字的量測與排版，支援中文。繪製在 `render/canvas_text.cpp`，內部設計見 [ARCHITECTURE.md](ARCHITECTURE.md)。
+提供文字的量測與排版，支援中文。繪製在 `graphics/canvas_text.cpp`，內部設計見 [ARCHITECTURE.md](ARCHITECTURE.md)。
 
 ## 字型種類
 
@@ -31,7 +31,7 @@ inline const FontStyle TitleFont = GlyphFontStyle{GlyphFont::NOTO_SANS_CJK_TC, 7
 
 // position 預設為文字框左上角；anchor 可改為以中心、右下角等位置對齊
 canvas.drawText("會動的機器人", TitleFont, color, position);
-canvas.drawText("開始", TitleFont, color, center, {render::TextAlign::CENTER, render::TextAlign::CENTER});
+canvas.drawText("開始", TitleFont, color, center, {graphics::TextAlign::CENTER, graphics::TextAlign::CENTER});
 
 // 需要文字框大小時（例如畫背景）再另外量測
 const float width = getFontWidth(TitleFont, "會動的機器人");

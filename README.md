@@ -55,7 +55,7 @@ src/
 ├── view/       依世界狀態繪製場景與 HUD
 ├── screen/     選單畫面（主選單、暫停、操作說明）
 ├── gui/        通用介面元件（按鈕）
-├── render/     2D 畫布、3D / 2D 繪製階段、相機與投影參數
+├── graphics/   2D 畫布、3D / 2D 繪製階段、相機與投影參數
 ├── common/     顏色、座標、矩形與 UTF-8
 ├── font/       字型的量測與排版（見 src/font/README.md）
 ├── input/      按鍵代碼與輸入狀態

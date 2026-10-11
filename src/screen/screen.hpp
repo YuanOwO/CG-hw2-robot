@@ -8,7 +8,7 @@
 #include "common/point.hpp"
 #include "gui/button.hpp"
 #include "input/input_types.hpp"
-#include "render/canvas.hpp"
+#include "graphics/canvas.hpp"
 #include "screen/screen_host.hpp"
 
 namespace robot::screen {
@@ -28,7 +28,7 @@ class Screen {
     // 打開畫面或視窗大小改變時呼叫：清除所有按鈕後重新建立。
     void init(int width, int height);
 
-    void render(render::Canvas& canvas) const;
+    void render(graphics::Canvas& canvas) const;
 
     // 回傳是否已處理
     bool keyDown(Key key, bool repeat);
@@ -44,8 +44,8 @@ class Screen {
 
    protected:
     virtual void build() = 0;
-    virtual void renderBackground(render::Canvas& canvas) const;
-    virtual void renderContent(render::Canvas& canvas) const {}
+    virtual void renderBackground(graphics::Canvas& canvas) const;
+    virtual void renderContent(graphics::Canvas& canvas) const {}
 
     // 主選單沒有可以回去的地方
     virtual bool closesOnEscape() const { return true; }

@@ -39,7 +39,7 @@ void Button::press() {
     }
 }
 
-void Button::render(render::Canvas& canvas, bool focused) const {
+void Button::render(graphics::Canvas& canvas, bool focused) const {
     const ColorRGBA& fill = _armed && _hovered ? _style.pressed : _hovered ? _style.hovered : _style.fill;
     const ColorRGBA& border = focused ? _style.focusBorder : _style.border;
     const int borderWidth = focused ? 2 : 1;
@@ -50,7 +50,8 @@ void Button::render(render::Canvas& canvas, bool focused) const {
     canvas.strokeRoundedRect(_bounds.x, _bounds.y, _bounds.width, _bounds.height, radius, borderWidth, border);
 
     const Point center(_bounds.x + _bounds.width / 2.0f, _bounds.y + _bounds.height / 2.0f);
-    canvas.drawText(_label, _style.font, _style.text, center, {render::TextAlign::CENTER, render::TextAlign::CENTER});
+    canvas.drawText(_label, _style.font, _style.text, center,
+                    {graphics::TextAlign::CENTER, graphics::TextAlign::CENTER});
 }
 
 }  // namespace robot::gui

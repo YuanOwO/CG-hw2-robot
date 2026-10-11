@@ -32,14 +32,14 @@ void HelpScreen::build() {
     addButton(buttonSlot(0, top), "返回", [this]() { onClose(); });
 }
 
-void HelpScreen::renderContent(render::Canvas& canvas) const {
+void HelpScreen::renderContent(graphics::Canvas& canvas) const {
     // 按鍵靠右對齊在中線左側，說明從中線右側開始，兩欄才會對齊
     const float center = width() / 2.0f;
     float y = static_cast<float>(contentTop(titleBottom()));
 
     for (const auto& [key, description] : CONTROLS) {
         canvas.drawText(key, style::BodyFont, style::MutedText, Point(center - 16.0f, y),
-                        {render::TextAlign::END, render::TextAlign::START});
+                        {graphics::TextAlign::END, graphics::TextAlign::START});
         canvas.drawText(description, style::BodyFont, style::Text, Point(center + 16.0f, y));
         y += LINE_HEIGHT;
     }

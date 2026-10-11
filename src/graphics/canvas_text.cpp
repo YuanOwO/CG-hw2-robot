@@ -5,9 +5,9 @@
 #include "common/point.hpp"
 #include "font/font_library.hpp"
 #include "platform/glut.hpp"
-#include "render/canvas.hpp"
+#include "graphics/canvas.hpp"
 
-namespace robot::render {
+namespace robot::graphics {
 
 namespace {
 
@@ -255,4 +255,4 @@ void Canvas::drawText(const std::string& text, const FontStyle& fontStyle, const
     glPopAttrib();
 }
 
-}  // namespace robot::render
+}  // namespace robot::graphics

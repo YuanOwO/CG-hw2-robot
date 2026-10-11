@@ -1,8 +1,8 @@
-#include "render/stage.hpp"
+#include "graphics/stage.hpp"
 
 #include "platform/glut.hpp"
 
-namespace robot::render {
+namespace robot::graphics {
 
 void begin3D(int width, int height, const Camera& camera, const OrthoProjection& projection) {
     glViewport(0, 0, width, height);
@@ -40,4 +40,4 @@ void begin2D(int width, int height) {
     glLoadIdentity();
 }
 
-}  // namespace robot::render
+}  // namespace robot::graphics

@@ -1,13 +1,13 @@
 #include "view/world_renderer.hpp"
 
 #include "platform/glut.hpp"
-#include "render/stage.hpp"
+#include "graphics/stage.hpp"
 
 namespace robot::view {
 
-void WorldRenderer::render(const world::World& world, const render::Camera& camera,
-                           const render::OrthoProjection& projection, int width, int height) const {
-    render::begin3D(width, height, camera, projection);
+void WorldRenderer::render(const world::World& world, const graphics::Camera& camera,
+                           const graphics::OrthoProjection& projection, int width, int height) const {
+    graphics::begin3D(width, height, camera, projection);
 
     // 繞地板中心旋轉
     glTranslatef(25.0f, 0.0f, 25.0f);

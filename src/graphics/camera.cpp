@@ -1,6 +1,6 @@
-#include "render/camera.hpp"
+#include "graphics/camera.hpp"
 
-namespace robot::render {
+namespace robot::graphics {
 
 OrthoProjection OrthoProjection::fittedTo(float aspect) const {
     const float centerX = (left + right) / 2.0f;
@@ -22,4 +22,4 @@ OrthoProjection OrthoProjection::fittedTo(float aspect) const {
     return fitted;
 }
 
-}  // namespace robot::render
+}  // namespace robot::graphics

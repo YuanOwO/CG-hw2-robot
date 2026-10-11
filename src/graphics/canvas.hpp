@@ -6,7 +6,7 @@
 #include "common/point.hpp"
 #include "font/font.hpp"
 
-namespace robot::render {
+namespace robot::graphics {
 
 enum class TextAlign {
     START,   // 左 / 上
@@ -21,7 +21,7 @@ struct TextAnchor {
 
 // 畫布工具：在像素座標中繪製矩形、圓角矩形與文字。
 //
-// 座標單位為像素，原點在視窗左上角，y 向下為正。使用前須先呼叫 render::begin2D 切換到 2D 繪製。
+// 座標單位為像素，原點在視窗左上角，y 向下為正。使用前須先呼叫 graphics::begin2D 切換到 2D 繪製。
 // 所有繪製都會套用目前的座標轉換，可以用 pushTransform / translate / popTransform 平移一組繪製。
 class Canvas {
    public:
@@ -47,4 +47,4 @@ class Canvas {
                   TextAnchor anchor = {});
 };
 
-}  // namespace robot::render
+}  // namespace robot::graphics
