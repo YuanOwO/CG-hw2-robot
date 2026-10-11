@@ -1,27 +1,24 @@
 #include "view/world_renderer.hpp"
 
-#include "platform/glut.hpp"
+#include "graphics/primitives.hpp"
 #include "graphics/stage.hpp"
+#include "view/chunk_renderer.hpp"
 
 namespace robot::view {
+
+namespace {
+
+const float AXIS_LENGTH = 8.0f;
+
+}  // namespace
 
 void WorldRenderer::render(const world::World& world, const graphics::Camera& camera,
                            const graphics::OrthoProjection& projection, int width, int height) const {
     graphics::begin3D(width, height, camera, projection);
 
-    // 繞地板中心旋轉
-    glTranslatef(25.0f, 0.0f, 25.0f);
-    glRotatef(world.floorAngle(), 0.0f, 1.0f, 0.0f);
-    glTranslatef(-25.0f, 0.0f, -25.0f);
+    world.forEachChunk([](const world::Chunk& chunk) { drawChunk(chunk); });
 
-    // 逆時針，正面朝上
-    glColor3f(0.0f, 0.0f, 0.0f);
-    glBegin(GL_QUADS);
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f, 0.0f, 50.0f);
-    glVertex3f(50.0f, 0.0f, 50.0f);
-    glVertex3f(50.0f, 0.0f, 0.0f);
-    glEnd();
+    graphics::drawAxes(AXIS_LENGTH);
 }
 
 }  // namespace robot::view

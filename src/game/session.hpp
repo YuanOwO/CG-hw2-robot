@@ -12,6 +12,8 @@ namespace robot::game {
 // 回到主選單時整個銷毀，再次開始遊戲時因此一定從乾淨的狀態開始。
 class Session {
    public:
+    Session();
+
     void tick(float dt);
 
     // 分成兩段，讓 Game 能在 HUD 之上接著用同一個 2D 階段畫選單。
