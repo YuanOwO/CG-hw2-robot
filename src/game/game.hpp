@@ -22,10 +22,14 @@ class Game : public engine::Application {
 
     bool hasWorld() const { return _world != nullptr; }
 
-    void startWorld();  // 建立新世界並關閉畫面
+    void startWorld();   // 建立新世界並關閉畫面
+    void quitToTitle();  // 銷毀世界並回到主選單
     void quit();
 
     void setScreen(std::unique_ptr<Screen> screen);  // nullptr 表示關閉畫面
+
+    // 目前的畫面成為新畫面的上一層，關閉新畫面時回到它。
+    void openChildScreen(std::unique_ptr<Screen> screen);
 
     // engine::Application
 
@@ -33,6 +37,7 @@ class Game : public engine::Application {
     void render() override;
 
     void onResize(int width, int height) override;
+    void onKeyDown(Key key, bool repeat) override;
     void onMouseDown(MouseButton button, Point position) override;
     void onMouseUp(MouseButton button, Point position) override;
     void onMouseMove(Point position) override;
@@ -43,8 +48,15 @@ class Game : public engine::Application {
     std::unique_ptr<World> _world;
     std::unique_ptr<Screen> _screen;
 
-    bool _pendingStartWorld = false;
-    std::optional<std::unique_ptr<Screen>> _pendingScreen;  // 內含 nullptr 表示要關閉畫面
+    enum class WorldChange { None, Start, Unload };
+
+    struct ScreenChange {
+        std::unique_ptr<Screen> screen;  // nullptr 表示關閉畫面
+        bool asChild = false;
+    };
+
+    WorldChange _pendingWorld = WorldChange::None;
+    std::optional<ScreenChange> _pendingScreen;
 
     void applyPendingChanges();
     void renderHud(render::Canvas& canvas);

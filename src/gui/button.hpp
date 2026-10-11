@@ -18,6 +18,7 @@ struct ButtonStyle {
     ColorRGBA hovered;
     ColorRGBA pressed;
     ColorRGBA border;
+    ColorRGBA focusBorder;
     int cornerRadius = 6;
 };
 
@@ -34,7 +35,9 @@ class Button {
     bool mouseDown(Point position);  // 回傳是否已處理
     bool mouseUp(Point position);
 
-    void render(render::Canvas& canvas) const;
+    void press();
+
+    void render(render::Canvas& canvas, bool focused) const;
 
    private:
     BoundingBox _bounds;

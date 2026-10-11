@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -13,10 +14,13 @@ namespace robot::game {
 
 class Game;
 
-// 疊在最上層的畫面，例如主選單。同一時間最多一個，由 Game 持有。
+// 疊在最上層的畫面，例如主選單、暫停選單。同一時間最多一個，由 Game 持有。
+//
+// 畫面可以持有上一層畫面：從暫停選單打開操作說明時，暫停選單由操作說明保管，
+// 關閉操作說明就把它交還給 Game。
 class Screen {
    public:
-    explicit Screen(Game& game);
+    explicit Screen(Game& game, std::string title = "");
     virtual ~Screen() = default;
 
     Screen(const Screen&) = delete;
@@ -28,18 +32,32 @@ class Screen {
     void render(render::Canvas& canvas) const;
 
     // 回傳是否已處理
+    bool keyDown(Key key, bool repeat);
     bool mouseMove(Point position);
     bool mouseDown(MouseButton button, Point position);
     bool mouseUp(MouseButton button, Point position);
+
+    // 預設回到上一層畫面，沒有上一層時回到遊戲。
+    virtual void onClose();
+
+    void setParent(std::unique_ptr<Screen> parent) { _parent = std::move(parent); }
+    std::unique_ptr<Screen> takeParent() { return std::move(_parent); }
 
    protected:
     virtual void build() = 0;
     virtual void renderBackground(render::Canvas& canvas) const;
     virtual void renderContent(render::Canvas& canvas) const {}
 
+    // 主選單沒有可以回去的地方
+    virtual bool closesOnEscape() const { return true; }
+
     Game& game() { return _game; }
+    const Game& game() const { return _game; }
     int width() const { return _width; }
     int height() const { return _height; }
+
+    // 標題下緣的 y 座標，供子類別安排下方的內容。
+    int titleBottom() const;
 
     void addButton(const BoundingBox& bounds, const std::string& label, gui::Button::PressHandler onPress);
 
@@ -48,9 +66,13 @@ class Screen {
 
    private:
     Game& _game;
+    std::string _title;
+    std::unique_ptr<Screen> _parent;
+
     int _width = 0;
     int _height = 0;
     std::vector<gui::Button> _buttons;
+    int _focusedButton = -1;  // -1：尚未用鍵盤選擇
 };
 
 }  // namespace robot::game

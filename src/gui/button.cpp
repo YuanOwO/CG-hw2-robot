@@ -27,18 +27,27 @@ bool Button::mouseUp(Point position) {
     _armed = false;
     _hovered = contains(position);
 
-    if (wasArmed && _hovered && _onPress) {
-        _onPress();
+    if (wasArmed && _hovered) {
+        press();
     }
     return wasArmed;
 }
 
-void Button::render(render::Canvas& canvas) const {
+void Button::press() {
+    if (_onPress) {
+        _onPress();
+    }
+}
+
+void Button::render(render::Canvas& canvas, bool focused) const {
     const ColorRGBA& fill = _armed && _hovered ? _style.pressed : _hovered ? _style.hovered : _style.fill;
+    const ColorRGBA& border = focused ? _style.focusBorder : _style.border;
+    const int borderWidth = focused ? 2 : 1;
     const int radius = _style.cornerRadius;
 
-    canvas.fillRoundedRect(_bounds.x + 1, _bounds.y + 1, _bounds.width - 2, _bounds.height - 2, radius - 1, fill);
-    canvas.strokeRoundedRect(_bounds.x, _bounds.y, _bounds.width, _bounds.height, radius, 1, _style.border);
+    canvas.fillRoundedRect(_bounds.x + borderWidth, _bounds.y + borderWidth, _bounds.width - 2 * borderWidth,
+                           _bounds.height - 2 * borderWidth, radius - borderWidth, fill);
+    canvas.strokeRoundedRect(_bounds.x, _bounds.y, _bounds.width, _bounds.height, radius, borderWidth, border);
 
     const Point center(_bounds.x + _bounds.width / 2.0f, _bounds.y + _bounds.height / 2.0f);
     canvas.drawText(_label, _style.font, _style.text, center, {render::TextAlign::CENTER, render::TextAlign::CENTER});

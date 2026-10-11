@@ -7,6 +7,7 @@
 
 #include "common/color.hpp"
 #include "font/font.hpp"
+#include "game/screens/pause_screen.hpp"
 #include "game/screens/title_screen.hpp"
 #include "render/canvas.hpp"
 #include "render/stage.hpp"
@@ -27,8 +28,13 @@ Game::Game(engine::Engine& engine) : _engine(engine) {
 Game::~Game() = default;
 
 void Game::startWorld() {
-    _pendingStartWorld = true;
+    _pendingWorld = WorldChange::Start;
     setScreen(nullptr);
+}
+
+void Game::quitToTitle() {
+    _pendingWorld = WorldChange::Unload;
+    setScreen(std::make_unique<TitleScreen>(*this));
 }
 
 void Game::quit() {
@@ -36,23 +42,41 @@ void Game::quit() {
 }
 
 void Game::setScreen(std::unique_ptr<Screen> screen) {
-    _pendingScreen = std::move(screen);
+    _pendingScreen = ScreenChange{std::move(screen), false};
+}
+
+void Game::openChildScreen(std::unique_ptr<Screen> screen) {
+    _pendingScreen = ScreenChange{std::move(screen), true};
 }
 
 void Game::applyPendingChanges() {
-    if (_pendingStartWorld) {
+    switch (_pendingWorld) {
+    case WorldChange::Start:
         _world = std::make_unique<World>();
-        _pendingStartWorld = false;
+        break;
+    case WorldChange::Unload:
+        _world.reset();
+        break;
+    case WorldChange::None:
+        break;
+    }
+    _pendingWorld = WorldChange::None;
+
+    if (!_pendingScreen) {
+        return;
     }
 
-    if (_pendingScreen) {
-        _screen = std::move(*_pendingScreen);  // 舊畫面在這裡銷毀
-        _pendingScreen.reset();
+    ScreenChange change = std::move(*_pendingScreen);
+    _pendingScreen.reset();
 
-        if (_screen) {
-            _screen->init(_engine.width(), _engine.height());
-            _screen->mouseMove(_engine.input().mouse().position());
-        }
+    if (change.asChild && change.screen) {
+        change.screen->setParent(std::move(_screen));
+    }
+    _screen = std::move(change.screen);  // 沒有交給新畫面保管的舊畫面在這裡銷毀
+
+    if (_screen) {
+        _screen->init(_engine.width(), _engine.height());
+        _screen->mouseMove(_engine.input().mouse().position());
     }
 }
 
@@ -84,6 +108,15 @@ void Game::onResize(int width, int height) {
         _screen->init(width, height);
         _screen->mouseMove(_engine.input().mouse().position());
     }
+}
+
+void Game::onKeyDown(Key key, bool repeat) {
+    if (_screen) {
+        _screen->keyDown(key, repeat);
+    } else if (_world && key == Key::Escape && !repeat) {
+        setScreen(std::make_unique<PauseScreen>(*this));
+    }
+    applyPendingChanges();
 }
 
 void Game::onMouseDown(MouseButton button, Point position) {
