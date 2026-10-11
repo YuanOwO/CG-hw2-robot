@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <initializer_list>
 #include <limits>
+#include <utility>
 #include <vector>
 
 #include "platform/glut.hpp"
@@ -62,6 +63,26 @@ void pixelRect(int x, int y, int width) {
     glVertex2i(x + width, y);
     glVertex2i(x + width, y + 1);
     glVertex2i(x, y + 1);
+}
+
+// 圓角矩形在第 row 列 (0 <= row < height) 的水平範圍，以相對於矩形左緣的 [left, right] 表示。
+// radius 須已限制在 (min(width, height) - 1) / 2 以內，extents 為 rowExtents(radius, true)。
+std::pair<int, int> roundedRowSpan(int width, int height, int radius, const std::vector<int>& extents, int row) {
+    // dy 為此列到最近圓心列的距離；位於上下圓心之間的列 dy = 0，整列填滿。
+    int dy = 0;
+    if (row < radius) {
+        dy = radius - row;
+    } else if (row > height - 1 - radius) {
+        dy = row - (height - 1 - radius);
+    }
+
+    // 左右圓角的圓心欄位；中間的直邊由兩者之間的水平區段自然連接。
+    return {radius - extents[dy], width - 1 - radius + extents[dy]};
+}
+
+// 圓心落在像素中心，直徑為 2r + 1 像素；限制半徑讓上下、左右兩側的圓角不會交疊。
+int clampCornerRadius(int width, int height, int radius) {
+    return std::clamp(radius, 0, (std::min(width, height) - 1) / 2);
 }
 
 }  // namespace
@@ -169,29 +190,54 @@ void RenderContext::fillRoundedRect(int x, int y, int width, int height, int rad
         return;
     }
 
-    // 圓心落在像素中心，直徑為 2r + 1 像素；限制半徑讓上下、左右兩側的圓角不會交疊。
-    radius = std::clamp(radius, 0, (std::min(width, height) - 1) / 2);
+    radius = clampCornerRadius(width, height, radius);
     const std::vector<int> extents = rowExtents(radius, true);
-
-    // 左右圓角的圓心欄位；中間的直邊由兩者之間的水平區段自然連接。
-    const int leftCenter = x + radius;
-    const int rightCenter = x + width - 1 - radius;
 
     glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT | GL_POLYGON_BIT);
     beginPixels(color);
 
     for (int row = 0; row < height; row++) {
-        // dy 為此列到最近圓心列的距離；位於上下圓心之間的列 dy = 0，整列填滿。
-        int dy = 0;
-        if (row < radius) {
-            dy = radius - row;
-        } else if (row > height - 1 - radius) {
-            dy = row - (height - 1 - radius);
+        const auto [left, right] = roundedRowSpan(width, height, radius, extents, row);
+        pixelRect(x + left, y + row, right - left + 1);
+    }
+
+    glEnd();
+    glPopAttrib();
+}
+
+void RenderContext::strokeRoundedRect(int x, int y, int width, int height, int radius, int thickness,
+                                      const ColorRGBA& color) {
+    if (width <= 0 || height <= 0 || thickness <= 0 || color.a <= 0.0f) {
+        return;
+    }
+
+    radius = clampCornerRadius(width, height, radius);
+    const std::vector<int> outerExtents = rowExtents(radius, true);
+
+    // 內圓角矩形與 fillRoundedRect(x + t, y + t, ...) 使用相同的像素，兩者可無縫拼接。
+    const int innerWidth = width - 2 * thickness;
+    const int innerHeight = height - 2 * thickness;
+    const bool hasInner = innerWidth > 0 && innerHeight > 0;
+    const int innerRadius = hasInner ? clampCornerRadius(innerWidth, innerHeight, radius - thickness) : 0;
+    const std::vector<int> innerExtents = rowExtents(innerRadius, true);
+
+    glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT | GL_POLYGON_BIT);
+    beginPixels(color);
+
+    for (int row = 0; row < height; row++) {
+        const auto [left, right] = roundedRowSpan(width, height, radius, outerExtents, row);
+        const int innerRow = row - thickness;
+
+        if (!hasInner || innerRow < 0 || innerRow >= innerHeight) {
+            pixelRect(x + left, y + row, right - left + 1);  // 上下邊框整列填滿
+            continue;
         }
 
-        const int left = leftCenter - extents[dy];
-        const int right = rightCenter + extents[dy];
-        pixelRect(left, y + row, right - left + 1);
+        // 中間列只畫內圓角矩形左右兩側的區段。
+        const auto [innerLeft, innerRight] =
+            roundedRowSpan(innerWidth, innerHeight, innerRadius, innerExtents, innerRow);
+        pixelRect(x + left, y + row, thickness + innerLeft - left);
+        pixelRect(x + thickness + innerRight + 1, y + row, right - (thickness + innerRight));
     }
 
     glEnd();

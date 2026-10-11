@@ -8,7 +8,6 @@
 
 #include "common/color.hpp"
 #include "event/events.hpp"
-#include "render/renderer/input_renderer.hpp"
 #include "ui/element.hpp"
 #include "ui/theme.hpp"
 
@@ -57,7 +56,7 @@ class InputElement : public Element {
     const InputStyle& style() const { return _style; }
     void setStyle(const InputStyle& style) {
         _style = style;
-        invalidateDisplay();
+        updateVisualState();
     }
 
     void setOnValueChanged(ValueChangedHandler handler);
@@ -67,7 +66,6 @@ class InputElement : public Element {
 
     void arrangeContent(const BoundingBox& contentBounds) override;
 
-    void renderContent(render::RenderContext& context) override;
     void renderOverlay(render::RenderContext& context) override;
     void update(std::chrono::milliseconds delta) override;
 
@@ -91,7 +89,6 @@ class InputElement : public Element {
     bool _unicodeInputActive = false;
     std::string _unicodeDigits;
 
-    render::InputRenderer _renderer;
     InputStyle _style;
     TextElement* _textElement = nullptr;
     ValueChangedHandler _onValueChanged;
@@ -100,6 +97,9 @@ class InputElement : public Element {
     void handleTextInput(TextInputEvent& event);
     void commitUnicodeInput();
     void resetCursorBlink();
+
+    // 依 focus 狀態把對應的 style 套用到 Element 的外觀屬性。
+    void updateVisualState();
 
     void rebuildValue();
     void updateDisplayedText();

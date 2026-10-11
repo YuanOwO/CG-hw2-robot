@@ -76,8 +76,20 @@ class Element : public EventTarget {
     bool isFocusable() const { return _focusable; }
     void setFocusable(bool focusable);
 
+    // 外觀：背景與邊框由 Element 統一繪製，子類別只需在狀態改變時更新這些屬性。
+    // 邊框畫在元素範圍內側，不影響佈局；需要時以 padding 預留空間。
+
     const ColorRGBA& backgroundColor() const { return _backgroundColor; }
     void setBackgroundColor(const ColorRGBA& color);
+
+    const ColorRGBA& borderColor() const { return _borderColor; }
+    void setBorderColor(const ColorRGBA& color);
+
+    int borderWidth() const { return _borderWidth; }
+    void setBorderWidth(int width);
+
+    int cornerRadius() const { return _cornerRadius; }
+    void setCornerRadius(int radius);
 
     // Tree
 
@@ -140,6 +152,11 @@ class Element : public EventTarget {
     // Rendering
 
     ColorRGBA _backgroundColor = Color::Transparent;
+    ColorRGBA _borderColor = Color::Transparent;
+    int _borderWidth = 0;
+    int _cornerRadius = 0;
+
+    void renderBox(render::RenderContext& context) const;
     void render(render::RenderContext& context);
     void updateTree(std::chrono::milliseconds delta);
 

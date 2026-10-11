@@ -11,15 +11,18 @@ namespace robot::ui {
 ButtonElement::ButtonElement(ClickHandler onClick) : _onClick(std::move(onClick)) {
     setPadding({8, 4, 8, 4});
     setFocusable(true);
+    setBorderWidth(1);
+    setCornerRadius(7);
+    updateVisualState();
 
     addEventListener<HoverEvent>([this](HoverEvent& event) {
         _hovered = true;
-        invalidateDisplay();
+        updateVisualState();
     });
 
     addEventListener<UnhoverEvent>([this](UnhoverEvent& event) {
         _hovered = false;
-        invalidateDisplay();
+        updateVisualState();
     });
 
     addEventListener<MouseDownEvent>([this](MouseDownEvent& event) {
@@ -29,7 +32,7 @@ ButtonElement::ButtonElement(ClickHandler onClick) : _onClick(std::move(onClick)
 
         _pressed = true;
         captureMouse();
-        invalidateDisplay();
+        updateVisualState();
     });
 
     addEventListener<MouseUpEvent>([this](MouseUpEvent& event) {
@@ -39,7 +42,7 @@ ButtonElement::ButtonElement(ClickHandler onClick) : _onClick(std::move(onClick)
 
         _pressed = false;
         releaseMouseCapture();
-        invalidateDisplay();
+        updateVisualState();
     });
 
     addEventListener<MouseMoveEvent>([this](MouseMoveEvent& event) {
@@ -51,7 +54,7 @@ ButtonElement::ButtonElement(ClickHandler onClick) : _onClick(std::move(onClick)
         // 如果滑鼠移動到按鈕外部，則取消按下狀態。
         if (!contains(event.position())) {
             _pressed = false;
-            invalidateDisplay();
+            updateVisualState();
         }
     });
 
@@ -93,8 +96,9 @@ void ButtonElement::arrangeContent(const BoundingBox& contentBounds) {
     child->arrange(contentBounds);
 }
 
-void ButtonElement::renderContent(render::RenderContext& context) {
-    _renderer.render(context, *this);
+void ButtonElement::updateVisualState() {
+    setBackgroundColor(_pressed ? _style.pressed : _hovered ? _style.hovered : _style.background);
+    setBorderColor(_style.border);
 }
 
 }  // namespace robot::ui

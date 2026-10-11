@@ -4,7 +4,6 @@
 
 #include "common/color.hpp"
 #include "font/font.hpp"
-#include "render/renderer/text_renderer.hpp"
 #include "ui/element.hpp"
 
 namespace robot::ui {
@@ -53,7 +52,6 @@ class TextElement : public Element {
     std::string _text;
     FontStyle _fontStyle;
     ColorRGBA _color;
-    render::TextRenderer _renderer;
 };
 
 }  // namespace robot::ui

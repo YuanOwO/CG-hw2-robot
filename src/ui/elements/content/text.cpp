@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include "common/point.hpp"
+
 namespace robot::ui {
 
 Size TextElement::measureContent(const Size& availableSize) {
@@ -9,12 +11,12 @@ Size TextElement::measureContent(const Size& availableSize) {
     float width = getFontWidth(_fontStyle, _text);
     float height = getFontHeight(_fontStyle, _text);
 
-    return Size(static_cast<int>(std::ceil(width)), static_cast<int>(std::ceil(height)));
+    return Size(std::ceil(width), std::ceil(height));
 }
 
 void TextElement::renderContent(render::RenderContext& context) {
-    // 使用 TextRenderer 來渲染文字
-    _renderer.render(context, *this);
+    const Point origin(padding().left, padding().top);
+    context.drawText(_text, _fontStyle, _color, origin);
 }
 
 }  // namespace robot::ui

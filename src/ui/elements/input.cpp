@@ -35,6 +35,8 @@ InputElement::InputElement(std::string value, std::string placeholder) : _placeh
     setFocusable(true);
     setPadding({8, 4, 8, 4});
     setPreferredSize({180, 36});
+    setBorderWidth(1);
+    updateVisualState();
 
     auto text = std::make_unique<TextElement>("", theme::BodyFont);
     _textElement = text.get();
@@ -44,12 +46,14 @@ InputElement::InputElement(std::string value, std::string placeholder) : _placeh
 
     addEventListener<FocusEvent>([this](FocusEvent&) {
         _focused = true;
+        updateVisualState();
         resetCursorBlink();
         updateDisplayedText();
     });
 
     addEventListener<BlurEvent>([this](BlurEvent&) {
         _focused = false;
+        updateVisualState();
         _cursorVisible = false;
         _cursorElapsed = std::chrono::milliseconds{0};
         _unicodeInputActive = false;
@@ -134,12 +138,25 @@ void InputElement::arrangeContent(const BoundingBox& contentBounds) {
     _textElement->arrange(contentBounds);
 }
 
-void InputElement::renderContent(render::RenderContext& context) {
-    _renderer.render(context, *this);
+void InputElement::renderOverlay(render::RenderContext& context) {
+    if (!_focused || !_cursorVisible) {
+        return;
+    }
+
+    const int height = cursorHeight();
+    if (height <= 0) {
+        return;
+    }
+
+    context.pushTransform();
+    context.translate(cursorX(), cursorY());
+    context.fillRect(1, height, _style.cursor);
+    context.popTransform();
 }
 
-void InputElement::renderOverlay(render::RenderContext& context) {
-    _renderer.renderCursor(context, *this);
+void InputElement::updateVisualState() {
+    setBackgroundColor(_style.background);
+    setBorderColor(_focused ? _style.focusedBorder : _style.border);
 }
 
 void InputElement::update(std::chrono::milliseconds delta) {

@@ -357,6 +357,32 @@ void Element::setBackgroundColor(const ColorRGBA& color) {
     invalidateDisplay();
 }
 
+void Element::setBorderColor(const ColorRGBA& color) {
+    if (_borderColor == color) {
+        return;
+    }
+    _borderColor = color;
+    invalidateDisplay();
+}
+
+void Element::setBorderWidth(int width) {
+    width = std::max(width, 0);
+    if (_borderWidth == width) {
+        return;
+    }
+    _borderWidth = width;
+    invalidateDisplay();
+}
+
+void Element::setCornerRadius(int radius) {
+    radius = std::max(radius, 0);
+    if (_cornerRadius == radius) {
+        return;
+    }
+    _cornerRadius = radius;
+    invalidateDisplay();
+}
+
 void Element::invalidateDisplay() {
     if (auto* w = window()) {
         w->requestRedisplay();
@@ -372,7 +398,7 @@ void Element::render(render::RenderContext& context) {
 
     context.translate(static_cast<float>(x()), static_cast<float>(y()));  // 將原點移動到目前元素的局部座標
 
-    context.fillRect(width(), height(), _backgroundColor);
+    renderBox(context);
     renderContent(context);
 
     for (const auto& child : children()) {
@@ -385,6 +411,25 @@ void Element::render(render::RenderContext& context) {
     renderOverlay(context);
 
     context.popTransform();  // 恢復父元素的座標系
+}
+
+void Element::renderBox(render::RenderContext& context) const {
+    // 背景填在邊框內側，邊框只畫外圈，半透明背景不會被邊框色蓋住。
+    const int inset = _borderWidth;
+    const int innerWidth = width() - 2 * inset;
+    const int innerHeight = height() - 2 * inset;
+    const int innerRadius = std::max(_cornerRadius - inset, 0);
+
+    if (innerRadius == 0) {
+        context.pushTransform();
+        context.translate(static_cast<float>(inset), static_cast<float>(inset));
+        context.fillRect(innerWidth, innerHeight, _backgroundColor);
+        context.popTransform();
+    } else {
+        context.fillRoundedRect(inset, inset, innerWidth, innerHeight, innerRadius, _backgroundColor);
+    }
+
+    context.strokeRoundedRect(0, 0, width(), height(), _cornerRadius, _borderWidth, _borderColor);
 }
 
 void Element::updateTree(std::chrono::milliseconds delta) {

@@ -1,5 +1,3 @@
-#include "render/renderer/text_renderer.hpp"
-
 #include <cstddef>
 #include <cstdint>
 #include <variant>
@@ -7,9 +5,10 @@
 
 #include "common/point.hpp"
 #include "common/utf8.hpp"
+#include "font/font.hpp"
 #include "font/gfnt_font.hpp"
 #include "platform/glut.hpp"
-#include "ui/elements.hpp"
+#include "render/render_context.hpp"
 
 namespace robot::render {
 
@@ -159,15 +158,8 @@ void renderGfnt(RenderContext& context, const std::string& text, const GfntFontS
 
 }  // namespace
 
-void TextRenderer::render(RenderContext& context, const ui::TextElement& element) {
-    const auto& padding = element.padding();
-    const Point origin{static_cast<float>(padding.left), static_cast<float>(padding.top)};
-
-    drawText(context, element.text(), element.fontStyle(), element.color(), origin);
-}
-
-void TextRenderer::drawText(RenderContext& context, const std::string& text, const FontStyle& fontStyle,
-                            const ColorRGBA& color, const Point& origin) {
+void RenderContext::drawText(const std::string& text, const FontStyle& fontStyle, const ColorRGBA& color,
+                             const Point& origin) {
     if (text.empty()) {
         return;
     }
@@ -180,9 +172,9 @@ void TextRenderer::drawText(RenderContext& context, const std::string& text, con
         renderBitmap(text, *bitmap, origin.x, origin.y);
     } else if (const auto* stroke = std::get_if<StrokeFontStyle>(&fontStyle)) {
         glLineWidth(1.0f);
-        renderStroke(context, text, *stroke, origin.x, origin.y);
+        renderStroke(*this, text, *stroke, origin.x, origin.y);
     } else if (const auto* gfnt = std::get_if<GfntFontStyle>(&fontStyle)) {
-        renderGfnt(context, text, *gfnt, origin.x, origin.y);
+        renderGfnt(*this, text, *gfnt, origin.x, origin.y);
     }
 
     glPopAttrib();

@@ -3,7 +3,6 @@
 #include <functional>
 
 #include "common/color.hpp"
-#include "render/renderer/button_renderer.hpp"
 #include "ui/element.hpp"
 #include "ui/theme.hpp"
 
@@ -27,21 +26,22 @@ class ButtonElement : public Element {
     const ButtonStyle& style() const { return _style; }
     void setStyle(const ButtonStyle& style) {
         _style = style;
-        invalidateDisplay();
+        updateVisualState();
     }
 
    protected:
     Size measureContent(const Size& availableSize) override;
     void arrangeContent(const BoundingBox& contentBounds) override;
-    void renderContent(render::RenderContext& context) override;
 
    private:
-    render::ButtonRenderer _renderer;
     ClickHandler _onClick;
     ButtonStyle _style;
 
     bool _hovered = false;
     bool _pressed = false;
+
+    // 依 hover / pressed 狀態把對應的 style 套用到 Element 的外觀屬性。
+    void updateVisualState();
 };
 
 }  // namespace robot::ui

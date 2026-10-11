@@ -1,6 +1,10 @@
 #pragma once
 
+#include <string>
+
 #include "common/color.hpp"
+#include "common/point.hpp"
+#include "font/font.hpp"
 
 namespace robot::render {
 
@@ -22,6 +26,13 @@ class RenderContext {
 
     // 填滿左上角為 (x, y)、寬高為 width x height 像素的圓角矩形；圓角以中點畫圓法逐列計算。
     void fillRoundedRect(int x, int y, int width, int height, int radius, const ColorRGBA& color);
+
+    // 繪製圓角矩形外框：只填滿外框與內縮 thickness 像素後的內圓角矩形之間的區域，內部保持不變。
+    // 內圓角半徑為 radius - thickness；radius 為 0 時即為直角外框。
+    void strokeRoundedRect(int x, int y, int width, int height, int radius, int thickness, const ColorRGBA& color);
+
+    // 以 origin 為文字框左上角繪製多行文字；換行字元 '\n' 會回到 origin.x 並下移一行。
+    void drawText(const std::string& text, const FontStyle& fontStyle, const ColorRGBA& color, const Point& origin);
 };
 
 }  // namespace robot::render
