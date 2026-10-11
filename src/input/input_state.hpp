@@ -5,10 +5,16 @@
 #include "common/point.hpp"
 #include "input/input_types.hpp"
 
+namespace robot::engine {
+class Input;
+}
+
 namespace robot {
 
 template <typename ButtonType>
 class InputState {
+    friend class engine::Input;
+
    public:
     bool isDown(ButtonType button) const;
     bool isUp(ButtonType button) const;
@@ -52,6 +58,8 @@ class KeyboardState : public InputState<Key> {
 };
 
 class MouseState : public InputState<MouseButton> {
+    friend class engine::Input;
+
    public:
     using InputState<MouseButton>::InputState;
 

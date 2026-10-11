@@ -77,7 +77,10 @@ void Engine::frame() {
 
     // 每累積滿一個 tick 的時間就執行一次，剩下的留給下一幀
     while (_accumulator >= TICK_DURATION) {
-        _app->tick(TICK_SECONDS);
+        _input.beginTick();
+        _app->tick(TICK_SECONDS, _input);
+        _input.endTick();
+
         _accumulator -= TICK_DURATION;
         _tickCount++;
     }
@@ -124,6 +127,8 @@ void Engine::onReshape(int width, int height) {
 void Engine::onVisibility(int state) {
     if (state == GLUT_VISIBLE) {
         _displayedFrame = -1;  // 重新顯示時強制重畫
+    } else if (state == GLUT_NOT_VISIBLE) {
+        _input.clear();  // 隱藏時可能收不到放開事件，避免卡鍵
     }
 }
 
@@ -148,5 +153,79 @@ void Engine::onDisplay() {
 }
 
 #pragma endregion  // Window callbacks
+
+#pragma region Keyboard callbacks
+
+Key Engine::mapKeyboardKey(unsigned char key) const {
+    // 按住 Ctrl 時 GLUT 送出的是控制字元（例如 Ctrl+A 是 1），需要另外對應回字母鍵
+    return _input.keyboard().isCtrlDown() ? mapCharacterWithCtrl(key) : mapCharacter(key);
+}
+
+void Engine::onKeyboard(unsigned char key, int x, int y) {
+    const Key mapped = mapKeyboardKey(key);
+    if (mapped == Key::Unknown) {
+        return;
+    }
+    _input.moveMouse(x, y);
+    _input.keyDown(mapped);
+}
+
+void Engine::onKeyboardUp(unsigned char key, int x, int y) {
+    const Key mapped = mapKeyboardKey(key);
+    if (mapped == Key::Unknown) {
+        return;
+    }
+    _input.moveMouse(x, y);
+    _input.keyUp(mapped);
+}
+
+void Engine::onSpecial(int key, int x, int y) {
+    const Key mapped = mapSpecialKey(key);
+    if (mapped == Key::Unknown) {
+        return;
+    }
+    _input.moveMouse(x, y);
+    _input.keyDown(mapped);
+}
+
+void Engine::onSpecialUp(int key, int x, int y) {
+    const Key mapped = mapSpecialKey(key);
+    if (mapped == Key::Unknown) {
+        return;
+    }
+    _input.moveMouse(x, y);
+    _input.keyUp(mapped);
+}
+
+#pragma endregion  // Keyboard callbacks
+
+#pragma region Mouse callbacks
+
+void Engine::onMouse(int button, int state, int x, int y) {
+    const MouseButton mapped = mapMouseButton(button);
+    if (mapped == MouseButton::Unknown) {
+        return;
+    }
+    _input.moveMouse(x, y);
+    if (state == GLUT_DOWN) {
+        _input.mouseDown(mapped);
+    } else if (state == GLUT_UP) {
+        _input.mouseUp(mapped);
+    }
+}
+
+void Engine::onMotion(int x, int y) {
+    _input.moveMouse(x, y);
+}
+
+void Engine::onPassiveMotion(int x, int y) {
+    _input.moveMouse(x, y);
+}
+
+void Engine::onEntry(int state) {
+    _input.clearMouseButtons();  // 進入或離開視窗時，可能錯過放開事件
+}
+
+#pragma endregion  // Mouse callbacks
 
 }  // namespace robot::engine

@@ -21,7 +21,7 @@ const FontStyle HUD_FONT = GfntFontStyle{GfntFontId::UNIFONT_16};
 
 Game::Game(engine::Engine& engine) : _engine(engine) {}
 
-void Game::tick(float dt) {
+void Game::tick(float dt, const engine::Input& input) {
     _angle = std::fmod(_angle + ROTATION_SPEED * dt, 360.0f);
 }
 

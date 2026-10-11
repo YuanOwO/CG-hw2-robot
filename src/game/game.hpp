@@ -11,7 +11,7 @@ class Game : public engine::Application {
    public:
     explicit Game(engine::Engine& engine);
 
-    void tick(float dt) override;
+    void tick(float dt, const engine::Input& input) override;
     void render() override;
 
    private:

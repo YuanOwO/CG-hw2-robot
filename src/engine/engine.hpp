@@ -4,6 +4,7 @@
 #include <string>
 
 #include "engine/application.hpp"
+#include "engine/input.hpp"
 #include "platform/platform.hpp"
 
 namespace robot::engine {
@@ -45,6 +46,7 @@ class Engine : private platform::WindowHandler {
     int _height;
 
     Application* _app = nullptr;
+    Input _input;
 
     Clock::time_point _lastFrame;
     Clock::duration _accumulator{0};  // 尚未用來執行 tick 的時間
@@ -64,6 +66,8 @@ class Engine : private platform::WindowHandler {
     void frame();
     void updateStats(Clock::time_point now);
 
+    Key mapKeyboardKey(unsigned char key) const;
+
     // platform::WindowHandler
 
     void onClose() override;
@@ -71,15 +75,15 @@ class Engine : private platform::WindowHandler {
     void onVisibility(int state) override;
     void onDisplay() override;
 
-    void onKeyboard(unsigned char key, int x, int y) override {}
-    void onKeyboardUp(unsigned char key, int x, int y) override {}
-    void onSpecial(int key, int x, int y) override {}
-    void onSpecialUp(int key, int x, int y) override {}
+    void onKeyboard(unsigned char key, int x, int y) override;
+    void onKeyboardUp(unsigned char key, int x, int y) override;
+    void onSpecial(int key, int x, int y) override;
+    void onSpecialUp(int key, int x, int y) override;
 
-    void onMouse(int button, int state, int x, int y) override {}
-    void onMotion(int x, int y) override {}
-    void onPassiveMotion(int x, int y) override {}
-    void onEntry(int state) override {}
+    void onMouse(int button, int state, int x, int y) override;
+    void onMotion(int x, int y) override;
+    void onPassiveMotion(int x, int y) override;
+    void onEntry(int state) override;
 };
 
 }  // namespace robot::engine
