@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "math/constants.hpp"
-#include "math/vec2d.hpp"
+#include "math/vec2.hpp"
 
 namespace robot {
 
@@ -20,7 +20,7 @@ struct Point {
     }
     bool operator!=(const Point& other) const { return !(*this == other); }
 
-    Vec2D operator-(const Point& other) const { return Vec2D(x - other.x, y - other.y); }
+    Vec2 operator-(const Point& other) const { return Vec2(x - other.x, y - other.y); }
 };
 
 }  // namespace robot

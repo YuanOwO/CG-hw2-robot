@@ -53,7 +53,7 @@ src/
 ├── font/       字型樣式、GLUT 字型對應、文字度量與 GFNT 字型
 ├── input/      輸入狀態與快捷鍵管理
 ├── io/         檔案讀寫（GFNT 字型等）
-├── math/       向量與數學常數
+├── math/       向量、數學常數與角度轉換、內插等工具函式
 ├── platform/   GLUT 平台層：FreeGLUT 與 Apple GLUT 的差異
 ├── render/     Render Context 與各元件的 Renderer
 └── ui/         元素樹、版面配置、選單與主題

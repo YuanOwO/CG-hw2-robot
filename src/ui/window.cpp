@@ -525,7 +525,7 @@ void Window::onMouse(int button, int state, int x, int y) {
         // 判斷是否為點擊事件
         // 如果滑鼠按下和釋放的位置距離小於閾值，則認為是點擊事件
         auto& press = _clickCandidate[btn];
-        const bool isClick = press.active && abs(_mouseState.position() - press.position) <= CLICK_MOVE_THRESHOLD;
+        const bool isClick = press.active && length(_mouseState.position() - press.position) <= CLICK_MOVE_THRESHOLD;
 
         // 重置滑鼠按下狀態。須在派送事件前完成：事件處理可能開啟 modal 視窗，
         // setModal 會清空 _clickCandidate，使 press 失效
@@ -542,7 +542,7 @@ void Window::onMouse(int button, int state, int x, int y) {
             const Point position = _mouseState.position();
 
             const bool isDoubleClick = lastClick.active && now - lastClick.time <= DOUBLE_CLICK_TIME_THRESHOLD &&
-                                       abs(position - lastClick.position) <= CLICK_MOVE_THRESHOLD;
+                                       length(position - lastClick.position) <= CLICK_MOVE_THRESHOLD;
 
             if (isDoubleClick) {
                 lastClick.active = false;  // 重置上一次點擊事件，避免三擊事件被誤判為雙擊事件
@@ -573,7 +573,7 @@ void Window::mouseMoveHandler(int x, int y) {
 
     // 移動距離超過閾值，則取消所有滑鼠按下狀態，避免誤判為點擊事件
     for (auto& [button, press] : _clickCandidate) {
-        if (press.active && abs(_mouseState.position() - press.position) > CLICK_MOVE_THRESHOLD) {
+        if (press.active && length(_mouseState.position() - press.position) > CLICK_MOVE_THRESHOLD) {
             press.active = false;
         }
     }
