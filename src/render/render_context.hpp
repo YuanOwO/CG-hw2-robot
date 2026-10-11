@@ -12,6 +12,14 @@ class RenderContext {
    public:
     ~RenderContext() = default;
 
+    // 繪圖表面（視窗）的像素尺寸；由 Renderer 在每幀設定，供需要換算 OpenGL 視窗座標的繪製使用。
+    int surfaceWidth() const { return _surfaceWidth; }
+    int surfaceHeight() const { return _surfaceHeight; }
+    void setSurfaceSize(int width, int height) {
+        _surfaceWidth = width;
+        _surfaceHeight = height;
+    }
+
     void pushTransform();  // 保存目前的座標轉換狀態
     void popTransform();   // 恢復上一個座標轉換狀態
 
@@ -33,6 +41,10 @@ class RenderContext {
 
     // 以 origin 為文字框左上角繪製多行文字；換行字元 '\n' 會回到 origin.x 並下移一行。
     void drawText(const std::string& text, const FontStyle& fontStyle, const ColorRGBA& color, const Point& origin);
+
+   private:
+    int _surfaceWidth = 0;
+    int _surfaceHeight = 0;
 };
 
 }  // namespace robot::render

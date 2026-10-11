@@ -8,4 +8,5 @@
 #include "ui/elements/containers/stack_panel.hpp"
 #include "ui/elements/content/text.hpp"
 #include "ui/elements/input.hpp"
+#include "ui/elements/viewport.hpp"
 // IWYU pragma: end_exports

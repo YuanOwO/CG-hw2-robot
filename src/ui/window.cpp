@@ -5,7 +5,6 @@
 
 #include "platform/glut.hpp"
 #include "platform/platform.hpp"
-#include "render/render_context.hpp"
 #include "ui/elements.hpp"
 
 namespace robot::ui {
@@ -184,14 +183,6 @@ void Window::ensureLayout() {
 
 #pragma region Rendering
 
-void Window::render() {
-    ensureLayout();  // 確保佈局是最新的
-
-    render::RenderContext context;
-
-    _rootElement->render(context);
-}
-
 void Window::requestRedisplay() {
     // 如果視窗已經關閉，直接返回
     if (_id == 0) {
@@ -324,19 +315,6 @@ void Window::onReshape(int width, int height) {
     _width = width;
     _height = height;
 
-    // 零尺寸 viewport 合法，表示沒有可繪製的區域。
-    glViewport(0, 0, width, height);
-
-    // glOrtho 的左右、上下界不能相等。
-    if (width > 0 && height > 0) {
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(0.0, static_cast<GLdouble>(width), static_cast<GLdouble>(height), 0.0, -1.0, 1.0);
-
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-    }
-
     WindowResizeEvent event(width, height);
 
     dispatchEvent(event);
@@ -357,10 +335,13 @@ void Window::onVisibility(int state) {
 
 void Window::onDisplay() {
     // 雙緩衝下 back buffer 的內容在 swap 後未定義，因此每次都完整重繪，不再快取畫面。
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);  // 設置背景色為白色
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _renderer.beginFrame(_width, _height, Color::White);
 
-    render();  // 渲染視窗內容
+    ensureLayout();  // 確保佈局是最新的
+
+    // 3D 場景由 ViewportElement 在介面繪製途中嵌入，依介面樹的順序與其他元件互相覆蓋。
+    _renderer.begin2D();
+    _rootElement->render(_renderer.canvas());
 
     // 交換前後緩衝區，顯示這一幀
     glutSwapBuffers();

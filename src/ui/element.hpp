@@ -5,12 +5,12 @@
 #include <utility>
 #include <vector>
 
+#include "common/bounding_box.hpp"
 #include "common/color.hpp"
 #include "common/point.hpp"
 #include "render/render_context.hpp"
 #include "ui/event_target.hpp"
 #include "ui/layout/alignment.hpp"
-#include "ui/layout/bounding.hpp"
 #include "ui/layout/size.hpp"
 #include "ui/layout/thickness.hpp"
 

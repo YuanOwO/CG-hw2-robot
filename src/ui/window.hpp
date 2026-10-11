@@ -10,6 +10,7 @@
 #include "input/input_state.hpp"
 #include "input/input_types.hpp"
 #include "platform/platform.hpp"
+#include "render/renderer.hpp"
 #include "ui/event_target.hpp"
 
 namespace robot::ui {
@@ -86,8 +87,6 @@ class Window : public EventTarget, private platform::WindowHandler {
 
     // Rendering
 
-    void render();
-
     void requestRedisplay();
 
     // 每次 timer 觸發時呼叫（約 60 次 / 秒），在元素樹更新之前；delta 為實際經過的時間
@@ -143,6 +142,8 @@ class Window : public EventTarget, private platform::WindowHandler {
     bool _layoutDirty = true;
 
     // Rendering
+
+    render::Renderer _renderer;
 
     // 上一次 timer 觸發的時間，用來計算實際經過的時間
     std::chrono::steady_clock::time_point _lastUpdate = std::chrono::steady_clock::now();

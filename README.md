@@ -55,7 +55,7 @@ src/
 ├── io/         檔案讀寫（GFNT 字型等）
 ├── math/       向量、數學常數與角度轉換、內插等工具函式
 ├── platform/   GLUT 平台層：FreeGLUT 與 Apple GLUT 的差異
-├── render/     2D 繪圖基本操作（RenderContext：矩形、圓角、文字）
+├── render/     繪製流程（Renderer）、相機與投影參數、在介面中嵌入 3D 場景（Scene3DScope）、2D 繪圖（RenderContext）
 └── ui/         元素樹、版面配置、選單與主題
 assets/fonts/   Cubic 11 與 Unifont 的 GFNT 點陣字型
 docs/           報告各章節、圖片與圖片原始檔
