@@ -1,5 +1,6 @@
 #include "math/vec2.hpp"
 
+#include <algorithm>
 #include <cmath>
 
 namespace robot {
@@ -14,6 +15,18 @@ float lengthSquared(const Vec2& vec) {
 
 float distance(const Vec2& a, const Vec2& b) {
     return length(b - a);
+}
+
+float distanceToSegment(const Vec2& point, const Vec2& start, const Vec2& end) {
+    const Vec2 segment = end - start;
+    const float segmentLengthSquared = lengthSquared(segment);
+
+    if (segmentLengthSquared < EPSILON * EPSILON) {
+        return distance(point, start);  // 線段退化成一點
+    }
+
+    const float t = std::clamp(dot(point - start, segment) / segmentLengthSquared, 0.0f, 1.0f);
+    return distance(point, lerp(start, end, t));
 }
 
 float dot(const Vec2& a, const Vec2& b) {

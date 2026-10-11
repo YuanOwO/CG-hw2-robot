@@ -38,6 +38,7 @@ inline Vec2 operator*(float scalar, const Vec2& vec) {
 float length(const Vec2& vec);
 float lengthSquared(const Vec2& vec);
 float distance(const Vec2& a, const Vec2& b);
+float distanceToSegment(const Vec2& point, const Vec2& start, const Vec2& end);  // 點到線段的最短距離
 
 float dot(const Vec2& a, const Vec2& b);
 float cross(const Vec2& a, const Vec2& b);  // 2D 外積為純量（z 分量）

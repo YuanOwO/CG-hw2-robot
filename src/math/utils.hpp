@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include "math/constants.hpp"
 
 namespace robot {
@@ -16,6 +18,20 @@ inline float degrees(float radians) {
 // t = 0 時為 a，t = 1 時為 b；t 不限制在 [0, 1]，需要時請搭配 std::clamp
 inline float lerp(float a, float b, float t) {
     return a + (b - a) * t;
+}
+
+// 向負無窮取整的整數除法（C++ 的 / 向 0 取整）；denominator 必須不為 0
+inline std::int64_t floorDiv(std::int64_t numerator, std::int64_t denominator) {
+    std::int64_t quotient = numerator / denominator;
+    if ((numerator % denominator != 0) && ((numerator < 0) != (denominator < 0))) {
+        quotient--;
+    }
+    return quotient;
+}
+
+// 向正無窮取整的整數除法；denominator 必須不為 0
+inline std::int64_t ceilDiv(std::int64_t numerator, std::int64_t denominator) {
+    return -floorDiv(-numerator, denominator);
 }
 
 }  // namespace robot
