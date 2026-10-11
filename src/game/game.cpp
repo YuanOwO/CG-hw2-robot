@@ -1,11 +1,11 @@
 #include "game/game.hpp"
 
 #include <cmath>
+#include <memory>
 #include <string>
 
 #include "common/color.hpp"
 #include "font/font.hpp"
-#include "platform/glut.hpp"
 #include "render/canvas.hpp"
 #include "render/stage.hpp"
 
@@ -13,39 +13,23 @@ namespace robot::game {
 
 namespace {
 
-const float ROTATION_SPEED = 45.0f;  // 度 / 秒：8 秒轉一圈
-
 const FontStyle HUD_FONT = GfntFontStyle{GfntFontId::UNIFONT_16};
 
 }  // namespace
 
-Game::Game(engine::Engine& engine) : _engine(engine) {}
+Game::Game(engine::Engine& engine) : _engine(engine), _world(std::make_unique<World>()) {}
 
 void Game::tick(float dt, const engine::Input& input) {
-    _angle = std::fmod(_angle + ROTATION_SPEED * dt, 360.0f);
+    if (_world) {
+        _world->tick(dt, input);
+    }
 }
 
 void Game::render() {
-    renderWorld();
+    if (_world) {
+        _world->render(_engine.width(), _engine.height());
+    }
     renderHud();  // 後畫的蓋在上面
-}
-
-void Game::renderWorld() {
-    render::begin3D(_engine.width(), _engine.height(), _camera, _projection);
-
-    // 繞地板中心 (25, 0, 25) 旋轉：移到中心 → 旋轉 → 移回去（講義 01-2 p52）
-    glTranslatef(25.0f, 0.0f, 25.0f);
-    glRotatef(_angle, 0.0f, 1.0f, 0.0f);
-    glTranslatef(-25.0f, 0.0f, -25.0f);
-
-    // 從上方看為逆時針，正面朝上（講義 lecture 3 p24）
-    glColor3f(0.0f, 0.0f, 0.0f);
-    glBegin(GL_QUADS);
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f, 0.0f, 50.0f);
-    glVertex3f(50.0f, 0.0f, 50.0f);
-    glVertex3f(50.0f, 0.0f, 0.0f);
-    glEnd();
 }
 
 void Game::renderHud() {

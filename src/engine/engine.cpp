@@ -122,6 +122,10 @@ void Engine::onReshape(int width, int height) {
     _width = width;
     _height = height;
     _displayedFrame = -1;  // 視窗大小改變，舊畫面不能用了
+
+    if (_app != nullptr) {
+        _app->onResize(width, height);
+    }
 }
 
 void Engine::onVisibility(int state) {
@@ -167,7 +171,11 @@ void Engine::onKeyboard(unsigned char key, int x, int y) {
         return;
     }
     _input.moveMouse(x, y);
-    _input.keyDown(mapped);
+    const bool firstPress = _input.keyDown(mapped);
+
+    if (_app != nullptr) {
+        _app->onKeyDown(mapped, !firstPress);
+    }
 }
 
 void Engine::onKeyboardUp(unsigned char key, int x, int y) {
@@ -177,6 +185,10 @@ void Engine::onKeyboardUp(unsigned char key, int x, int y) {
     }
     _input.moveMouse(x, y);
     _input.keyUp(mapped);
+
+    if (_app != nullptr) {
+        _app->onKeyUp(mapped);
+    }
 }
 
 void Engine::onSpecial(int key, int x, int y) {
@@ -185,7 +197,11 @@ void Engine::onSpecial(int key, int x, int y) {
         return;
     }
     _input.moveMouse(x, y);
-    _input.keyDown(mapped);
+    const bool firstPress = _input.keyDown(mapped);
+
+    if (_app != nullptr) {
+        _app->onKeyDown(mapped, !firstPress);
+    }
 }
 
 void Engine::onSpecialUp(int key, int x, int y) {
@@ -195,6 +211,10 @@ void Engine::onSpecialUp(int key, int x, int y) {
     }
     _input.moveMouse(x, y);
     _input.keyUp(mapped);
+
+    if (_app != nullptr) {
+        _app->onKeyUp(mapped);
+    }
 }
 
 #pragma endregion  // Keyboard callbacks
@@ -206,20 +226,32 @@ void Engine::onMouse(int button, int state, int x, int y) {
     if (mapped == MouseButton::Unknown) {
         return;
     }
+
     _input.moveMouse(x, y);
+    const Point position(static_cast<float>(x), static_cast<float>(y));
+
     if (state == GLUT_DOWN) {
         _input.mouseDown(mapped);
+        if (_app != nullptr) {
+            _app->onMouseDown(mapped, position);
+        }
     } else if (state == GLUT_UP) {
         _input.mouseUp(mapped);
+        if (_app != nullptr) {
+            _app->onMouseUp(mapped, position);
+        }
     }
 }
 
 void Engine::onMotion(int x, int y) {
     _input.moveMouse(x, y);
+    if (_app != nullptr) {
+        _app->onMouseMove(Point(static_cast<float>(x), static_cast<float>(y)));
+    }
 }
 
 void Engine::onPassiveMotion(int x, int y) {
-    _input.moveMouse(x, y);
+    onMotion(x, y);  // 有沒有按著滑鼠按鈕，對遊戲來說都是移動
 }
 
 void Engine::onEntry(int state) {
