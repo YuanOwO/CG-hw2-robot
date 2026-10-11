@@ -34,7 +34,7 @@
 | `glutMainLoop` 不會返回                                             | `runMainLoop` 以 `glutCheckLoop` 執行，所有視窗關閉後返回        |
 | 沒有 `glutGet(GLUT_INIT_STATE)`                                     | `isRunning` 自行記錄                                             |
 | 先銷毀上層選單、再銷毀子選單會崩潰                                  | `Menu` 先銷毀子選單（兩個平台共用）                              |
-| 沒有 `glutBitmapHeight`、`glutStrokeHeight`                         | `font/font` 自行查表（兩個平台共用）                             |
+| 沒有 `glutBitmapHeight`、`glutStrokeHeight`                         | `font/glut_font` 自行查表（兩個平台共用）                        |
 | 不會送出修飾鍵事件，也沒有 `GLUT_KEY_SHIFT_L` 等常數                | 攔截器送出 `onSpecial` / `onSpecialUp`，常數為 `platform::KEY_*` |
 | Command 組合鍵會被應用程式選單攔截（例如 Cmd+S 會儲存 TIFF）        | 攔截器依實體按鍵換算字元，送出 `onKeyboard` / `onKeyboardUp`     |
 | Backspace 送出 `0x7F`、Delete 送出 `0x08`，與 FreeGLUT 相反         | 攔截器送出與 FreeGLUT 相同的字元                                 |
