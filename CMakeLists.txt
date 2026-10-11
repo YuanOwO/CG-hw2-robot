@@ -54,10 +54,11 @@ if(APPLE)
 endif()
 
 add_custom_command(TARGET main POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    COMMAND ${CMAKE_COMMAND} -E rm -rf "$<TARGET_FILE_DIR:main>/assets"
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
         "${CMAKE_SOURCE_DIR}/assets"
         "$<TARGET_FILE_DIR:main>/assets"
-    COMMENT "Copying assets"
+    COMMENT "Linking assets"
 )
 
 # -------------------------
