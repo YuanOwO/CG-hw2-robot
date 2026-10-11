@@ -1,5 +1,6 @@
 #include "ui/window.hpp"
 
+#include <algorithm>
 #include <utility>
 
 #include "platform/glut.hpp"
@@ -280,8 +281,11 @@ void Window::timerCallback(int windowId) {
 
     // glutTimerFunc 不保證準時，動畫要用實際經過的時間推進，速度才不會受 FPS 影響。
     const auto now = std::chrono::steady_clock::now();
-    const auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(now - window->_lastUpdate);
-    window->_lastUpdate += delta;  // 不足 1ms 的部分留到下一次，避免長時間累積誤差
+    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - window->_lastUpdate);
+    window->_lastUpdate += elapsed;  // 不足 1ms 的部分留到下一次，避免長時間累積誤差
+
+    // 停頓的時間直接丟棄：_lastUpdate 仍推進完整的 elapsed，只限制傳給動畫的 delta。
+    const auto delta = std::min(elapsed, MAX_FRAME_DELTA);
 
     window->update(delta);
 

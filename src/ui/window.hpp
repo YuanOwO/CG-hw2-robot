@@ -19,6 +19,10 @@ const int FRAME_INTERVAL_MS = 1000 / FRAME_RATE;
 const float CLICK_MOVE_THRESHOLD = 4.0f;
 const std::chrono::milliseconds DOUBLE_CLICK_TIME_THRESHOLD(300);
 
+// 單次 update 允許推進的最長時間。主迴圈停頓（拖曳視窗、除錯中斷）後，
+// 動畫只前進這麼多，而不是一次補上整段停頓。
+const std::chrono::milliseconds MAX_FRAME_DELTA(100);
+
 class Element;
 class RootElement;
 
