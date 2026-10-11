@@ -1,0 +1,44 @@
+% !TEX root = hw2-robot.tex
+\documentclass[a4paper, 12pt, oneside, fleqn]{article}
+
+\input{docs/preamble.tex}
+
+\title{\textbf{電腦圖學 Homework \#2}\\ A Moving Robot}
+\author{黃俊源 01257128}
+\date{\today}
+
+\begin{document}
+\pagestyle{fancy}
+
+% 頁首、頁尾
+\renewcommand{\headrulewidth}{0.5pt}
+\fancyhead[L]{\textbf{CG HW \#2}: A Moving Robot}
+\fancyhead[R]{\leftmark}
+\fancyfoot[C]{\thepage}
+
+\pagenumbering{gobble}
+
+% 標題 & 目錄
+\maketitle
+
+\begingroup
+
+\hypersetup{linkcolor=black}
+\setlength{\columnsep}{2em}
+\setlength{\columnseprule}{0.2pt}
+
+\begin{multicols}{3}
+    \scriptsize
+    \tableofcontents
+\end{multicols}
+
+\endgroup
+
+% 正文
+
+\clearpage
+
+\pagenumbering{arabic}
+
+
+\end{document}

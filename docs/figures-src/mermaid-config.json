@@ -1,0 +1,13 @@
+{
+    "theme": "default",
+    "themeVariables": {
+        "fontFamily": "Noto Sans CJK TC, Arial, sans-serif",
+        "fontSize": "18px"
+    },
+    "flowchart": {
+        "curve": "basis",
+        "htmlLabels": true,
+        "nodeSpacing": 35,
+        "rankSpacing": 40
+    }
+}
