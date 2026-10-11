@@ -48,7 +48,7 @@ GLUT 無法使用輸入法，注音等輸入法開啟時單鍵快捷鍵會失效
 src/
 ├── main.cpp
 ├── app/        Application 與各視窗
-├── common/     顏色、座標與 UTF-8
+├── common/     顏色、座標、矩形與 UTF-8
 ├── event/      輸入、視窗與元素事件
 ├── font/       字型樣式、GLUT 字型對應、文字度量與 GFNT 字型
 ├── input/      輸入狀態與快捷鍵管理
