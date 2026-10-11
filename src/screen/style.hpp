@@ -4,7 +4,7 @@
 #include "font/font.hpp"
 #include "gui/button.hpp"
 
-namespace robot::game::style {
+namespace robot::screen::style {
 
 inline const FontStyle TitleFont = GlyphFontStyle{GlyphFont::NOTO_SANS_CJK_TC, 72};
 inline const FontStyle HeadingFont = GlyphFontStyle{GlyphFont::NOTO_SANS_CJK_TC, 32};
@@ -28,4 +28,4 @@ inline const gui::ButtonStyle MenuButton{
     ColorRGBA{0.38f, 0.60f, 1.00f}, // focusBorder
 };
 
-}  // namespace robot::game::style
+}  // namespace robot::screen::style

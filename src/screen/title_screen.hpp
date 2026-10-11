@@ -1,13 +1,13 @@
 #pragma once
 
-#include "game/screen.hpp"
+#include "screen/screen.hpp"
 
-namespace robot::game {
+namespace robot::screen {
 
 // 主選單：開始、操作說明、離開。
 class TitleScreen : public Screen {
    public:
-    explicit TitleScreen(Game& game);
+    explicit TitleScreen(ScreenHost& host);
 
    protected:
     void build() override;
@@ -15,4 +15,4 @@ class TitleScreen : public Screen {
     bool closesOnEscape() const override { return false; }
 };
 
-}  // namespace robot::game
+}  // namespace robot::screen

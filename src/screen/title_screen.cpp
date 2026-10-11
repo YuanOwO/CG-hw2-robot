@@ -1,13 +1,12 @@
-#include "game/screens/title_screen.hpp"
+#include "screen/title_screen.hpp"
 
 #include <memory>
 #include <string>
 
-#include "game/game.hpp"
-#include "game/screens/help_screen.hpp"
-#include "game/style.hpp"
+#include "screen/help_screen.hpp"
+#include "screen/style.hpp"
 
-namespace robot::game {
+namespace robot::screen {
 
 namespace {
 
@@ -16,13 +15,14 @@ const std::string SUBTITLE = "電腦圖學 Homework #2";
 
 }  // namespace
 
-TitleScreen::TitleScreen(Game& game) : Screen(game) {}
+TitleScreen::TitleScreen(ScreenHost& host) : Screen(host) {}
 
 void TitleScreen::build() {
     const int top = height() / 2;
-    addButton(buttonSlot(0, top), "開始", [this]() { game().startWorld(); });
-    addButton(buttonSlot(1, top), "操作說明", [this]() { game().openChildScreen(std::make_unique<HelpScreen>(game())); });
-    addButton(buttonSlot(2, top), "離開", [this]() { game().quit(); });
+    addButton(buttonSlot(0, top), "開始", [this]() { host().startWorld(); });
+    addButton(buttonSlot(1, top), "操作說明",
+              [this]() { host().openChildScreen(std::make_unique<HelpScreen>(host())); });
+    addButton(buttonSlot(2, top), "離開", [this]() { host().quit(); });
 }
 
 void TitleScreen::renderContent(render::Canvas& canvas) const {
@@ -36,4 +36,4 @@ void TitleScreen::renderContent(render::Canvas& canvas) const {
                     {render::TextAlign::CENTER, render::TextAlign::START});
 }
 
-}  // namespace robot::game
+}  // namespace robot::screen

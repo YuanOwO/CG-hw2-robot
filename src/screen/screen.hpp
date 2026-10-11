@@ -9,18 +9,17 @@
 #include "gui/button.hpp"
 #include "input/input_types.hpp"
 #include "render/canvas.hpp"
+#include "screen/screen_host.hpp"
 
-namespace robot::game {
+namespace robot::screen {
 
-class Game;
-
-// 疊在最上層的畫面，例如主選單、暫停選單。同一時間最多一個，由 Game 持有。
+// 疊在最上層的畫面，例如主選單、暫停選單。同一時間最多一個，由 ScreenHost 持有。
 //
 // 畫面可以持有上一層畫面：從暫停選單打開操作說明時，暫停選單由操作說明保管，
-// 關閉操作說明就把它交還給 Game。
+// 關閉操作說明就把它交還給 ScreenHost。
 class Screen {
    public:
-    explicit Screen(Game& game, std::string title = "");
+    explicit Screen(ScreenHost& host, std::string title = "");
     virtual ~Screen() = default;
 
     Screen(const Screen&) = delete;
@@ -51,8 +50,8 @@ class Screen {
     // 主選單沒有可以回去的地方
     virtual bool closesOnEscape() const { return true; }
 
-    Game& game() { return _game; }
-    const Game& game() const { return _game; }
+    ScreenHost& host() { return _host; }
+    const ScreenHost& host() const { return _host; }
     int width() const { return _width; }
     int height() const { return _height; }
 
@@ -65,7 +64,7 @@ class Screen {
     BoundingBox buttonSlot(int row, int top) const;
 
    private:
-    Game& _game;
+    ScreenHost& _host;
     std::string _title;
     std::unique_ptr<Screen> _parent;
 
@@ -75,4 +74,4 @@ class Screen {
     int _focusedButton = -1;  // -1：尚未用鍵盤選擇
 };
 
-}  // namespace robot::game
+}  // namespace robot::screen

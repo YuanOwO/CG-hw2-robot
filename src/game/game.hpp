@@ -5,31 +5,31 @@
 
 #include "engine/application.hpp"
 #include "engine/engine.hpp"
-#include "game/screen.hpp"
-#include "game/world.hpp"
-#include "render/canvas.hpp"
+#include "game/session.hpp"
+#include "screen/screen.hpp"
+#include "screen/screen_host.hpp"
 
 namespace robot::game {
 
-// 遊戲的流程：目前的世界與畫面，兩者都可以為空。
+// 遊戲的流程：目前的 Session 與畫面，兩者都可以為空。有畫面時 Session 暫停。
 //
-// 切換世界與畫面的操作延後到目前的事件或 tick 處理完畢才生效：
+// 切換 Session 與畫面的操作延後到目前的事件或 tick 處理完畢才生效：
 // 這些操作通常由畫面上的按鈕觸發，立即替換會在畫面的成員函式執行中銷毀畫面。
-class Game : public engine::Application {
+class Game : public engine::Application, public screen::ScreenHost {
    public:
     explicit Game(engine::Engine& engine);
     ~Game() override;
 
-    bool hasWorld() const { return _world != nullptr; }
+    // screen::ScreenHost
 
-    void startWorld();   // 建立新世界並關閉畫面
-    void quitToTitle();  // 銷毀世界並回到主選單
-    void quit();
+    bool hasWorld() const override { return _session != nullptr; }
 
-    void setScreen(std::unique_ptr<Screen> screen);  // nullptr 表示關閉畫面
+    void setScreen(std::unique_ptr<screen::Screen> screen) override;
+    void openChildScreen(std::unique_ptr<screen::Screen> screen) override;
 
-    // 目前的畫面成為新畫面的上一層，關閉新畫面時回到它。
-    void openChildScreen(std::unique_ptr<Screen> screen);
+    void startWorld() override;
+    void quitToTitle() override;
+    void quit() override;
 
     // engine::Application
 
@@ -45,21 +45,22 @@ class Game : public engine::Application {
    private:
     engine::Engine& _engine;
 
-    std::unique_ptr<World> _world;
-    std::unique_ptr<Screen> _screen;
+    std::unique_ptr<Session> _session;
+    std::unique_ptr<screen::Screen> _screen;
 
-    enum class WorldChange { None, Start, Unload };
+    struct SessionRequest {
+        std::unique_ptr<Session> session;  // nullptr 表示結束 Session
+    };
 
-    struct ScreenChange {
-        std::unique_ptr<Screen> screen;  // nullptr 表示關閉畫面
+    struct ScreenRequest {
+        std::unique_ptr<screen::Screen> screen;  // nullptr 表示關閉畫面
         bool asChild = false;
     };
 
-    WorldChange _pendingWorld = WorldChange::None;
-    std::optional<ScreenChange> _pendingScreen;
+    std::optional<SessionRequest> _pendingSession;
+    std::optional<ScreenRequest> _pendingScreen;
 
-    void applyPendingChanges();
-    void renderHud(render::Canvas& canvas);
+    void applyPendingRequests();
 };
 
 }  // namespace robot::game

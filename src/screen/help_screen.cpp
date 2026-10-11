@@ -1,12 +1,12 @@
-#include "game/screens/help_screen.hpp"
+#include "screen/help_screen.hpp"
 
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "game/style.hpp"
+#include "screen/style.hpp"
 
-namespace robot::game {
+namespace robot::screen {
 
 namespace {
 
@@ -14,17 +14,18 @@ const int LINE_HEIGHT = 28;
 
 const std::vector<std::pair<std::string, std::string>> CONTROLS = {
     {"Esc",   "暫停 / 返回"},
-    {"↑ ↓",   "選擇按鈕"},
-    {"Enter", "確認"},
+    {"↑ ↓",   "選擇按鈕"   },
+    {"Enter", "確認"       },
 };
 
+// build 與 renderContent 共用，按鈕才會接在說明列表下方
 int contentTop(int titleBottom) {
     return titleBottom + 32;
 }
 
 }  // namespace
 
-HelpScreen::HelpScreen(Game& game) : Screen(game, "操作說明") {}
+HelpScreen::HelpScreen(ScreenHost& host) : Screen(host, "操作說明") {}
 
 void HelpScreen::build() {
     const int top = contentTop(titleBottom()) + static_cast<int>(CONTROLS.size()) * LINE_HEIGHT + 32;
@@ -44,4 +45,4 @@ void HelpScreen::renderContent(render::Canvas& canvas) const {
     }
 }
 
-}  // namespace robot::game
+}  // namespace robot::screen
