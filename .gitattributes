@@ -12,6 +12,8 @@
 *.jpg binary
 *.exe binary
 *.pdf binary
+*.gfnt binary
+*.gotl binary
 
 # Markdown 與 JSON diff
 *.md   diff=markdown

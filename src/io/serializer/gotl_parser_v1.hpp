@@ -4,7 +4,7 @@
 #include <istream>
 #include <vector>
 
-#include "font/gotl_font.hpp"
+#include "font/data/gotl_data.hpp"
 #include "io/serializer/core/binary_parser.hpp"
 #include "io/serializer/format/gotl.hpp"
 
@@ -15,7 +15,7 @@ class GotlParserV1 : public serializer::BinaryParser {
     explicit GotlParserV1(std::istream& input) : BinaryParser(input, "GOTL v1") {}
 
     // 讀取並驗證整個字型，任何一項不合法就拋出例外。
-    GotlFont parse();
+    GotlData parse();
 
    private:
     struct BoundingBox;

@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <stdexcept>
 
-#include "font/font.hpp"
+#include "io/font_catalog.hpp"
 #include "platform/glut.hpp"
 
 namespace robot::engine {
@@ -24,7 +24,7 @@ Engine::Engine(int& argc, char** argv, const std::string& title, int width, int 
 
     // 載入失敗會拋出例外，因此在設定 currentEngine 之前執行
     const auto executablePath = std::filesystem::weakly_canonical(std::filesystem::absolute(argv[0]));
-    initializeFonts(executablePath.parent_path() / "assets" / "fonts");
+    io::registerFonts(executablePath.parent_path() / "assets" / "fonts" / "fonts.ini");
 
     currentEngine = this;
 

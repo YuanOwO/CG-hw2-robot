@@ -1,49 +1,24 @@
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include <vector>
+#include <optional>
+
+#include "font/data/gfnt_data.hpp"
+#include "font/sized_font.hpp"
 
 namespace robot {
 
-// 載入後的 GFNT 點陣字型。與檔案格式版本無關，由 io::GfntParserV1 等 parser 建立。
-class GfntFont {
+// 直接使用 GFNT 事先點陣化的字形。像素字型可以整數倍放大，放大後每個像素仍是銳利的方塊。
+class GfntFont : public SizedFont {
    public:
-    struct Metrics {
-        int pixelSize;
-        int ascender;   // baseline 以上的高度
-        int descender;  // baseline 以下的深度，為非負值
-    };
+    // data 必須比這個物件活得久；由 FontLibrary 保證。
+    GfntFont(const GfntData& data, int scale);
 
-    struct Glyph {
-        char32_t codepoint;
-
-        int width;
-        int height;
-
-        int bearingX;
-        int bearingY;
-
-        int advanceX;
-
-        std::size_t bitmapOffset;  // 在 bitmap data 中的位置，每個 pixel 一個 alpha byte
-    };
-
-    // glyphs 必須已依 codepoint 嚴格遞增排列，且每個 bitmap 都落在 bitmapData 內；
-    // 讀檔時由 parser 負責驗證。
-    GfntFont(const Metrics& metrics, std::vector<Glyph> glyphs, std::vector<std::uint8_t> bitmapData);
-
-    const Metrics& metrics() const { return _metrics; }
-
-    const Glyph* findGlyph(char32_t codepoint) const;
-    const Glyph* findGlyphOrFallback(char32_t codepoint) const;
-
-    const std::uint8_t* bitmap(const Glyph& glyph) const { return _bitmapData.data() + glyph.bitmapOffset; }
+    FontMetrics metrics() const override;
+    std::optional<Glyph> glyph(char32_t codepoint) const override;
 
    private:
-    Metrics _metrics;
-    std::vector<Glyph> _glyphs;
-    std::vector<std::uint8_t> _bitmapData;
+    const GfntData& _data;
+    int _scale;
 };
 
 }  // namespace robot

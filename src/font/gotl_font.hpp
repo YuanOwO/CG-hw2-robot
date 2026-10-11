@@ -1,66 +1,31 @@
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include <vector>
+#include <optional>
+#include <unordered_map>
+
+#include "font/data/gotl_data.hpp"
+#include "font/raster/outline_rasterizer.hpp"
+#include "font/sized_font.hpp"
 
 namespace robot {
 
-// 載入後的 GOTL 向量字型。與檔案格式版本無關，由 io::GotlParserV1 等 parser 建立。
-// 座標單位為 font units，Y 軸向上，原點為 pen 在基線上的位置。
-class GotlFont {
+// 將 GOTL 輪廓點陣化成指定字號。每個字只在第一次用到時點陣化，結果留在快取中。
+class GotlFont : public SizedFont {
    public:
-    struct Metrics {
-        int unitsPerEm;
-        int ascender;    // baseline 以上的高度
-        int descender;   // baseline 以下的深度，為非負值
-        int curveOrder;  // 所有 CurveTo 的次數，2 或 3
-    };
+    // data 必須比這個物件活得久；由 FontLibrary 保證。
+    GotlFont(const GotlData& data, int pixelSize);
 
-    struct Glyph {
-        char32_t codepoint;
-
-        std::size_t outlineOffset;  // 在 outline data 中的位置
-        int opCount;                // 0 表示沒有輪廓（例如空白）
-
-        int advanceX;
-
-        int xMin, yMin, xMax, yMax;  // 包含控制點的 bounding box
-    };
-
-    enum class OutlineOp : std::uint8_t {
-        MOVE_TO = 0,
-        LINE_TO = 1,
-        CURVE_TO = 2,
-    };
-
-    struct OutlinePoint {
-        int x, y;
-    };
-
-    // 一個指令與它的點；CurveTo 依 curveOrder 使用前 2 或 3 個點，最後一個為終點。
-    struct OutlineCommand {
-        OutlineOp op;
-        OutlinePoint points[3];
-    };
-
-    // glyphs 必須已依 codepoint 嚴格遞增排列，且每個輪廓都通過合法性檢查；
-    // 讀檔時由 parser 負責驗證。
-    GotlFont(const Metrics& metrics, std::vector<Glyph> glyphs, std::vector<std::uint8_t> outlineData);
-
-    const Metrics& metrics() const { return _metrics; }
-    const std::vector<Glyph>& glyphs() const { return _glyphs; }
-
-    const Glyph* findGlyph(char32_t codepoint) const;
-    const Glyph* findGlyphOrFallback(char32_t codepoint) const;
-
-    // 解碼字形的輪廓。輪廓的閉合由使用端處理：遇到下一個 MoveTo 與結尾時都要回到起點。
-    std::vector<OutlineCommand> outline(const Glyph& glyph) const;
+    FontMetrics metrics() const override;
+    std::optional<Glyph> glyph(char32_t codepoint) const override;
 
    private:
-    Metrics _metrics;
-    std::vector<Glyph> _glyphs;
-    std::vector<std::uint8_t> _outlineData;
+    const GotlData& _data;
+    int _pixelSize;
+
+    // 快取不影響對外的結果，因此 glyph() 仍是 const。key 是實際使用的字形，
+    // 不同缺字都替代成同一個字形時只點陣化一次。
+    // unordered_map 新增元素時不會搬動既有元素，回傳給呼叫端的 bitmap 指標保持有效。
+    mutable std::unordered_map<char32_t, RasterizedGlyph> _cache;
 };
 
 }  // namespace robot

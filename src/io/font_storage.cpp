@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <string>
 
+#include "io/serializer/font_manifest_parser.hpp"
 #include "io/serializer/gfnt_parser_v1.hpp"
 #include "io/serializer/gotl_parser_v1.hpp"
 #include "io/utils.hpp"
@@ -33,12 +34,16 @@ auto parseFile(const std::filesystem::path& filename) {
 
 }  // namespace
 
-GfntFont FontStorage::readGfnt(const std::filesystem::path& filename) {
+GfntData FontStorage::readGfnt(const std::filesystem::path& filename) {
     return parseFile<GfntParserV1>(filename);
 }
 
-GotlFont FontStorage::readGotl(const std::filesystem::path& filename) {
+GotlData FontStorage::readGotl(const std::filesystem::path& filename) {
     return parseFile<GotlParserV1>(filename);
+}
+
+std::vector<FontManifestFace> FontStorage::readFontManifest(const std::filesystem::path& filename) {
+    return parseFile<FontManifestParser>(filename);
 }
 
 }  // namespace robot::io

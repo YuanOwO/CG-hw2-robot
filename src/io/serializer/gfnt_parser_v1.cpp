@@ -42,9 +42,9 @@ gfnt::GfntGlyphV1 readGlyph(serializer::ByteReader& reader) {
     return glyph;
 }
 
-// GfntFont 不綁定檔案版本，之後的新版 parser 也轉成同樣的型別。
-GfntFont::Glyph toGlyph(const gfnt::GfntGlyphV1& glyph) {
-    return GfntFont::Glyph{
+// GfntData 不綁定檔案版本，之後的新版 parser 也轉成同樣的型別。
+GfntData::Glyph toGlyph(const gfnt::GfntGlyphV1& glyph) {
+    return GfntData::Glyph{
         static_cast<char32_t>(glyph.codepoint),
         glyph.width,
         glyph.height,
@@ -57,7 +57,7 @@ GfntFont::Glyph toGlyph(const gfnt::GfntGlyphV1& glyph) {
 
 }  // namespace
 
-GfntFont GfntParserV1::parse() {
+GfntData GfntParserV1::parse() {
     const std::uint64_t fileSize = inputSize();
 
     if (fileSize < gfnt::HEADER_SIZE) {
@@ -130,16 +130,16 @@ GfntFont GfntParserV1::parse() {
         }
     }
 
-    std::vector<GfntFont::Glyph> fontGlyphs;
+    std::vector<GfntData::Glyph> fontGlyphs;
     fontGlyphs.reserve(glyphs.size());
 
     for (const auto& glyph : glyphs) {
         fontGlyphs.push_back(toGlyph(glyph));
     }
 
-    const GfntFont::Metrics metrics{header.pixelSize, header.ascender, header.descender};
+    const GfntData::Metrics metrics{header.pixelSize, header.ascender, header.descender};
 
-    return GfntFont(metrics, std::move(fontGlyphs), std::move(bitmapData));
+    return GfntData(metrics, std::move(fontGlyphs), std::move(bitmapData));
 }
 
 }  // namespace robot::io

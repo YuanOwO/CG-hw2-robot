@@ -1,65 +1,40 @@
 #include "font/gotl_font.hpp"
 
-#include <algorithm>
-#include <utility>
+#include <cstdint>
 
-#include "common/bytes.hpp"
+#include "math/utils.hpp"
 
 namespace robot {
 
-GotlFont::GotlFont(const Metrics& metrics, std::vector<Glyph> glyphs, std::vector<std::uint8_t> outlineData)
-    : _metrics(metrics), _glyphs(std::move(glyphs)), _outlineData(std::move(outlineData)) {}
+GotlFont::GotlFont(const GotlData& data, int pixelSize) : _data(data), _pixelSize(pixelSize) {}
 
-const GotlFont::Glyph* GotlFont::findGlyph(char32_t codepoint) const {
-    // Glyph Table 在載入時已確認為 codepoint 遞增排列。
-    const auto it = std::lower_bound(_glyphs.begin(), _glyphs.end(), codepoint,
-                                     [](const Glyph& glyph, char32_t searchedCodepoint) {
-                                         return glyph.codepoint < searchedCodepoint;
-                                     });
+FontMetrics GotlFont::metrics() const {
+    const auto& metrics = _data.metrics();
 
-    if (it == _glyphs.end() || it->codepoint != codepoint) {
-        return nullptr;
-    }
+    // 無條件進位，行高才容得下點陣化時向外取整的字形 bitmap。
+    const auto scaledCeil = [&](int value) {
+        return static_cast<int>(ceilDiv(static_cast<std::int64_t>(value) * _pixelSize, metrics.unitsPerEm));
+    };
 
-    return &*it;
+    return FontMetrics{_pixelSize, scaledCeil(metrics.ascender), scaledCeil(metrics.descender)};
 }
 
-const GotlFont::Glyph* GotlFont::findGlyphOrFallback(char32_t codepoint) const {
-    if (const auto* glyph = findGlyph(codepoint)) {
-        return glyph;
+std::optional<Glyph> GotlFont::glyph(char32_t codepoint) const {
+    const GotlData::Glyph* outline = _data.findGlyphOrFallback(codepoint);
+    if (outline == nullptr) {
+        return std::nullopt;
     }
 
-    if (const auto* glyph = findGlyph(U'�')) {
-        return glyph;
+    auto it = _cache.find(outline->codepoint);
+    if (it == _cache.end()) {
+        it = _cache.emplace(outline->codepoint, rasterizeGlyph(_data, *outline, _pixelSize)).first;
     }
 
-    return findGlyph(U'?');
-}
-
-std::vector<GotlFont::OutlineCommand> GotlFont::outline(const Glyph& glyph) const {
-    std::vector<OutlineCommand> commands;
-    commands.reserve(static_cast<std::size_t>(glyph.opCount));
-
-    // 載入時已驗證 ops 與點都落在 outline data 內，這裡不再檢查邊界。
-    // 座標為 little-endian，逐 byte 組合，不依賴平台的 endian 與對齊。
-    using bytes::readI16;
-
-    const std::uint8_t* ops = _outlineData.data() + glyph.outlineOffset;
-    const std::uint8_t* point = ops + glyph.opCount + (glyph.opCount & 1);
-
-    for (int i = 0; i < glyph.opCount; i++) {
-        OutlineCommand command{static_cast<OutlineOp>(ops[i]), {}};
-        const int pointCount = command.op == OutlineOp::CURVE_TO ? _metrics.curveOrder : 1;
-
-        for (int j = 0; j < pointCount; j++) {
-            command.points[j] = {readI16(point), readI16(point + 2)};
-            point += 4;
-        }
-
-        commands.push_back(command);
-    }
-
-    return commands;
+    const RasterizedGlyph& glyph = it->second;
+    return Glyph{
+        glyph.width,    glyph.height,   glyph.bearingX, glyph.bearingY, glyph.advanceX,
+        glyph.width,    glyph.height,   1,              glyph.bitmap.data(),
+    };
 }
 
 }  // namespace robot

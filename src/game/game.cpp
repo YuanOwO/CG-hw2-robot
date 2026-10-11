@@ -13,7 +13,7 @@ namespace robot::game {
 
 namespace {
 
-const FontStyle HUD_FONT = GfntFontStyle{GfntFontId::UNIFONT_16};
+const FontStyle HUD_FONT = GlyphFontStyle{GlyphFont::UNIFONT, 16};
 
 }  // namespace
 

@@ -1,12 +1,8 @@
-#include <cstddef>
-#include <cstdint>
+#include <string>
 #include <variant>
-#include <vector>
 
 #include "common/point.hpp"
-#include "common/utf8.hpp"
-#include "font/font.hpp"
-#include "font/gfnt_font.hpp"
+#include "font/font_library.hpp"
 #include "platform/glut.hpp"
 #include "render/canvas.hpp"
 
@@ -22,7 +18,9 @@ void renderBitmap(const std::string& text, const BitmapFontStyle& style, float l
     float x = left;
     float y = top + lineHeight - getOriginY(style.font);
 
-    for (unsigned char c : text) {
+    for (const char ch : text) {
+        const auto c = static_cast<unsigned char>(ch);
+
         if (c == '\n') {
             x = left;
             y += lineHeight;  // 元素座標向下為正。
@@ -40,13 +38,15 @@ void renderStroke(Canvas& canvas, const std::string& text, const StrokeFontStyle
                   float top) {
     void* font = mapFont(style.font);
 
-    const float scale = style.size;
+    const float scale = style.scale;
     const float lineHeight = getLineHeight(style.font) * scale;
 
     float x = left;
     float y = top + getAscent(style.font) * scale;
 
-    for (unsigned char c : text) {
+    for (const char ch : text) {
+        const auto c = static_cast<unsigned char>(ch);
+
         if (c == '\n') {
             x = left;
             y += lineHeight;
@@ -75,28 +75,13 @@ void renderStroke(Canvas& canvas, const std::string& text, const StrokeFontStyle
     }
 }
 
-void renderGfnt(Canvas& canvas, const std::string& text, const GfntFontStyle& style, float left, float top) {
-    // GFNT glyph 直接使用 raster position 繪製，不需要改變 model-view matrix。
-    (void)canvas;
+void renderGlyphs(const std::string& text, const GlyphFontStyle& style, float left, float top) {
+    const TextLayout layout = fonts().get(style).layout(text);
 
-    const GfntFont& font = mapFont(style.font);
-    const auto& metrics = font.metrics();
-    const float lineHeight = static_cast<float>(metrics.ascender + metrics.descender);
-
-    float penX = left;
-    float baselineY = top + static_cast<float>(metrics.ascender);
-
-    // glDrawPixels 不會用 glColor 替 alpha bitmap 上色，所以取出目前文字顏色，
-    // 再為每個 glyph 產生著色後的 RGBA pixels。
+    // glDrawPixels 不套用 glColor。以 GL_ALPHA 格式送出時 RGB 視為 0，
+    // 因此用 pixel transfer 的 bias 填入文字顏色、scale 乘上文字透明度，直接畫字形的 alpha bitmap。
     GLfloat currentColor[4];
     glGetFloatv(GL_CURRENT_COLOR, currentColor);
-
-    const std::uint8_t red = colorToByte(currentColor[0]);
-    const std::uint8_t green = colorToByte(currentColor[1]);
-    const std::uint8_t blue = colorToByte(currentColor[2]);
-    const std::uint8_t colorAlpha = colorToByte(currentColor[3]);
-
-    std::vector<std::uint8_t> rgbaPixels;
 
     GLint previousUnpackAlignment;
     glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousUnpackAlignment);
@@ -106,50 +91,19 @@ void renderGfnt(Canvas& canvas, const std::string& text, const GfntFontStyle& st
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    // GFNT 的第一列是 bitmap 頂端；負的 Y zoom 讓 OpenGL 由上往下畫。
-    glPixelZoom(1.0f, -1.0f);
+    glPixelTransferf(GL_RED_BIAS, currentColor[0]);
+    glPixelTransferf(GL_GREEN_BIAS, currentColor[1]);
+    glPixelTransferf(GL_BLUE_BIAS, currentColor[2]);
+    glPixelTransferf(GL_ALPHA_SCALE, currentColor[3]);
 
-    std::size_t offset = 0;
-    while (offset < text.size()) {
-        const auto decoded = utf8::decodeOne(text, offset);
-        if (decoded.bytesConsumed == 0) {
-            break;
-        }
-        offset += decoded.bytesConsumed;
+    for (const PlacedGlyph& placed : layout.glyphs) {
+        const Glyph& glyph = placed.glyph;
 
-        if (decoded.codepoint == U'\n') {
-            penX = left;
-            baselineY += lineHeight;
-            continue;
-        }
-
-        const GfntFont::Glyph* glyph = font.findGlyphOrFallback(decoded.codepoint);
-        if (glyph == nullptr) {
-            penX += static_cast<float>(metrics.pixelSize);
-            continue;
-        }
-
-        const float glyphLeft = penX + static_cast<float>(glyph->bearingX);
-        const float glyphTop = baselineY - static_cast<float>(glyph->bearingY);
-        const std::size_t pixelCount = static_cast<std::size_t>(glyph->width) * static_cast<std::size_t>(glyph->height);
-
-        if (pixelCount != 0) {
-            const std::uint8_t* alphaPixels = font.bitmap(*glyph);
-            rgbaPixels.resize(pixelCount * 4);
-
-            for (std::size_t i = 0; i < pixelCount; i++) {
-                rgbaPixels[i * 4] = red;
-                rgbaPixels[i * 4 + 1] = green;
-                rgbaPixels[i * 4 + 2] = blue;
-                rgbaPixels[i * 4 + 3] =
-                    static_cast<std::uint8_t>((static_cast<unsigned int>(alphaPixels[i]) * colorAlpha + 127) / 255);
-            }
-
-            glRasterPos2f(glyphLeft, glyphTop);
-            glDrawPixels(glyph->width, glyph->height, GL_RGBA, GL_UNSIGNED_BYTE, rgbaPixels.data());
-        }
-
-        penX += static_cast<float>(glyph->advanceX);
+        // bitmap 的第一列是頂端；負的 Y zoom 讓 OpenGL 由上往下畫，像素字型放大時每個像素畫成 scale × scale。
+        const float scale = static_cast<float>(glyph.scale);
+        glPixelZoom(scale, -scale);
+        glRasterPos2f(left + placed.x, top + placed.y);
+        glDrawPixels(glyph.bitmapWidth, glyph.bitmapHeight, GL_ALPHA, GL_UNSIGNED_BYTE, glyph.alpha);
     }
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, previousUnpackAlignment);
@@ -173,8 +127,8 @@ void Canvas::drawText(const std::string& text, const FontStyle& fontStyle, const
     } else if (const auto* stroke = std::get_if<StrokeFontStyle>(&fontStyle)) {
         glLineWidth(1.0f);
         renderStroke(*this, text, *stroke, origin.x, origin.y);
-    } else if (const auto* gfnt = std::get_if<GfntFontStyle>(&fontStyle)) {
-        renderGfnt(*this, text, *gfnt, origin.x, origin.y);
+    } else if (const auto* glyphs = std::get_if<GlyphFontStyle>(&fontStyle)) {
+        renderGlyphs(text, *glyphs, origin.x, origin.y);
     }
 
     glPopAttrib();

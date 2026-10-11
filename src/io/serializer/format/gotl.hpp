@@ -3,7 +3,7 @@
 #include <cstdint>
 
 // GOTL v1 檔案格式，完整說明見同資料夾的 gotl-v1.md。
-// 只供 parser 使用；程式其他部分透過 GotlFont 取用字型。
+// 只供 parser 使用；程式其他部分透過 GotlData 取用字型。
 
 namespace robot::io::gotl {
 

@@ -50,9 +50,9 @@ gotl::GotlGlyphV1 readGlyph(serializer::ByteReader& reader) {
     return glyph;
 }
 
-// GotlFont 不綁定檔案版本，之後的新版 parser 也轉成同樣的型別。
-GotlFont::Glyph toGlyph(const gotl::GotlGlyphV1& glyph) {
-    return GotlFont::Glyph{
+// GotlData 不綁定檔案版本，之後的新版 parser 也轉成同樣的型別。
+GotlData::Glyph toGlyph(const gotl::GotlGlyphV1& glyph) {
+    return GotlData::Glyph{
         static_cast<char32_t>(glyph.codepoint),
         glyph.outlineOffset,
         glyph.opCount,
@@ -143,7 +143,7 @@ GotlParserV1::BoundingBox GotlParserV1::validateOutline(const std::vector<std::u
 
 #pragma region Parsing
 
-GotlFont GotlParserV1::parse() {
+GotlData GotlParserV1::parse() {
     const std::uint64_t fileSize = inputSize();
 
     if (fileSize < gotl::HEADER_SIZE) {
@@ -213,7 +213,7 @@ GotlFont GotlParserV1::parse() {
     }
 
     // 已確認 glyphCount 不超出檔案，才依它配置記憶體。
-    // 兩個區段各自讀取，outline data 直接交給 GotlFont，不必複製。
+    // 兩個區段各自讀取，outline data 直接交給 GotlData，不必複製。
     const std::vector<std::uint8_t> tableBytes = readSection(tableOffset, tableSize);
     std::vector<std::uint8_t> outlineData = readSection(outlineOffset, outlineSize);
 
@@ -270,16 +270,16 @@ GotlFont GotlParserV1::parse() {
         }
     }
 
-    std::vector<GotlFont::Glyph> fontGlyphs;
+    std::vector<GotlData::Glyph> fontGlyphs;
     fontGlyphs.reserve(glyphs.size());
 
     for (const auto& glyph : glyphs) {
         fontGlyphs.push_back(toGlyph(glyph));
     }
 
-    const GotlFont::Metrics metrics{header.unitsPerEm, header.ascender, header.descender, header.curveOrder};
+    const GotlData::Metrics metrics{header.unitsPerEm, header.ascender, header.descender, header.curveOrder};
 
-    return GotlFont(metrics, std::move(fontGlyphs), std::move(outlineData));
+    return GotlData(metrics, std::move(fontGlyphs), std::move(outlineData));
 }
 
 #pragma endregion  // Parsing
