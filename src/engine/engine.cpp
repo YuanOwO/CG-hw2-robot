@@ -102,8 +102,8 @@ void Engine::updateStats(Clock::time_point now) {
     }
 
     const double seconds = std::chrono::duration<double>(elapsed).count();
-    _framesPerSecond = static_cast<int>(_frameCount / seconds + 0.5);
-    _ticksPerSecond = static_cast<int>(_tickCount / seconds + 0.5);
+    _framesPerSecond = _frameCount / seconds;
+    _ticksPerSecond = _tickCount / seconds;
 
     _frameCount = 0;
     _tickCount = 0;

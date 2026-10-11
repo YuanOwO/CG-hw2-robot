@@ -13,9 +13,11 @@ namespace {
 const int LINE_HEIGHT = 28;
 
 const std::vector<std::pair<std::string, std::string>> CONTROLS = {
-    {"Esc",   "暫停 / 返回"},
-    {"↑ ↓",   "選擇按鈕"   },
-    {"Enter", "確認"       },
+    {"左鍵拖曳", "轉動視角"   },
+    {"Q E",      "環繞視角"   },
+    {"Esc",      "暫停 / 返回"},
+    {"↑ ↓",      "選擇按鈕"   },
+    {"Enter",    "確認"       },
 };
 
 // build 與 renderContent 共用，按鈕才會接在說明列表下方

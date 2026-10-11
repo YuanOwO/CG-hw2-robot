@@ -1,7 +1,11 @@
 #pragma once
 
-#include "graphics/camera.hpp"
+#include <optional>
+
+#include "common/point.hpp"
+#include "engine/input.hpp"
 #include "graphics/canvas.hpp"
+#include "view/camera_rig.hpp"
 #include "view/hud.hpp"
 #include "view/world_renderer.hpp"
 #include "world/world.hpp"
@@ -14,19 +18,22 @@ class Session {
    public:
     Session();
 
-    void tick(float dt);
+    void tick(float dt, const engine::Input& input);
 
     // 分成兩段，讓 Game 能在 HUD 之上接著用同一個 2D 階段畫選單。
     void renderWorld(int width, int height) const;
-    void renderHud(graphics::Canvas& canvas, int framesPerSecond, int ticksPerSecond) const;
+    void renderHud(graphics::Canvas& canvas, double framesPerSecond, double ticksPerSecond) const;
 
    private:
     world::World _world;
+    view::CameraRig _cameraRig;
 
+    void updateCamera(float dt, const engine::Input& input);
+
+    // 拖曳視角時上一個 tick 的游標位置；沒有在拖曳時為空，按下的那一刻才記錄起點
+    std::optional<Point> _dragFrom;
     view::WorldRenderer _worldRenderer;
     view::Hud _hud;
-    graphics::Camera _camera;
-    graphics::OrthoProjection _projection;
 };
 
 }  // namespace robot::game

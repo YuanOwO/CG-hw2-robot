@@ -77,7 +77,7 @@ void Game::applyPendingRequests() {
 void Game::tick(float dt, const engine::Input& input) {
     // 有畫面時暫停：世界仍會繪製，只是不再前進
     if (_session && !_screen) {
-        _session->tick(dt);
+        _session->tick(dt, input);
     }
     applyPendingRequests();
 }

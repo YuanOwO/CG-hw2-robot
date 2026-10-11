@@ -12,9 +12,8 @@ const float AXIS_LENGTH = 8.0f;
 
 }  // namespace
 
-void WorldRenderer::render(const world::World& world, const graphics::Camera& camera,
-                           const graphics::OrthoProjection& projection, int width, int height) const {
-    graphics::begin3D(width, height, camera, projection);
+void WorldRenderer::render(const world::World& world, const CameraRig& camera, int width, int height) const {
+    graphics::begin3D(width, height, camera.camera(), camera.projection());
 
     world.forEachChunk([](const world::Chunk& chunk) { drawChunk(chunk); });
 

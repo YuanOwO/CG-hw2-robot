@@ -6,11 +6,11 @@
 
 需要 CMake 3.16 以上、支援 C++17 的編譯器，以及 OpenGL / GLU / GLUT。
 
-| 平台 | 相依套件 |
-| --- | --- |
-| macOS | Xcode Command Line Tools（`xcode-select --install`）與 CMake（例如 `brew install cmake`） |
-| Linux（Debian / Ubuntu） | `sudo apt install cmake freeglut3-dev libglu1-mesa-dev` |
-| Windows | MinGW-w64 + FreeGLUT（MinGW 會靜態連結執行檔） |
+| 平台                     | 相依套件                                                                                  |
+| ------------------------ | ----------------------------------------------------------------------------------------- |
+| macOS                    | Xcode Command Line Tools（`xcode-select --install`）與 CMake（例如 `brew install cmake`） |
+| Linux（Debian / Ubuntu） | `sudo apt install cmake freeglut3-dev libglu1-mesa-dev`                                   |
+| Windows                  | MinGW-w64 + FreeGLUT（MinGW 會靜態連結執行檔）                                            |
 
 > macOS 使用系統內建的 GLUT、OpenGL framework（含 GLU），有硬體加速，不需要 Homebrew 的 FreeGLUT、Mesa 或 XQuartz。Apple GLUT 與 FreeGLUT 的差異（關閉視窗、主循環、修飾鍵、Command 快捷鍵等）由平台層處理，見 [`src/platform/README.md`](src/platform/README.md)。
 
@@ -34,11 +34,13 @@ cmake --build build
 
 啟動後為主選單，選「開始」進入世界。世界目前是一片 64×64 的棋盤格草地，機器人尚在建置中。
 
-| 按鍵 | 功能 |
-| --- | --- |
-| Esc | 遊玩中：打開暫停選單；選單中：返回上一層 |
-| ↑ ↓ / Tab | 在選單中選擇按鈕 |
-| Enter / 空白鍵 | 按下選擇的按鈕 |
+| 按鍵           | 功能                                     |
+| -------------- | ---------------------------------------- |
+| 左鍵拖曳       | 遊玩中：左右轉動、上下俯仰視角           |
+| Q / E          | 遊玩中：繞世界中心環繞視角               |
+| Esc            | 遊玩中：打開暫停選單；選單中：返回上一層 |
+| ↑ ↓ / Tab      | 在選單中選擇按鈕                         |
+| Enter / 空白鍵 | 按下選擇的按鈕                           |
 
 選單也可以用滑鼠點擊。
 

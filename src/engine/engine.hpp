@@ -37,8 +37,8 @@ class Engine : private platform::WindowHandler {
     int height() const { return _height; }
 
     // 最近一秒實際的繪製次數與 tick 次數
-    int framesPerSecond() const { return _framesPerSecond; }
-    int ticksPerSecond() const { return _ticksPerSecond; }
+    double framesPerSecond() const { return _framesPerSecond; }
+    double ticksPerSecond() const { return _ticksPerSecond; }
 
     const Input& input() const { return _input; }
 
@@ -64,8 +64,8 @@ class Engine : private platform::WindowHandler {
     Clock::time_point _statsStart;
     int _frameCount = 0;
     int _tickCount = 0;
-    int _framesPerSecond = 0;
-    int _ticksPerSecond = 0;
+    double _framesPerSecond = 0.0;
+    double _ticksPerSecond = 0.0;
 
     static void timerCallback(int value);
     void frame();
