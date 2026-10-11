@@ -6,6 +6,7 @@
 #include <string>
 
 #include "io/serializer/gfnt_parser_v1.hpp"
+#include "io/serializer/gotl_parser_v1.hpp"
 #include "io/utils.hpp"
 
 namespace robot::io {
@@ -35,6 +36,10 @@ auto parseFile(const std::filesystem::path& filename) {
 GfntFont FontStorage::readGfnt(const std::filesystem::path& filename) {
     // 目前只有 V1；新增格式版本時，可以在這一層依檔頭選擇對應的 parser。
     return parseFile<GfntParserV1>(filename);
+}
+
+GotlFont FontStorage::readGotl(const std::filesystem::path& filename) {
+    return parseFile<GotlParserV1>(filename);
 }
 
 }  // namespace robot::io
