@@ -3,6 +3,7 @@
 #include <cmath>
 #include <locale>
 #include <sstream>
+#include <stdexcept>
 
 #include "common/utf8.hpp"
 
@@ -48,12 +49,29 @@ bool parseInteger(const std::string& text, long long& value) {
 
 bool readExact(std::istream& input, std::string& data, std::size_t size) {
     data.assign(size, '\0');
+    return readExact(input, data.data(), size);
+}
+
+bool readExact(std::istream& input, void* destination, std::size_t size) {
     if (size == 0) {
         return true;
     }
 
-    input.read(&data[0], static_cast<std::streamsize>(size));
+    input.read(static_cast<char*>(destination), static_cast<std::streamsize>(size));
     return input.gcount() == static_cast<std::streamsize>(size);
+}
+
+std::uint64_t remainingSize(std::istream& input) {
+    const std::streampos start = input.tellg();
+    input.seekg(0, std::ios::end);
+    const std::streampos end = input.tellg();
+    input.seekg(start);
+
+    if (start < 0 || end < 0 || !input) {
+        throw std::runtime_error("Input must be seekable");
+    }
+
+    return static_cast<std::uint64_t>(end - start);
 }
 
 bool isValidUtf8(const std::string& text) {

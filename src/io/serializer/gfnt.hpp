@@ -9,7 +9,8 @@ namespace robot::io::gfnt {
 inline const char MAGIC[4] = {'G', 'F', 'N', 'T'};
 inline const uint16_t VERSION = 1;
 
-#pragma pack(push, 1)
+inline const std::uint64_t HEADER_SIZE = 16;
+inline const std::uint64_t GLYPH_RECORD_SIZE = 18;
 
 struct GfntHeaderV1 {
     char magic[4];
@@ -36,10 +37,5 @@ struct GfntGlyphV1 {
 
     uint32_t bitmapOffset;
 };
-
-#pragma pack(pop)
-
-static_assert(sizeof(GfntHeaderV1) == 16);
-static_assert(sizeof(GfntGlyphV1) == 18);
 
 }  // namespace robot::io::gfnt

@@ -1,5 +1,7 @@
 #include "common/utf8.hpp"
 
+#include <cstdio>
+
 namespace robot::utf8 {
 
 namespace {
@@ -64,15 +66,25 @@ DecodeResult decodeOne(const std::string& text, std::size_t offset) {
 
     // 排除 overlong encoding、不存在的 code point，
     // 以及保留給 UTF-16 使用的 surrogate 範圍。
-    if (codepoint < minimumValue || codepoint > 0x10FFFF || isSurrogate(codepoint)) {
+    if (codepoint < minimumValue || !isScalarValue(codepoint)) {
         return {REPLACEMENT_CHARACTER, 1};
     }
 
     return {codepoint, length};
 }
 
+bool isScalarValue(char32_t codepoint) {
+    return codepoint <= 0x10FFFF && !isSurrogate(codepoint);
+}
+
+std::string formatCodepoint(char32_t codepoint) {
+    char buffer[16];
+    std::snprintf(buffer, sizeof(buffer), "U+%04X", static_cast<unsigned int>(codepoint));
+    return buffer;
+}
+
 std::string encodeOne(char32_t codepoint) {
-    if (codepoint > 0x10FFFF || isSurrogate(codepoint)) {
+    if (!isScalarValue(codepoint)) {
         codepoint = REPLACEMENT_CHARACTER;
     }
 

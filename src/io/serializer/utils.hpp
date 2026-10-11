@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <istream>
 #include <string>
 #include <vector>
@@ -17,8 +18,12 @@ std::vector<std::string> splitFields(const std::string& line);
 bool parseFloat(const std::string& text, float& value);
 bool parseInteger(const std::string& text, long long& value);
 
-// 按指定 byte 數讀取，適合文字 payload 或二進位資料。
+// 按指定 byte 數讀取，適合文字 payload 或二進位資料；資料不足時回傳 false。
 bool readExact(std::istream& input, std::string& data, std::size_t size);
+bool readExact(std::istream& input, void* destination, std::size_t size);
+
+// 從目前位置到結尾的 byte 數，不移動讀取位置；input 無法 seek 時拋出例外。
+std::uint64_t remainingSize(std::istream& input);
 
 bool isValidUtf8(const std::string& text);
 
