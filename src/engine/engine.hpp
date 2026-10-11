@@ -30,12 +30,17 @@ class Engine : private platform::WindowHandler {
     // 進入主迴圈，視窗關閉後返回。app 必須在返回前保持有效。
     void run(Application& app);
 
+    // 在下一次計時器觸發時關閉視窗，run() 隨後返回。
+    void quit() { _quitRequested = true; }
+
     int width() const { return _width; }
     int height() const { return _height; }
 
     // 最近一秒實際的繪製次數與 tick 次數
     int framesPerSecond() const { return _framesPerSecond; }
     int ticksPerSecond() const { return _ticksPerSecond; }
+
+    const Input& input() const { return _input; }
 
    private:
     using Clock = std::chrono::steady_clock;
@@ -46,6 +51,7 @@ class Engine : private platform::WindowHandler {
 
     Application* _app = nullptr;
     Input _input;
+    bool _quitRequested = false;
 
     Clock::time_point _lastFrame;
     Clock::duration _accumulator{0};  // 尚未用來執行 tick 的時間

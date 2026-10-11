@@ -66,6 +66,12 @@ void Engine::timerCallback(int) {
 }
 
 void Engine::frame() {
+    if (_quitRequested) {
+        platform::destroyWindow(_windowId);
+        _windowId = 0;
+        return;
+    }
+
     const auto now = Clock::now();
     const Clock::duration elapsed = now - _lastFrame;
     _lastFrame = now;
