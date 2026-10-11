@@ -29,12 +29,17 @@
 
 inline const FontStyle TitleFont = GlyphFontStyle{GlyphFont::NOTO_SANS_CJK_TC, 72};
 
+// position 預設為文字框左上角；anchor 可改為以中心、右下角等位置對齊
+canvas.drawText("會動的機器人", TitleFont, color, position);
+canvas.drawText("開始", TitleFont, color, center, {render::TextAlign::CENTER, render::TextAlign::CENTER});
+
+// 需要文字框大小時（例如畫背景）再另外量測
 const float width = getFontWidth(TitleFont, "會動的機器人");
 const float height = getFontHeight(TitleFont, "第一行\n第二行");
-canvas.drawText("會動的機器人", TitleFont, color, origin);  // origin 為文字框左上角
 ```
 
-- 文字以 `'\n'` 換行；結尾的換行不會多算一行。
+- 文字以 `'\n'` 換行，每行靠文字框左緣；結尾的換行不會多算一行。
+- 文字框的左上角會取整到整數像素，呼叫端不需要自行取整。
 - 量出來的大小與畫出來的位置使用同一份排版，兩者一定一致。
 - 缺字時依序以 U+FFFD、`?` 替代；都沒有時空出一個字號寬。
 - 使用不存在的字號（例如 `CUBIC11` 的 13 px）會拋出例外。
@@ -72,5 +77,4 @@ gotl = NotoSansCJKtc/NotoSansCJKtc-Regular.gotl         # 向量輪廓，可省�
 ## 注意事項
 
 - GLUT bitmap 字型會把非 ASCII 的每個位元組當成 Latin-1 字元畫出；stroke 字型則跳過非 ASCII 位元組。中文請用 GlyphFont。
-- GlyphFont 以 `glDrawPixels` 繪製。字形左上角超出 viewport 時，raster position 失效，整個字不會畫出（不是只裁掉超出的部分）。
 - 所有字型與點陣化結果在程式結束前都不會釋放，因此字號種類不宜過多。

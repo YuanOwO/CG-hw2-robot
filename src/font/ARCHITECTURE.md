@@ -134,7 +134,12 @@ glyph(codepoint)        GotlFont 第一次用到某字形時點陣化，存入�
 
 ## 繪製
 
-`render/canvas_text.cpp` 以 `glDrawPixels` 繪製每個字形的 alpha bitmap：
+`render/canvas_text.cpp` 的 `Canvas::drawText` 以 `std::visit` 分派到各種字型的繪製；`FontStyle` 新增型別而沒有對應的繪製時會編譯失敗。
+
+- **對齊**：GlyphFont 只排版一次，同時得到文字框大小與字形位置，依 anchor 算出左上角後取整到整數像素。
+- **raster position**：直接用 `glRasterPos` 時，只要那一點在畫面外，整個字都不會畫出。因此先把 raster position 設在一定有效的 viewport 中心，再用 `glBitmap` 位移到目標位置；位移不經過裁切，超出畫面的部分由 OpenGL 正常裁掉。GLUT bitmap 字型也使用同樣的方式。
+
+GlyphFont 以 `glDrawPixels` 繪製每個字形的 alpha bitmap：
 
 - 以 `GL_ALPHA` 格式送出時 RGB 視為 0，用 pixel transfer 的 bias 填入文字顏色、scale 乘上透明度，不需要在 CPU 上產生 RGBA。
 - bitmap 的第一列在頂端，負的 Y zoom 讓 OpenGL 由上往下畫。

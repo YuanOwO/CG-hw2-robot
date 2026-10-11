@@ -8,6 +8,17 @@
 
 namespace robot::render {
 
+enum class TextAlign {
+    START,   // 左 / 上
+    CENTER,  // 中央
+    END,     // 右 / 下
+};
+
+struct TextAnchor {
+    TextAlign horizontal = TextAlign::START;
+    TextAlign vertical = TextAlign::START;
+};
+
 // 畫布工具：在像素座標中繪製矩形、圓角矩形與文字。
 //
 // 座標單位為像素，原點在視窗左上角，y 向下為正。使用前須先呼叫 render::begin2D 切換到 2D 繪製。
@@ -29,8 +40,11 @@ class Canvas {
     // 內圓角半徑為 radius - thickness；radius 為 0 時即為直角外框。
     void strokeRoundedRect(int x, int y, int width, int height, int radius, int thickness, const ColorRGBA& color);
 
-    // 以 origin 為文字框左上角繪製多行文字；換行字元 '\n' 會回到 origin.x 並下移一行。
-    void drawText(const std::string& text, const FontStyle& fontStyle, const ColorRGBA& color, const Point& origin);
+    // 繪製多行文字，以 '\n' 換行，每行都靠文字框左緣。
+    // anchor 決定 position 是文字框的哪一點，例如 {CENTER, CENTER} 時 position 為文字框中心；
+    // 文字框的左上角會取整到整數像素，字形才不會因為落在像素之間而模糊或抖動。
+    void drawText(const std::string& text, const FontStyle& fontStyle, const ColorRGBA& color, const Point& position,
+                  TextAnchor anchor = {});
 };
 
 }  // namespace robot::render
