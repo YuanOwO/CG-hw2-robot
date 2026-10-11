@@ -1,4 +1,4 @@
-#include "io/serializer/utils.hpp"
+#include "io/serializer/core/utils.hpp"
 
 #include <cmath>
 #include <locale>
@@ -8,6 +8,8 @@
 #include "common/utf8.hpp"
 
 namespace robot::io::serializer::utils {
+
+#pragma region Text lines
 
 bool readLine(std::istream& input, std::string& line) {
     if (!std::getline(input, line)) {
@@ -32,10 +34,15 @@ std::vector<std::string> splitFields(const std::string& line) {
     return fields;
 }
 
+#pragma endregion  // Text lines
+
+#pragma region Number parsing
+
 bool parseFloat(const std::string& text, float& value) {
     std::istringstream stream(text);
     stream.imbue(std::locale::classic());
 
+    // 讀完數值後若還能讀到字元，代表尾端有多餘內容。
     char extra;
     return (stream >> value) && !(stream >> extra) && std::isfinite(value);
 }
@@ -46,6 +53,10 @@ bool parseInteger(const std::string& text, long long& value) {
     char extra;
     return (stream >> value) && !(stream >> extra);
 }
+
+#pragma endregion  // Number parsing
+
+#pragma region Raw input
 
 bool readExact(std::istream& input, std::string& data, std::size_t size) {
     data.assign(size, '\0');
@@ -74,6 +85,10 @@ std::uint64_t remainingSize(std::istream& input) {
     return static_cast<std::uint64_t>(end - start);
 }
 
+#pragma endregion  // Raw input
+
+#pragma region Validation
+
 bool isValidUtf8(const std::string& text) {
     std::size_t offset = 0;
 
@@ -92,5 +107,7 @@ bool isValidUtf8(const std::string& text) {
     }
     return true;
 }
+
+#pragma endregion  // Validation
 
 }  // namespace robot::io::serializer::utils

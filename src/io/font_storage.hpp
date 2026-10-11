@@ -7,9 +7,9 @@
 
 namespace robot::io {
 
+// 讀取字型相關檔案。整份檔案驗證通過才回傳，失敗時拋出帶有檔名的例外。
 class FontStorage {
    public:
-    // 讀取、解析、驗證成功後才回傳；失敗拋出例外。
     static GfntFont readGfnt(const std::filesystem::path& filename);
     static GotlFont readGotl(const std::filesystem::path& filename);
 };

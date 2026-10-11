@@ -1,10 +1,10 @@
-#include "io/serializer/text_parser.hpp"
+#include "io/serializer/core/text_parser.hpp"
 
 #include <algorithm>
 #include <limits>
 #include <locale>
 
-#include "io/serializer/utils.hpp"
+#include "io/serializer/core/utils.hpp"
 
 namespace robot::io::serializer {
 
@@ -12,6 +12,8 @@ TextParser::TextParser(std::istream& input, const std::string& formatName) : _in
     // 文字格式固定使用英文語系，避免小數點受到作業系統語系影響。
     _input.imbue(std::locale::classic());
 }
+
+#pragma region Errors
 
 std::runtime_error TextParser::error(const std::string& message, std::size_t lineNumber) const {
     // 沒有指定行號時，錯誤位置就是下一筆原本應該出現的記錄。
@@ -21,6 +23,10 @@ std::runtime_error TextParser::error(const std::string& message, std::size_t lin
     return std::runtime_error("Invalid " + _formatName + " document at line " + std::to_string(lineNumber) + ": " +
                               message);
 }
+
+#pragma endregion  // Errors
+
+#pragma region Records
 
 Record TextParser::readRecord() {
     std::string line;
@@ -50,6 +56,10 @@ Record TextParser::expectRecord(const char* keyword, std::size_t fieldCount) {
     return record;
 }
 
+#pragma endregion  // Records
+
+#pragma region Values
+
 float TextParser::parseFloat(const std::string& token, const char* field, std::size_t lineNumber) const {
     float value;
     if (!utils::parseFloat(token, value)) {
@@ -75,6 +85,10 @@ std::size_t TextParser::parseCount(const std::string& token, const char* field, 
     return static_cast<std::size_t>(value);
 }
 
+#pragma endregion  // Values
+
+#pragma region Payload and end of document
+
 std::string TextParser::readUtf8Payload(std::size_t byteCount) {
     std::string text;
     if (!utils::readExact(_input, text, byteCount)) {
@@ -84,6 +98,7 @@ std::string TextParser::readUtf8Payload(std::size_t byteCount) {
     // Payload 本身可以跨行，所以也要把其中的換行計入目前行號。
     _lineNumber += static_cast<std::size_t>(std::count(text.begin(), text.end(), '\n'));
 
+    // Payload 後必須緊接一個 LF 或 CRLF。
     char delimiter;
     if (!_input.get(delimiter)) {
         throw error("text payload has no trailing newline");
@@ -109,5 +124,7 @@ void TextParser::expectEnd() {
         throw error("unexpected data after end of document");
     }
 }
+
+#pragma endregion  // Payload and end of document
 
 }  // namespace robot::io::serializer

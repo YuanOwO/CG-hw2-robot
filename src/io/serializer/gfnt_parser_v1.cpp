@@ -8,8 +8,8 @@
 #include <vector>
 
 #include "common/utf8.hpp"
-#include "io/serializer/byte_reader.hpp"
-#include "io/serializer/gfnt.hpp"
+#include "io/serializer/core/byte_reader.hpp"
+#include "io/serializer/format/gfnt.hpp"
 
 namespace robot::io {
 
@@ -42,6 +42,7 @@ gfnt::GfntGlyphV1 readGlyph(serializer::ByteReader& reader) {
     return glyph;
 }
 
+// GfntFont 不綁定檔案版本，之後的新版 parser 也轉成同樣的型別。
 GfntFont::Glyph toGlyph(const gfnt::GfntGlyphV1& glyph) {
     return GfntFont::Glyph{
         static_cast<char32_t>(glyph.codepoint),
@@ -57,8 +58,6 @@ GfntFont::Glyph toGlyph(const gfnt::GfntGlyphV1& glyph) {
 }  // namespace
 
 GfntFont GfntParserV1::parse() {
-    // 檔案大小在建構時就已取得，之後才能在分配 glyph table 前確認
-    // header 裡的 glyphCount 沒有指向資料外。
     const std::uint64_t fileSize = inputSize();
 
     if (fileSize < gfnt::HEADER_SIZE) {
@@ -88,8 +87,7 @@ GfntFont GfntParserV1::parse() {
     // 以 64-bit 計算，glyphCount 再大也不會溢位。
     const std::uint64_t tableSize = static_cast<std::uint64_t>(header.glyphCount) * gfnt::GLYPH_RECORD_SIZE;
 
-    // Bitmap Data 緊接在 Glyph Table 後面，所以不需要額外的
-    // section offset 欄位。
+    // GFNT 沒有區段位移欄位，Bitmap Data 緊接在 Glyph Table 之後。
     const std::uint64_t bitmapDataOffset = gfnt::HEADER_SIZE + tableSize;
 
     if (bitmapDataOffset > fileSize) {
@@ -109,27 +107,26 @@ GfntFont GfntParserV1::parse() {
 
     std::vector<std::uint8_t> bitmapData = readBytes(fileSize - bitmapDataOffset);
 
-    // 載入時一次驗證完整個字型，渲染時就可以直接取用 bitmap，
-    // 不必每畫一個字都重複做邊界檢查。
+    // 載入時驗證完，繪製時就不必再檢查邊界。
     for (std::size_t i = 0; i < glyphs.size(); i++) {
         const auto& glyph = glyphs[i];
+        const auto where = [&glyph] { return " (" + utf8::formatCodepoint(glyph.codepoint) + ")"; };
 
-        // findGlyph() 使用 binary search，因此這裡不只要檢查排序，
-        // 也要拒絕重複的 codepoint。
+        // 嚴格遞增（不可重複），findGlyph() 才能二分搜尋。
         if (i != 0 && glyphs[i - 1].codepoint >= glyph.codepoint) {
-            throw error("glyph table is not strictly sorted at " + utf8::formatCodepoint(glyph.codepoint));
+            throw error("glyph table is not strictly sorted" + where());
         }
 
         if (!utf8::isScalarValue(glyph.codepoint)) {
-            throw error("invalid Unicode code point " + utf8::formatCodepoint(glyph.codepoint));
+            throw error("invalid Unicode code point" + where());
         }
 
         const std::size_t bitmapOffset = glyph.bitmapOffset;
         const std::size_t bitmapSize = static_cast<std::size_t>(glyph.width) * static_cast<std::size_t>(glyph.height);
 
-        // 用減法比較可以避免 bitmapOffset + bitmapSize 溢位。
+        // 用減法比較，避免 bitmapOffset + bitmapSize 溢位。
         if (bitmapOffset > bitmapData.size() || bitmapSize > bitmapData.size() - bitmapOffset) {
-            throw error("glyph bitmap extends past Bitmap Data (" + utf8::formatCodepoint(glyph.codepoint) + ")");
+            throw error("glyph bitmap extends past Bitmap Data" + where());
         }
     }
 

@@ -10,8 +10,8 @@
 
 namespace robot::io::serializer {
 
-// 在一段 little-endian 二進位資料上依序讀取欄位，讀取後游標自動前進，不必手算各欄位的位移。
-// 呼叫端應事先確認資料長度足夠；讀超過結尾屬於程式錯誤，會拋出 std::out_of_range。
+// 依序讀取 little-endian 欄位，游標自動前進，不必手算位移。
+// 呼叫端應事先確認長度足夠；讀超過結尾屬於程式錯誤，拋出 std::out_of_range。
 class ByteReader {
    public:
     ByteReader(const std::uint8_t* data, std::size_t size) : _data(data), _size(size) {}
@@ -22,11 +22,13 @@ class ByteReader {
     std::int16_t i16() { return bytes::readI16(take(2)); }
     std::uint32_t u32() { return bytes::readU32(take(4)); }
 
+    // 不需轉換 endian 的欄位，例如 magic 字串
     void read(void* destination, std::size_t size) { std::memcpy(destination, take(size), size); }
 
-    std::size_t position() const { return _position; }
+    std::size_t position() const { return _position; }  // 已讀取的 byte 數
 
    private:
+    // 用減法比較，避免 _position + size 溢位。
     const std::uint8_t* take(std::size_t size) {
         if (size > _size - _position) {
             throw std::out_of_range("ByteReader read past end of data");

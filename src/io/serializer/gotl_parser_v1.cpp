@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "common/utf8.hpp"
-#include "io/serializer/byte_reader.hpp"
+#include "io/serializer/core/byte_reader.hpp"
 
 namespace robot::io {
 
@@ -50,6 +50,7 @@ gotl::GotlGlyphV1 readGlyph(serializer::ByteReader& reader) {
     return glyph;
 }
 
+// GotlFont 不綁定檔案版本，之後的新版 parser 也轉成同樣的型別。
 GotlFont::Glyph toGlyph(const gotl::GotlGlyphV1& glyph) {
     return GotlFont::Glyph{
         static_cast<char32_t>(glyph.codepoint),
@@ -65,6 +66,8 @@ GotlFont::Glyph toGlyph(const gotl::GotlGlyphV1& glyph) {
 
 }  // namespace
 
+#pragma region Outline validation
+
 struct GotlParserV1::BoundingBox {
     int xMin, yMin, xMax, yMax;
 
@@ -75,7 +78,7 @@ struct GotlParserV1::BoundingBox {
 
 GotlParserV1::BoundingBox GotlParserV1::validateOutline(const std::vector<std::uint8_t>& outlineData,
                                                         const gotl::GotlGlyphV1& glyph, int curveOrder) const {
-    // 錯誤訊息標出是哪個字元；只在拋出例外時才組字串。
+    // 只在拋出例外時才組字串。
     const auto where = [&glyph] { return " (" + utf8::formatCodepoint(glyph.codepoint) + ")"; };
 
     const std::uint64_t outlineDataSize = outlineData.size();
@@ -136,10 +139,13 @@ GotlParserV1::BoundingBox GotlParserV1::validateOutline(const std::vector<std::u
     return box;
 }
 
+#pragma endregion  // Outline validation
+
+#pragma region Parsing
+
 GotlFont GotlParserV1::parse() {
     const std::uint64_t fileSize = inputSize();
 
-    // 條件 1：檔案長度、magic、version
     if (fileSize < gotl::HEADER_SIZE) {
         throw error("file is too small");
     }
@@ -156,7 +162,6 @@ GotlFont GotlParserV1::parse() {
         throw error("unsupported version " + std::to_string(header.version));
     }
 
-    // 條件 2：header 欄位
     if (header.unitsPerEm == 0) {
         throw error("unitsPerEm must not be zero");
     }
@@ -178,7 +183,6 @@ GotlFont GotlParserV1::parse() {
         throw error("flags must be zero, got " + std::to_string(header.flags));
     }
 
-    // 條件 3：區段位移
     const std::uint64_t tableOffset = header.glyphTableOffset;
     const std::uint64_t outlineOffset = header.outlineDataOffset;
     const std::uint64_t outlineSize = header.outlineDataSize;
@@ -191,7 +195,7 @@ GotlFont GotlParserV1::parse() {
         throw error("outlineDataOffset must be a multiple of 4 and at least 32");
     }
 
-    // 條件 4：區段範圍。全部以 64-bit 計算，32-bit 欄位相加或相乘都不會溢位。
+    // 以 64-bit 計算，32-bit 欄位相加或相乘不會溢位。
     const std::uint64_t tableSize = static_cast<std::uint64_t>(header.glyphCount) * gotl::GLYPH_RECORD_SIZE;
 
     if (tableOffset + tableSize > fileSize) {
@@ -208,8 +212,8 @@ GotlFont GotlParserV1::parse() {
         throw error("glyph table and outline data overlap");
     }
 
-    // 已確認 glyphCount 不超出檔案，才依它配置記憶體。兩個區段各自讀取，
-    // outline data 讀進來後直接交給 GotlFont，不必先讀整份檔案再複製。
+    // 已確認 glyphCount 不超出檔案，才依它配置記憶體。
+    // 兩個區段各自讀取，outline data 直接交給 GotlFont，不必複製。
     const std::vector<std::uint8_t> tableBytes = readSection(tableOffset, tableSize);
     std::vector<std::uint8_t> outlineData = readSection(outlineOffset, outlineSize);
 
@@ -222,26 +226,24 @@ GotlFont GotlParserV1::parse() {
         glyphs.push_back(readGlyph(tableReader));
     }
 
-    // 多筆記錄可以共用同一個輪廓，只需驗證一次；key 為 (outlineOffset, opCount)。
+    // 相容漢字等記錄會共用同一個輪廓，以 (outlineOffset, opCount) 為 key，每個輪廓只驗證一次。
     std::unordered_map<std::uint64_t, BoundingBox> validatedOutlines;
 
     for (std::size_t i = 0; i < glyphs.size(); i++) {
         const auto& glyph = glyphs[i];
         const auto where = [&glyph] { return " (" + utf8::formatCodepoint(glyph.codepoint) + ")"; };
 
-        // 條件 5：findGlyph() 使用二分搜尋，必須嚴格遞增（不可重複）。
+        // 嚴格遞增（不可重複），findGlyph() 才能二分搜尋。
         if (i != 0 && glyphs[i - 1].codepoint >= glyph.codepoint) {
             throw error("glyph table is not strictly sorted" + where());
         }
 
-        // 條件 6：合法的 Unicode scalar value。
         if (!utf8::isScalarValue(glyph.codepoint)) {
             throw error("invalid Unicode code point" + where());
         }
 
         const BoundingBox recordBox{glyph.xMin, glyph.yMin, glyph.xMax, glyph.yMax};
 
-        // 條件 7：沒有輪廓的字元。
         if (glyph.opCount == 0) {
             if (glyph.outlineOffset > outlineSize) {
                 throw error("outlineOffset extends past Outline Data" + where());
@@ -254,7 +256,6 @@ GotlFont GotlParserV1::parse() {
             continue;
         }
 
-        // 條件 8：有輪廓的字元。
         const std::uint64_t key = (static_cast<std::uint64_t>(glyph.outlineOffset) << 16) | glyph.opCount;
 
         auto it = validatedOutlines.find(key);
@@ -263,7 +264,7 @@ GotlFont GotlParserV1::parse() {
             it = validatedOutlines.emplace(key, actualBox).first;
         }
 
-        // bbox 必須與實際的點完全相等，不可放寬。
+        // 點陣化依 bbox 配置 bitmap；bbox 比實際的點小就會寫出 bitmap 範圍，因此必須完全相等。
         if (!(recordBox == it->second)) {
             throw error("glyph bounding box does not match its outline points" + where());
         }
@@ -280,5 +281,7 @@ GotlFont GotlParserV1::parse() {
 
     return GotlFont(metrics, std::move(fontGlyphs), std::move(outlineData));
 }
+
+#pragma endregion  // Parsing
 
 }  // namespace robot::io

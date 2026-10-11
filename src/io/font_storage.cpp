@@ -13,7 +13,7 @@ namespace robot::io {
 
 namespace {
 
-// 以 binary mode 開檔並解析；解析錯誤會補上檔名，方便找出是哪個字型檔有問題。
+// 以 binary mode 開檔並解析；錯誤訊息補上檔名，才知道是哪個檔案有問題。
 template <typename Parser>
 auto parseFile(const std::filesystem::path& filename) {
     utils::validateReadPath(filename);
@@ -34,7 +34,6 @@ auto parseFile(const std::filesystem::path& filename) {
 }  // namespace
 
 GfntFont FontStorage::readGfnt(const std::filesystem::path& filename) {
-    // 目前只有 V1；新增格式版本時，可以在這一層依檔頭選擇對應的 parser。
     return parseFile<GfntParserV1>(filename);
 }
 

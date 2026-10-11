@@ -7,7 +7,7 @@ namespace robot::bytes {
 // 從 bytes 讀取 little-endian 整數。逐 byte 組合，不依賴執行平台的 endian，也不要求指標對齊。
 
 inline std::uint16_t readU16(const std::uint8_t* bytes) {
-    return static_cast<std::uint16_t>(bytes[0]) | (static_cast<std::uint16_t>(bytes[1]) << 8);
+    return static_cast<std::uint16_t>(bytes[0] | (bytes[1] << 8));
 }
 
 inline std::int16_t readI16(const std::uint8_t* bytes) {
