@@ -33,6 +33,10 @@ class Engine : private platform::WindowHandler {
     int width() const { return _width; }
     int height() const { return _height; }
 
+    // 最近一秒實際的繪製次數與 tick 次數
+    int framesPerSecond() const { return _framesPerSecond; }
+    int ticksPerSecond() const { return _ticksPerSecond; }
+
    private:
     using Clock = std::chrono::steady_clock;
 
@@ -53,6 +57,8 @@ class Engine : private platform::WindowHandler {
     Clock::time_point _statsStart;
     int _frameCount = 0;
     int _tickCount = 0;
+    int _framesPerSecond = 0;
+    int _ticksPerSecond = 0;
 
     static void timerCallback(int value);
     void frame();

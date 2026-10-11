@@ -1,8 +1,13 @@
 #include "game/game.hpp"
 
 #include <cmath>
+#include <string>
 
+#include "common/color.hpp"
+#include "font/font.hpp"
 #include "platform/glut.hpp"
+#include "render/stage.hpp"
+#include "render/render_context.hpp"
 
 namespace robot::game {
 
@@ -10,16 +15,23 @@ namespace {
 
 const float ROTATION_SPEED = 45.0f;  // 度 / 秒：8 秒轉一圈
 
+const FontStyle HUD_FONT = GfntFontStyle{GfntFontId::UNIFONT_16};
+
 }  // namespace
+
+Game::Game(engine::Engine& engine) : _engine(engine) {}
 
 void Game::tick(float dt) {
     _angle = std::fmod(_angle + ROTATION_SPEED * dt, 360.0f);
 }
 
 void Game::render() {
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    gluLookAt(55.0, 70.0, 55.0, 25.0, 0.0, 25.0, 0.0, 1.0, 0.0);
+    renderWorld();
+    renderHud();  // 後畫的蓋在上面
+}
+
+void Game::renderWorld() {
+    render::begin3D(_engine.width(), _engine.height(), _camera, _projection);
 
     // 繞地板中心 (25, 0, 25) 旋轉：移到中心 → 旋轉 → 移回去（講義 01-2 p52）
     glTranslatef(25.0f, 0.0f, 25.0f);
@@ -34,6 +46,23 @@ void Game::render() {
     glVertex3f(50.0f, 0.0f, 50.0f);
     glVertex3f(50.0f, 0.0f, 0.0f);
     glEnd();
+}
+
+void Game::renderHud() {
+    render::begin2D(_engine.width(), _engine.height());
+    render::RenderContext canvas;
+
+    const std::string text =
+        "FPS " + std::to_string(_engine.framesPerSecond()) + " · TPS " + std::to_string(_engine.ticksPerSecond());
+    const int textWidth = static_cast<int>(std::ceil(getFontWidth(HUD_FONT, text)));
+    const int textHeight = static_cast<int>(std::ceil(getFontHeight(HUD_FONT, text)));
+
+    // 半透明黑底，讓文字在白色背景和黑色地板上都看得清楚
+    canvas.pushTransform();
+    canvas.translate(8.0f, 8.0f);
+    canvas.fillRect(textWidth + 12, textHeight + 8, ColorRGBA{0.0f, 0.0f, 0.0f, 0.6f});
+    canvas.drawText(text, HUD_FONT, Color::White, Point(5.0f, 5.0f));
+    canvas.popTransform();
 }
 
 }  // namespace robot::game

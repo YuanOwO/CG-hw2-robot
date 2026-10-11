@@ -1,9 +1,10 @@
 #include "engine/engine.hpp"
 
 #include <algorithm>
-#include <cstdio>
+#include <filesystem>
 #include <stdexcept>
 
+#include "font/font.hpp"
 #include "platform/glut.hpp"
 
 namespace robot::engine {
@@ -20,6 +21,11 @@ Engine::Engine(int& argc, char** argv, const std::string& title, int width, int 
     if (currentEngine != nullptr) {
         throw std::runtime_error("Only one Engine instance is allowed.");
     }
+
+    // 字型放在執行檔旁的 assets/fonts；載入失敗會拋出例外，因此在設定 currentEngine 之前執行
+    const auto executablePath = std::filesystem::weakly_canonical(std::filesystem::absolute(argv[0]));
+    initializeFonts(executablePath.parent_path() / "assets" / "fonts");
+
     currentEngine = this;
 
     platform::initialize(argc, argv);
@@ -92,8 +98,8 @@ void Engine::updateStats(Clock::time_point now) {
     }
 
     const double seconds = std::chrono::duration<double>(elapsed).count();
-    std::printf("FPS %.0f · TPS %.0f\n", _frameCount / seconds, _tickCount / seconds);
-    std::fflush(stdout);
+    _framesPerSecond = static_cast<int>(_frameCount / seconds + 0.5);
+    _ticksPerSecond = static_cast<int>(_tickCount / seconds + 0.5);
 
     _frameCount = 0;
     _tickCount = 0;
@@ -113,14 +119,6 @@ void Engine::onReshape(int width, int height) {
     _width = width;
     _height = height;
     _displayedFrame = -1;  // 視窗大小改變，舊畫面不能用了
-
-    glViewport(0, 0, width, height);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-53.33, 53.33, -40.0, 40.0, 0.0, 120.0);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
 }
 
 void Engine::onVisibility(int state) {
@@ -136,6 +134,7 @@ void Engine::onDisplay() {
     }
     _displayedFrame = _frameIndex;
 
+    glViewport(0, 0, _width, _height);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
