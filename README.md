@@ -32,31 +32,21 @@ cmake --build build
 
 ## 操作
 
-在視窗上按右鍵開啟選單。底部為狀態列。
+目前只保留基礎模組，遊戲內容重新建置中，尚無可操作的畫面。
 
-### 快捷鍵
-
-GLUT 無法使用輸入法，注音等輸入法開啟時單鍵快捷鍵會失效。macOS 上程式在前景時會自動切換為英文鍵盤配置，切換到其他程式或結束時還原；其他平台請自行切換為英文輸入。
-
-| 快捷鍵 | 功能 |
-| --- | --- |
-| Ctrl+C | 關閉視窗 |
+GLUT 無法使用輸入法，注音等輸入法開啟時單鍵按鍵會失效。macOS 上程式在前景時會自動切換為英文鍵盤配置，切換到其他程式或結束時還原；其他平台請自行切換為英文輸入。
 
 ## 專案結構
 
 ```text
 src/
 ├── main.cpp
-├── app/        Application 與各視窗
 ├── common/     顏色、座標、矩形與 UTF-8
-├── event/      輸入、視窗與元素事件
 ├── font/       字型樣式、GLUT 字型對應、文字度量與 GFNT 字型
-├── input/      輸入狀態與快捷鍵管理
+├── input/      按鍵代碼與輸入狀態
 ├── io/         檔案讀寫（GFNT 字型等）
 ├── math/       向量、數學常數與角度轉換、內插等工具函式
-├── platform/   GLUT 平台層：FreeGLUT 與 Apple GLUT 的差異
-├── render/     繪製流程（Renderer）、相機與投影參數、在介面中嵌入 3D 場景（Scene3DScope）、2D 繪圖（RenderContext）
-└── ui/         元素樹、版面配置、選單與主題
+└── platform/   GLUT 平台層：FreeGLUT 與 Apple GLUT 的差異
 assets/fonts/   Cubic 11 與 Unifont 的 GFNT 點陣字型
 docs/           報告各章節、圖片與圖片原始檔
 ```

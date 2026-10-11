@@ -5,10 +5,6 @@
 #include "common/point.hpp"
 #include "input/input_types.hpp"
 
-namespace robot::ui {
-class Window;
-}
-
 namespace robot {
 
 template <typename ButtonType>
@@ -21,7 +17,6 @@ class InputState {
     bool isExactlyDown(const std::unordered_set<ButtonType>& buttons) const;
 
    private:
-    friend class ui::Window;
     std::unordered_set<ButtonType> _down;
 
     // 回傳是否真的發生 up -> down。
@@ -54,9 +49,6 @@ class KeyboardState : public InputState<Key> {
         return isCtrlDown();  // Windows 與 Linux 上的 Ctrl 鍵是主要的修飾鍵
 #endif
     }
-
-   private:
-    friend class ui::Window;
 };
 
 class MouseState : public InputState<MouseButton> {
@@ -68,8 +60,6 @@ class MouseState : public InputState<MouseButton> {
     Point position() const { return Point(_mouseX, _mouseY); }
 
    private:
-    friend class ui::Window;
-
     int _mouseX = 0;
     int _mouseY = 0;
 
