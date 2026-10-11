@@ -1,8 +1,6 @@
-#include "render/render_context.hpp"
+#include "render/canvas.hpp"
 
 #include <algorithm>
-#include <initializer_list>
-#include <limits>
 #include <utility>
 #include <vector>
 
@@ -31,18 +29,13 @@ void midpointOctant(int radius, Visit visit) {
     }
 }
 
-// 回傳中點圓在每一列 (以 |dy| 為索引) 的 |x|：outermost 為 true 取最外側，否則取最內側。
+// 回傳中點圓在每一列 (以 |dy| 為索引) 最外側的 |x|。
 // 八分圓的點 (x, y) 同時落在第 y 列 (|x| = x) 與第 x 列 (|x| = y)。
-std::vector<int> rowExtents(int radius, bool outermost) {
-    std::vector<int> extents(radius + 1, outermost ? -1 : std::numeric_limits<int>::max());
-    midpointOctant(radius, [&extents, outermost](int x, int y) {
-        if (outermost) {
-            extents[y] = std::max(extents[y], x);
-            extents[x] = std::max(extents[x], y);
-        } else {
-            extents[y] = std::min(extents[y], x);
-            extents[x] = std::min(extents[x], y);
-        }
+std::vector<int> rowExtents(int radius) {
+    std::vector<int> extents(radius + 1, -1);
+    midpointOctant(radius, [&extents](int x, int y) {
+        extents[y] = std::max(extents[y], x);
+        extents[x] = std::max(extents[x], y);
     });
     return extents;
 }
@@ -66,7 +59,7 @@ void pixelRect(int x, int y, int width) {
 }
 
 // 圓角矩形在第 row 列 (0 <= row < height) 的水平範圍，以相對於矩形左緣的 [left, right] 表示。
-// radius 須已限制在 (min(width, height) - 1) / 2 以內，extents 為 rowExtents(radius, true)。
+// radius 須已限制在 (min(width, height) - 1) / 2 以內，extents 為 rowExtents(radius)。
 std::pair<int, int> roundedRowSpan(int width, int height, int radius, const std::vector<int>& extents, int row) {
     // dy 為此列到最近圓心列的距離；位於上下圓心之間的列 dy = 0，整列填滿。
     int dy = 0;
@@ -87,19 +80,19 @@ int clampCornerRadius(int width, int height, int radius) {
 
 }  // namespace
 
-void RenderContext::pushTransform() {
+void Canvas::pushTransform() {
     glPushMatrix();
 }
 
-void RenderContext::popTransform() {
+void Canvas::popTransform() {
     glPopMatrix();
 }
 
-void RenderContext::translate(float x, float y) {
+void Canvas::translate(float x, float y) {
     glTranslatef(x, y, 0.0f);
 }
 
-void RenderContext::fillRect(int width, int height, const ColorRGBA& color) {
+void Canvas::fillRect(int x, int y, int width, int height, const ColorRGBA& color) {
     if (width <= 0 || height <= 0 || color.a <= 0.0f) {
         return;
     }
@@ -109,89 +102,17 @@ void RenderContext::fillRect(int width, int height, const ColorRGBA& color) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glColor4f(color.r, color.g, color.b, color.a);
-    glRecti(0, 0, width, height);
+    glRecti(x, y, x + width, y + height);
     glPopAttrib();
 }
 
-void RenderContext::strokeCircle(int centerX, int centerY, int radius, const ColorRGBA& color) {
-    if (radius < 0 || color.a <= 0.0f) {
-        return;
-    }
-
-    glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT | GL_POLYGON_BIT);
-    beginPixels(color);
-
-    // 對稱點重疊時 (x == 0 或 x == y) 只畫一次，避免半透明顏色疊色。
-    const auto plot = [centerX, centerY](int dx, int dy) { pixelRect(centerX + dx, centerY + dy, 1); };
-    midpointOctant(radius, [&plot](int x, int y) {
-        if (x == 0) {
-            plot(0, y);
-            plot(0, -y);
-            if (y != 0) {
-                plot(y, 0);
-                plot(-y, 0);
-            }
-            return;
-        }
-
-        plot(x, y);
-        plot(-x, y);
-        plot(x, -y);
-        plot(-x, -y);
-        if (x != y) {
-            plot(y, x);
-            plot(-y, x);
-            plot(y, -x);
-            plot(-y, -x);
-        }
-    });
-
-    glEnd();
-    glPopAttrib();
-}
-
-void RenderContext::fillRing(int centerX, int centerY, int innerRadius, int outerRadius, const ColorRGBA& color) {
-    if (innerRadius < 0 || outerRadius < innerRadius || color.a <= 0.0f) {
-        return;
-    }
-
-    // 環形每列從內圓最內側填到外圓最外側。
-    const std::vector<int> outerExtent = rowExtents(outerRadius, true);
-    const std::vector<int> innerExtent = rowExtents(innerRadius, false);
-
-    glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT | GL_POLYGON_BIT);
-    beginPixels(color);
-
-    for (int dy = 0; dy <= outerRadius; dy++) {
-        // 超出內圓範圍的列沒有中空部分，整列填滿。
-        const int from = dy <= innerRadius ? innerExtent[dy] : 0;
-        const int to = outerExtent[dy];
-
-        for (const int y : {centerY + dy, centerY - dy}) {
-            if (from == 0) {
-                pixelRect(centerX - to, y, 2 * to + 1);
-            } else {
-                pixelRect(centerX + from, y, to - from + 1);
-                pixelRect(centerX - to, y, to - from + 1);
-            }
-
-            if (dy == 0) {
-                break;  // 中心列只有一列，避免重複繪製
-            }
-        }
-    }
-
-    glEnd();
-    glPopAttrib();
-}
-
-void RenderContext::fillRoundedRect(int x, int y, int width, int height, int radius, const ColorRGBA& color) {
+void Canvas::fillRoundedRect(int x, int y, int width, int height, int radius, const ColorRGBA& color) {
     if (width <= 0 || height <= 0 || color.a <= 0.0f) {
         return;
     }
 
     radius = clampCornerRadius(width, height, radius);
-    const std::vector<int> extents = rowExtents(radius, true);
+    const std::vector<int> extents = rowExtents(radius);
 
     glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT | GL_POLYGON_BIT);
     beginPixels(color);
@@ -205,21 +126,21 @@ void RenderContext::fillRoundedRect(int x, int y, int width, int height, int rad
     glPopAttrib();
 }
 
-void RenderContext::strokeRoundedRect(int x, int y, int width, int height, int radius, int thickness,
+void Canvas::strokeRoundedRect(int x, int y, int width, int height, int radius, int thickness,
                                       const ColorRGBA& color) {
     if (width <= 0 || height <= 0 || thickness <= 0 || color.a <= 0.0f) {
         return;
     }
 
     radius = clampCornerRadius(width, height, radius);
-    const std::vector<int> outerExtents = rowExtents(radius, true);
+    const std::vector<int> outerExtents = rowExtents(radius);
 
     // 內圓角矩形與 fillRoundedRect(x + t, y + t, ...) 使用相同的像素，兩者可無縫拼接。
     const int innerWidth = width - 2 * thickness;
     const int innerHeight = height - 2 * thickness;
     const bool hasInner = innerWidth > 0 && innerHeight > 0;
     const int innerRadius = hasInner ? clampCornerRadius(innerWidth, innerHeight, radius - thickness) : 0;
-    const std::vector<int> innerExtents = rowExtents(innerRadius, true);
+    const std::vector<int> innerExtents = rowExtents(innerRadius);
 
     glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT | GL_POLYGON_BIT);
     beginPixels(color);

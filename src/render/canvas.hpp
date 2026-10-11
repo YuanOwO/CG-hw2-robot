@@ -8,29 +8,19 @@
 
 namespace robot::render {
 
-class RenderContext {
+// 畫布工具：在像素座標中繪製矩形、圓角矩形與文字。
+//
+// 座標單位為像素，原點在視窗左上角，y 向下為正。使用前須先呼叫 render::begin2D 切換到 2D 繪製。
+// 所有繪製都會套用目前的座標轉換，可以用 pushTransform / translate / popTransform 平移一組繪製。
+class Canvas {
    public:
-    ~RenderContext() = default;
-
-    // 繪圖表面（視窗）的像素尺寸；由 Renderer 在每幀設定，供需要換算 OpenGL 視窗座標的繪製使用。
-    int surfaceWidth() const { return _surfaceWidth; }
-    int surfaceHeight() const { return _surfaceHeight; }
-    void setSurfaceSize(int width, int height) {
-        _surfaceWidth = width;
-        _surfaceHeight = height;
-    }
-
     void pushTransform();  // 保存目前的座標轉換狀態
     void popTransform();   // 恢復上一個座標轉換狀態
 
     void translate(float x, float y);  // 平移目前座標系
-    void fillRect(int width, int height, const ColorRGBA& color);
 
-    // 以中點畫圓法繪製 1px 寬的圓周；圓心與半徑皆為整數像素。
-    void strokeCircle(int centerX, int centerY, int radius, const ColorRGBA& color);
-
-    // 填滿內外兩個中點圓之間的環形區域，包含兩個圓周本身；逐列填滿，不會留下空洞。
-    void fillRing(int centerX, int centerY, int innerRadius, int outerRadius, const ColorRGBA& color);
+    // 填滿左上角為 (x, y)、寬高為 width x height 像素的矩形。
+    void fillRect(int x, int y, int width, int height, const ColorRGBA& color);
 
     // 填滿左上角為 (x, y)、寬高為 width x height 像素的圓角矩形；圓角以中點畫圓法逐列計算。
     void fillRoundedRect(int x, int y, int width, int height, int radius, const ColorRGBA& color);
@@ -41,10 +31,6 @@ class RenderContext {
 
     // 以 origin 為文字框左上角繪製多行文字；換行字元 '\n' 會回到 origin.x 並下移一行。
     void drawText(const std::string& text, const FontStyle& fontStyle, const ColorRGBA& color, const Point& origin);
-
-   private:
-    int _surfaceWidth = 0;
-    int _surfaceHeight = 0;
 };
 
 }  // namespace robot::render

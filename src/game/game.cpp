@@ -6,8 +6,8 @@
 #include "common/color.hpp"
 #include "font/font.hpp"
 #include "platform/glut.hpp"
+#include "render/canvas.hpp"
 #include "render/stage.hpp"
-#include "render/render_context.hpp"
 
 namespace robot::game {
 
@@ -50,7 +50,7 @@ void Game::renderWorld() {
 
 void Game::renderHud() {
     render::begin2D(_engine.width(), _engine.height());
-    render::RenderContext canvas;
+    render::Canvas canvas;
 
     const std::string text =
         "FPS " + std::to_string(_engine.framesPerSecond()) + " · TPS " + std::to_string(_engine.ticksPerSecond());
@@ -58,11 +58,8 @@ void Game::renderHud() {
     const int textHeight = static_cast<int>(std::ceil(getFontHeight(HUD_FONT, text)));
 
     // 半透明黑底，讓文字在白色背景和黑色地板上都看得清楚
-    canvas.pushTransform();
-    canvas.translate(8.0f, 8.0f);
-    canvas.fillRect(textWidth + 12, textHeight + 8, ColorRGBA{0.0f, 0.0f, 0.0f, 0.6f});
-    canvas.drawText(text, HUD_FONT, Color::White, Point(5.0f, 5.0f));
-    canvas.popTransform();
+    canvas.fillRect(8, 8, textWidth + 12, textHeight + 8, ColorRGBA{0.0f, 0.0f, 0.0f, 0.6f});
+    canvas.drawText(text, HUD_FONT, Color::White, Point(14.0f, 12.0f));
 }
 
 }  // namespace robot::game

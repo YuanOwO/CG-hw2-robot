@@ -8,7 +8,7 @@
 #include "font/font.hpp"
 #include "font/gfnt_font.hpp"
 #include "platform/glut.hpp"
-#include "render/render_context.hpp"
+#include "render/canvas.hpp"
 
 namespace robot::render {
 
@@ -36,7 +36,7 @@ void renderBitmap(const std::string& text, const BitmapFontStyle& style, float l
     }
 }
 
-void renderStroke(RenderContext& context, const std::string& text, const StrokeFontStyle& style, float left,
+void renderStroke(Canvas& canvas, const std::string& text, const StrokeFontStyle& style, float left,
                   float top) {
     void* font = mapFont(style.font);
 
@@ -58,8 +58,8 @@ void renderStroke(RenderContext& context, const std::string& text, const StrokeF
             continue;
         }
 
-        context.pushTransform();
-        context.translate(x, y);
+        canvas.pushTransform();
+        canvas.translate(x, y);
 
         // Stroke 字型原本向上為正。
         // 翻轉 Y，配合目前 UI 向下為正的座標系。
@@ -68,16 +68,16 @@ void renderStroke(RenderContext& context, const std::string& text, const StrokeF
         // 此函式會移動目前矩陣，因此每個字都恢復矩陣。
         glutStrokeCharacter(font, c);
 
-        context.popTransform();
+        canvas.popTransform();
 
         // 與目前 getFontWidth() 使用相同的寬度計算。
         x += static_cast<float>(glutStrokeWidth(font, c)) * scale;
     }
 }
 
-void renderGfnt(RenderContext& context, const std::string& text, const GfntFontStyle& style, float left, float top) {
+void renderGfnt(Canvas& canvas, const std::string& text, const GfntFontStyle& style, float left, float top) {
     // GFNT glyph 直接使用 raster position 繪製，不需要改變 model-view matrix。
-    (void)context;
+    (void)canvas;
 
     const GfntFont& font = mapFont(style.font);
     const auto& metrics = font.metrics();
@@ -158,7 +158,7 @@ void renderGfnt(RenderContext& context, const std::string& text, const GfntFontS
 
 }  // namespace
 
-void RenderContext::drawText(const std::string& text, const FontStyle& fontStyle, const ColorRGBA& color,
+void Canvas::drawText(const std::string& text, const FontStyle& fontStyle, const ColorRGBA& color,
                              const Point& origin) {
     if (text.empty()) {
         return;
