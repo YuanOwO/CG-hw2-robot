@@ -5,7 +5,7 @@
 namespace robot::engine {
 
 bool Input::keyDown(Key key) {
-    // 按住時 GLUT 會重複送出按下事件；只有真正從放開變成按下才算剛按下
+    // 按住時的自動重複不算剛按下
     const bool firstPress = _keyboard._press(key);
     if (firstPress) {
         _pendingPressed.insert(key);

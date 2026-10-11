@@ -13,8 +13,7 @@ const int TICK_RATE = 60;  // 每秒 tick 次數
 const float TICK_SECONDS = 1.0f / TICK_RATE;
 const std::chrono::nanoseconds TICK_DURATION(1'000'000'000 / TICK_RATE);
 
-// 單幀最多推進的時間。主迴圈停頓（拖曳視窗、除錯中斷）後最多補這麼多，
-// 避免補 tick 花的時間又造成下一次停頓。
+// 單幀最多推進的時間；主迴圈停頓後，超過的部分直接丟棄。
 const std::chrono::milliseconds MAX_FRAME_DELTA(100);
 
 const int FRAME_INTERVAL_MS = 16;  // 計時器間隔，約 60 FPS
@@ -51,11 +50,11 @@ class Engine : private platform::WindowHandler {
     Clock::time_point _lastFrame;
     Clock::duration _accumulator{0};  // 尚未用來執行 tick 的時間
 
-    // Apple GLUT 每次要求重繪會呼叫兩次 display callback；同一幀只繪製一次。
+    // Apple GLUT 每次要求重繪會呼叫兩次 display callback，同一幀只繪製一次。
     long long _frameIndex = 0;
     long long _displayedFrame = -1;  // -1：強制下一次 display 繪製
 
-    // 每秒統計一次實際的繪製與 tick 次數
+    // FPS / TPS 統計
     Clock::time_point _statsStart;
     int _frameCount = 0;
     int _tickCount = 0;

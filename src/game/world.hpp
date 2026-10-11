@@ -14,7 +14,6 @@ class World {
    private:
     float _angle = 0.0f;  // 地板繞 y 軸旋轉的角度（度）
 
-    // 從斜上方看向地板中心；投影使用作業題目的範圍
     render::Camera _camera;
     render::OrthoProjection _projection;
 };

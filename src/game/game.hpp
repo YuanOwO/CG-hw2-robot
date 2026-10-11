@@ -18,9 +18,9 @@ class Game : public engine::Application {
 
    private:
     engine::Engine& _engine;
-    std::unique_ptr<World> _world;  // 可以是空的：之後的主選單沒有世界
+    std::unique_ptr<World> _world;  // 可以為空
 
-    void renderHud();  // 疊在場景上的 2D 介面
+    void renderHud();
 };
 
 }  // namespace robot::game

@@ -22,7 +22,7 @@ Engine::Engine(int& argc, char** argv, const std::string& title, int width, int 
         throw std::runtime_error("Only one Engine instance is allowed.");
     }
 
-    // 字型放在執行檔旁的 assets/fonts；載入失敗會拋出例外，因此在設定 currentEngine 之前執行
+    // 載入失敗會拋出例外，因此在設定 currentEngine 之前執行
     const auto executablePath = std::filesystem::weakly_canonical(std::filesystem::absolute(argv[0]));
     initializeFonts(executablePath.parent_path() / "assets" / "fonts");
 
@@ -30,16 +30,14 @@ Engine::Engine(int& argc, char** argv, const std::string& title, int width, int 
 
     platform::initialize(argc, argv);
 
-    // 雙緩衝避免動畫閃爍；深度緩衝供之後的 3D 場景做隱藏面消除
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(width, height);
 
-    // 建立視窗，之後這個視窗的事件都會呼叫 on* 成員函數
     _windowId = platform::createWindow(title.c_str(), *this);
 }
 
 Engine::~Engine() {
-    // 主迴圈結束前就被銷毀（例如建構後發生例外）時，才需要自行關閉視窗
+    // 主迴圈結束後視窗已由平台層銷毀
     if (_windowId != 0 && platform::isRunning()) {
         platform::destroyWindow(_windowId);
     }
@@ -72,10 +70,8 @@ void Engine::frame() {
     const Clock::duration elapsed = now - _lastFrame;
     _lastFrame = now;
 
-    // 停頓的時間直接丟棄：只累積不超過 MAX_FRAME_DELTA 的部分
     _accumulator += std::min<Clock::duration>(elapsed, MAX_FRAME_DELTA);
 
-    // 每累積滿一個 tick 的時間就執行一次，剩下的留給下一幀
     while (_accumulator >= TICK_DURATION) {
         _input.beginTick();
         _app->tick(TICK_SECONDS, _input);
@@ -87,7 +83,6 @@ void Engine::frame() {
 
     updateStats(now);
 
-    // 遊戲畫面持續變化，每幀都重繪
     _frameIndex++;
     glutPostWindowRedisplay(_windowId);
 
@@ -121,7 +116,7 @@ void Engine::onClose() {
 void Engine::onReshape(int width, int height) {
     _width = width;
     _height = height;
-    _displayedFrame = -1;  // 視窗大小改變，舊畫面不能用了
+    _displayedFrame = -1;
 
     if (_app != nullptr) {
         _app->onResize(width, height);
@@ -130,14 +125,13 @@ void Engine::onReshape(int width, int height) {
 
 void Engine::onVisibility(int state) {
     if (state == GLUT_VISIBLE) {
-        _displayedFrame = -1;  // 重新顯示時強制重畫
+        _displayedFrame = -1;
     } else if (state == GLUT_NOT_VISIBLE) {
-        _input.clear();  // 隱藏時可能收不到放開事件，避免卡鍵
+        _input.clear();
     }
 }
 
 void Engine::onDisplay() {
-    // 這一幀已經畫過：不重畫也不交換緩衝區，畫面維持剛才的內容
     if (_displayedFrame == _frameIndex) {
         return;
     }
@@ -151,7 +145,6 @@ void Engine::onDisplay() {
         _app->render();
     }
 
-    // 在後緩衝畫完後交換，顯示這一幀
     glutSwapBuffers();
     _frameCount++;
 }
@@ -161,7 +154,7 @@ void Engine::onDisplay() {
 #pragma region Keyboard callbacks
 
 Key Engine::mapKeyboardKey(unsigned char key) const {
-    // 按住 Ctrl 時 GLUT 送出的是控制字元（例如 Ctrl+A 是 1），需要另外對應回字母鍵
+    // 按住 Ctrl 時 GLUT 送出控制字元（Ctrl+A 為 1）
     return _input.keyboard().isCtrlDown() ? mapCharacterWithCtrl(key) : mapCharacter(key);
 }
 
@@ -251,11 +244,11 @@ void Engine::onMotion(int x, int y) {
 }
 
 void Engine::onPassiveMotion(int x, int y) {
-    onMotion(x, y);  // 有沒有按著滑鼠按鈕，對遊戲來說都是移動
+    onMotion(x, y);
 }
 
 void Engine::onEntry(int state) {
-    _input.clearMouseButtons();  // 進入或離開視窗時，可能錯過放開事件
+    _input.clearMouseButtons();  // 在視窗外放開時收不到事件
 }
 
 #pragma endregion  // Mouse callbacks
