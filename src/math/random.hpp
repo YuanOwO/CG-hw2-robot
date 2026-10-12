@@ -11,6 +11,9 @@ class Random {
     explicit Random(std::uint64_t seed);
     ~Random() = default;
 
+    std::uint64_t seed() const { return _seed; }
+
+    std::uint64_t valueAt(std::uint32_t stream = 0, std::uint32_t index = 0) const;
     std::uint64_t valueAt1D(std::int64_t x, std::uint32_t stream = 0, std::uint32_t index = 0) const;
     std::uint64_t valueAt2D(std::int64_t x, std::int64_t y, std::uint32_t stream = 0, std::uint32_t index = 0) const;
     std::uint64_t valueAt3D(std::int64_t x, std::int64_t y, std::int64_t z, std::uint32_t stream = 0,

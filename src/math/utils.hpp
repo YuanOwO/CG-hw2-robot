@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <cstdint>
 
 #include "math/constants.hpp"
@@ -13,6 +14,23 @@ inline float radians(float degrees) {
 
 inline float degrees(float radians) {
     return radians * (180.0f / PI);
+}
+
+// 換到 [0, 360)；fmod 保留被除數的正負號，負角度要再加一圈
+inline float wrapDegrees(float degrees) {
+    degrees = std::fmod(degrees, 360.0f);
+    return degrees < 0.0f ? degrees + 360.0f : degrees;
+}
+
+// 換到 (-180, 180]，用來判斷往哪邊轉比較近
+inline float wrapSignedDegrees(float degrees) {
+    degrees = std::fmod(degrees, 360.0f);
+    if (degrees > 180.0f) {
+        degrees -= 360.0f;
+    } else if (degrees <= -180.0f) {
+        degrees += 360.0f;
+    }
+    return degrees;
 }
 
 // t = 0 時為 a，t = 1 時為 b；t 不限制在 [0, 1]，需要時請搭配 std::clamp

@@ -10,6 +10,7 @@ namespace {
 // 這些值只需固定且彼此不同；修改任一值會改變既有世界的生成結果。
 // 取自 SHA-512 的初始雜湊值（前幾個質數平方根的小數部分），
 // 來源公開可查，表示這些數字沒有刻意挑選過。
+constexpr std::uint64_t DOMAIN_0D = 0x9b05688c2b3e6c1fULL;
 constexpr std::uint64_t DOMAIN_1D = 0x6a09e667f3bcc908ULL;
 constexpr std::uint64_t DOMAIN_2D = 0xbb67ae8584caa73bULL;
 constexpr std::uint64_t DOMAIN_3D = 0x510e527fade682d1ULL;
@@ -29,6 +30,12 @@ std::uint64_t Random::mix64(std::uint64_t value) {
     value = (value ^ (value >> 30)) * 0xbf58476d1ce4e5b9ULL;
     value = (value ^ (value >> 27)) * 0x94d049bb133111ebULL;
     return value ^ (value >> 31);
+}
+
+std::uint64_t Random::valueAt(std::uint32_t stream, std::uint32_t index) const {
+    std::uint64_t value = mix64(_seed ^ DOMAIN_0D);
+    value = mix64(value ^ STREAM_TAG ^ stream);
+    return mix64(value ^ INDEX_TAG ^ index);
 }
 
 std::uint64_t Random::valueAt1D(std::int64_t x, std::uint32_t stream, std::uint32_t index) const {
