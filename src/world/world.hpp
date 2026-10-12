@@ -15,6 +15,7 @@ class World {
 
     bool blockedAt(float worldX, float worldZ, float radius) const { return false; }  // TODO
 
+    const chunk::ChunkManager& chunks() const { return _chunkManager; }
     const entity::EntityManager& entities() const { return _entityManager; }
 
    private:

@@ -15,7 +15,7 @@ const float AXIS_LENGTH = 8.0f;
 void WorldRenderer::render(const world::World& world, const CameraRig& camera, int width, int height) const {
     graphics::begin3D(width, height, camera.camera(), camera.projection());
 
-    // world.forEachChunk([](const world::chunk::Chunk& c) { chunk::drawChunk(c); });
+    world.chunks().forEach([](const world::chunk::Chunk& c) { chunk::drawChunk(c); });
 
     world.entities().forEach<world::entity::Creeper>(
         [this](const world::entity::Creeper& creeper) { _creeperRenderer.render(creeper); });

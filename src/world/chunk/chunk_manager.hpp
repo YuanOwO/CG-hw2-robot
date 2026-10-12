@@ -10,7 +10,7 @@ namespace robot::world::chunk {
 
 class ChunkManager {
    public:
-    ChunkManager(std::uint64_t seed);
+    explicit ChunkManager(std::uint64_t seed);
     ~ChunkManager() = default;
 
     void update(ChunkPos center);
