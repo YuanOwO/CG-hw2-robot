@@ -144,7 +144,7 @@ void Engine::onDisplay() {
     _displayedFrame = _frameIndex;
 
     glViewport(0, 0, _width, _height);
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(0.53f, 0.81f, 0.92f, 1.0f);  // 天空藍背景
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (_app != nullptr) {

@@ -1,6 +1,7 @@
 #include "world/world.hpp"
 
 #include "math/random.hpp"
+#include "world/entity/creeper.hpp"
 
 namespace robot::world {
 
@@ -19,7 +20,9 @@ std::uint64_t deriveSeed(std::uint64_t seed, std::uint32_t stream) {
 World::World(std::uint64_t seed)
     : _seed(seed),
       _chunkManager(deriveSeed(seed, CHUNK_SEED_STREAM)),
-      _entityManager(deriveSeed(seed, ENTITY_SEED_STREAM)) {}
+      _entityManager(deriveSeed(seed, ENTITY_SEED_STREAM)) {
+    _entityManager.spawn<entity::Creeper>(Vec3(0.0f, 0.0f, 0.0f), 0.0f);
+}
 
 void World::tick(float dt) {
     _entityManager.tick(dt, *this);

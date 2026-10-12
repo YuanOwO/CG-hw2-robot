@@ -1,6 +1,7 @@
 #pragma once
 
 #include "view/camera_rig.hpp"
+#include "view/entity/creeper_renderer.hpp"
 #include "world/world.hpp"
 
 namespace robot::view {
@@ -9,6 +10,9 @@ namespace robot::view {
 class WorldRenderer {
    public:
     void render(const world::World& world, const CameraRig& camera, int width, int height) const;
+
+   private:
+    entity::CreeperRenderer _creeperRenderer;
 };
 
 }  // namespace robot::view

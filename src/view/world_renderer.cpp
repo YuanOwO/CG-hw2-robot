@@ -17,6 +17,9 @@ void WorldRenderer::render(const world::World& world, const CameraRig& camera, i
 
     // world.forEachChunk([](const world::chunk::Chunk& c) { chunk::drawChunk(c); });
 
+    world.entities().forEach<world::entity::Creeper>(
+        [this](const world::entity::Creeper& creeper) { _creeperRenderer.render(creeper); });
+
     graphics::drawAxes(AXIS_LENGTH);
 }
 
