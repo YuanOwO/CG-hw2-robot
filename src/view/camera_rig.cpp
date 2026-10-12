@@ -9,10 +9,17 @@ namespace robot::view {
 
 namespace {
 
-// 注視點在地面上，抬頭到水平以上眼睛就會鑽到地面下。
-// 也不能剛好朝正下方：視線與上方向 (0, 1, 0) 平行時 gluLookAt 無法決定畫面的左右。
+// 視線與上方向 (0, 1, 0) 平行時 gluLookAt 無法決定畫面的左右，因此不能剛好朝正上下方
 const float MIN_PITCH = -89.9f;
 const float MAX_PITCH = 89.9f;
+
+// 畫面寬度最近約 4 公尺，最遠約 190 公尺
+const float MIN_ZOOM = 0.5f;
+const float MAX_ZOOM = 24.0f;
+
+// 倍率為 1 時 view volume 的半寬與半高
+const float BASE_HALF_WIDTH = 48.0f;
+const float BASE_HALF_HEIGHT = 40.0f;
 
 }  // namespace
 
@@ -25,6 +32,18 @@ void CameraRig::turn(float degrees) {
 
 void CameraRig::tilt(float degrees) {
     _pitch = std::clamp(_pitch + degrees, MIN_PITCH, MAX_PITCH);
+}
+
+void CameraRig::pan(float forward, float right) {
+    const float yaw = radians(_yaw);
+    // 只取視線的水平分量，目標點的高度不變
+    const Vec3 ahead(-std::sin(yaw), 0.0f, -std::cos(yaw));
+    const Vec3 side(std::cos(yaw), 0.0f, -std::sin(yaw));
+    _target += (ahead * forward + side * right) / _zoom;
+}
+
+void CameraRig::zoom(float factor) {
+    _zoom = std::clamp(_zoom * factor, MIN_ZOOM, MAX_ZOOM);
 }
 
 graphics::Camera CameraRig::camera() const {
@@ -40,14 +59,14 @@ graphics::Camera CameraRig::camera() const {
     return camera;
 }
 
-graphics::OrthoProjection CameraRig::makeProjection() {
+graphics::OrthoProjection CameraRig::projection() const {
     graphics::OrthoProjection projection;
+    projection.left = -BASE_HALF_WIDTH / _zoom;
+    projection.right = BASE_HALF_WIDTH / _zoom;
+    projection.bottom = -BASE_HALF_HEIGHT / _zoom;
+    projection.top = BASE_HALF_HEIGHT / _zoom;
 
-    // 從對角方向看時世界寬約 90，左右各留一點邊；轉到其他角度時只會更窄
-    projection.left = -48.0f;
-    projection.right = 48.0f;
-
-    // 世界最遠的角落離眼睛約 120，涵蓋到 200 留出餘裕
+    // 眼睛在目標點後方 _distance = 75，目標點之後還能看到約 125 公尺
     projection.farPlane = 200.0f;
     return projection;
 }
