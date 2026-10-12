@@ -1,13 +1,15 @@
 #pragma once
 
+#include <array>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 
-namespace robot::world {
+namespace robot::world::chunk {
 
-const int CHUNK_SIZE = 16;  // 邊長
+const int CHUNK_SIZE = 16;                      // 邊長
+const int CHUNK_VERTEX_COUNT = CHUNK_SIZE + 1;  // 頂點數，包含邊界
 
 // chunk 座標：第幾個 chunk，乘上 CHUNK_SIZE 即為該 chunk 角落的世界座標。
 struct ChunkPos {
@@ -35,6 +37,8 @@ struct ChunkPosHash {
 // 世界中一塊 CHUNK_SIZE × CHUNK_SIZE 的正方形區域。
 struct Chunk {
     ChunkPos pos;
+    std::array<float, CHUNK_VERTEX_COUNT * CHUNK_VERTEX_COUNT> heights{};
+    float heightAt(int localX, int localZ) const;
 };
 
-}  // namespace robot::world
+}  // namespace robot::world::chunk

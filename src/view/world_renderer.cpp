@@ -2,7 +2,7 @@
 
 #include "graphics/primitives.hpp"
 #include "graphics/stage.hpp"
-#include "view/chunk_renderer.hpp"
+#include "view/chunk/chunk_renderer.hpp"
 
 namespace robot::view {
 
@@ -15,7 +15,7 @@ const float AXIS_LENGTH = 8.0f;
 void WorldRenderer::render(const world::World& world, const CameraRig& camera, int width, int height) const {
     graphics::begin3D(width, height, camera.camera(), camera.projection());
 
-    world.forEachChunk([](const world::Chunk& chunk) { drawChunk(chunk); });
+    // world.forEachChunk([](const world::chunk::Chunk& c) { chunk::drawChunk(c); });
 
     graphics::drawAxes(AXIS_LENGTH);
 }

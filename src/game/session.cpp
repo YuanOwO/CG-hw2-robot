@@ -13,9 +13,8 @@ const float PAN_SPEED = 20.0f;        // 公尺 / 秒，倍率為 1 時
 
 }  // namespace
 
-Session::Session() {
-    const float center = world::WORLD_SIZE / 2.0f;
-    _cameraRig.setTarget(Vec3(center, 0.0f, center));
+Session::Session() : _world(_seed) {
+    _cameraRig.setTarget(Vec3(0.0f, 0.0f, 0.0f));
 }
 
 void Session::tick(float dt, const engine::Input& input) {
