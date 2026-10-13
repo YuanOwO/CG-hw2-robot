@@ -13,13 +13,14 @@ namespace {
 const int LINE_HEIGHT = 28;
 
 const std::vector<std::pair<std::string, std::string>> CONTROLS = {
-    {"左鍵拖曳", "轉動視角"   },
-    {"W A S D",  "移動視角"   },
-    {"Q E",      "環繞視角"   },
-    {"= -",      "拉近 / 拉遠"},
-    {"Esc",      "暫停 / 返回"},
-    {"↑ ↓",      "選擇按鈕"   },
-    {"Enter",    "確認"       },
+    {"左鍵拖曳", "轉動視角"    },
+    {"W A S D",  "移動"        },
+    {"Q E",      "轉動視角"    },
+    {"L",        "切換視線綁定"},
+    {"= -",      "拉近 / 拉遠" },
+    {"Esc",      "暫停 / 返回" },
+    {"↑ ↓",      "選擇按鈕"    },
+    {"Enter",    "確認"        },
 };
 
 // build 與 renderContent 共用，按鈕才會接在說明列表下方

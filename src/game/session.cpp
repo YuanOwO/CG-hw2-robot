@@ -9,17 +9,19 @@ namespace {
 const float TURN_SPEED = 90.0f;       // 度 / 秒
 const float DRAG_SENSITIVITY = 0.3f;  // 度 / 像素
 const float ZOOM_SPEED = 4.0f;        // 按住一秒放大或縮小的倍數
-const float PAN_SPEED = 20.0f;        // 公尺 / 秒，倍率為 1 時
 
 }  // namespace
 
 Session::Session() : _world(_seed) {
-    _cameraRig.setTarget(Vec3(0.0f, 0.0f, 0.0f));
+    _cameraRig.setTarget(_world.player().eyePosition());
 }
 
 void Session::tick(float dt, const engine::Input& input) {
-    _world.tick(dt);
+    // 先轉相機，指令才用這個 tick 的視線；世界走完後相機再跟上玩家的位置，畫面才不會慢一拍
     updateCamera(dt, input);
+    _world.setPlayerCommand(_playerController.read(input, _cameraRig));
+    _world.tick(dt);
+    _cameraRig.setTarget(_world.player().eyePosition());
 }
 
 void Session::updateCamera(float dt, const engine::Input& input) {
@@ -33,23 +35,17 @@ void Session::updateCamera(float dt, const engine::Input& input) {
     }
     _cameraRig.turn(direction * TURN_SPEED * dt);
 
-    // x 為往右、y 為往前
-    Vec2 pan;
-    if (input.keyboard().isDown(Key::W)) {
-        pan.y += 1.0f;
+    const auto& mouse = input.mouse();
+    if (!mouse.isDown(MouseButton::MouseLeft)) {
+        _dragFrom.reset();
+    } else {
+        if (_dragFrom) {
+            const auto delta = mouse.position() - *_dragFrom;
+            _cameraRig.turn(delta.x * DRAG_SENSITIVITY);
+            _cameraRig.tilt(delta.y * DRAG_SENSITIVITY);
+        }
+        _dragFrom = mouse.position();
     }
-    if (input.keyboard().isDown(Key::S)) {
-        pan.y -= 1.0f;
-    }
-    if (input.keyboard().isDown(Key::D)) {
-        pan.x += 1.0f;
-    }
-    if (input.keyboard().isDown(Key::A)) {
-        pan.x -= 1.0f;
-    }
-    // 斜向移動才不會快 √2 倍；沒按鍵時 normalize 回傳零向量
-    pan = normalize(pan) * (PAN_SPEED * dt);
-    _cameraRig.pan(pan.y, pan.x);
 
     float zoomDirection = 0.0f;
     if (input.keyboard().isDown(Key::Equal)) {
@@ -60,21 +56,6 @@ void Session::updateCamera(float dt, const engine::Input& input) {
     }
     // 以指數變化，不論目前的倍率，縮放的手感都一樣
     _cameraRig.zoom(std::pow(ZOOM_SPEED, zoomDirection * dt));
-
-    if (!input.mouse().isDown(MouseButton::MouseLeft)) {
-        _dragFrom.reset();
-        return;
-    }
-
-    // 從按下的那一刻才開始累計，沒按住時游標移動的距離不算進來
-    const Point position = input.mouse().position();
-    if (_dragFrom) {
-        const Vec2 delta = position - *_dragFrom;
-        // 往右拖向右看、往上拖抬頭；螢幕座標的 y 向下，因此兩者都取負號
-        _cameraRig.turn(-delta.x * DRAG_SENSITIVITY);
-        _cameraRig.tilt(-delta.y * DRAG_SENSITIVITY);
-    }
-    _dragFrom = position;
 }
 
 void Session::renderWorld(int width, int height) const {

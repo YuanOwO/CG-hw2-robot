@@ -38,7 +38,7 @@ class CameraRig {
     float _distance = 75.0f;
 
     // 平行投影沒有近大遠小，縮放要縮小 view volume，改 _distance 沒有效果
-    float _zoom = 1.0f;
+    float _zoom = 4.0f;
 };
 
 }  // namespace robot::view

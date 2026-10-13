@@ -16,29 +16,28 @@ class EntityManager {
    public:
     explicit EntityManager(std::uint64_t seed);
 
-    // id 與 seed 接在其餘參數前面：spawn<Creeper>(position, yaw) 建構 Creeper(id, seed, position, yaw)
+    void tick(float dt, const World& world);
+
     template <typename T, typename... Args>
     T& spawn(Args&&... args) {
         const EntityId id = _nextEntityId++;
         auto entity = std::make_unique<T>(id, seedFor(id), std::forward<Args>(args)...);
-        T& reference = *entity;
+        T& ref = *entity;
         _entities.push_back(std::move(entity));
-        return reference;
+        return ref;
     }
 
-    void tick(float dt, const World& world);
-
     // 依生成順序
-    template <typename F>
-    void forEach(F&& visit) const {
+    template <typename Func>
+    void forEach(Func&& visit) const {
         for (const auto& entity : _entities) {
             visit(*entity);
         }
     }
 
     // 只走訪型別為 T 或其子類別的實體
-    template <typename T, typename F>
-    void forEach(F&& visit) const {
+    template <typename T, typename Func>
+    void forEach(Func&& visit) const {
         for (const auto& entity : _entities) {
             if (const T* typed = dynamic_cast<const T*>(entity.get())) {
                 visit(*typed);
@@ -49,7 +48,7 @@ class EntityManager {
    private:
     Random _random;
     std::vector<std::unique_ptr<Entity>> _entities;
-    EntityId _nextEntityId = 1;  // 0 保留給「沒有實體」
+    EntityId _nextEntityId = 1;  // 0 保留給 "沒有實體"
 
     std::uint64_t seedFor(EntityId id) const;
 };

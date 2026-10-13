@@ -5,6 +5,7 @@
 
 #include "common/point.hpp"
 #include "engine/input.hpp"
+#include "game/player_controller.hpp"
 #include "graphics/canvas.hpp"
 #include "view/camera_rig.hpp"
 #include "view/hud.hpp"
@@ -30,11 +31,13 @@ class Session {
 
     world::World _world;
     view::CameraRig _cameraRig;
-
-    void updateCamera(float dt, const engine::Input& input);
+    PlayerController _playerController;
 
     // 拖曳視角時上一個 tick 的游標位置；沒有在拖曳時為空，按下的那一刻才記錄起點
     std::optional<Point> _dragFrom;
+
+    void updateCamera(float dt, const engine::Input& input);
+
     view::WorldRenderer _worldRenderer;
     view::Hud _hud;
 };

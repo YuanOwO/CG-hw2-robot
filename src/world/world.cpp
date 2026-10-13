@@ -21,13 +21,19 @@ World::World(std::uint64_t seed)
     : _seed(seed),
       _chunkManager(deriveSeed(seed, CHUNK_SEED_STREAM)),
       _entityManager(deriveSeed(seed, ENTITY_SEED_STREAM)) {
-    // 還沒有玩家可以當作載入中心，暫時固定以原點為中心
-    _chunkManager.update({0, 0});
-    _entityManager.spawn<entity::Creeper>(Vec3(0.0f, 0.0f, 0.0f), 0.0f);
+    _player = &_entityManager.spawn<entity::Player>(Vec3(0.0f, 0.0f, 0.0f), 0.0f);
+    loadChunksAroundPlayer();
+    _entityManager.spawn<entity::Creeper>(Vec3(4.0f, 0.0f, 0.0f), 0.0f);
 }
 
 void World::tick(float dt) {
     _entityManager.tick(dt, *this);
+    loadChunksAroundPlayer();
+}
+
+void World::loadChunksAroundPlayer() {
+    const Vec3& position = _player->position();
+    _chunkManager.update(chunk::ChunkPos::containing(position.x, position.z));
 }
 
 }  // namespace robot::world
