@@ -7,6 +7,7 @@ namespace robot::world::entity::anatomy {
 struct HumanoidSize : public BipedSize {
     Vec3 upperArm;  // 從肩關節到肘關節
     Vec3 lowerArm;  // 從肘關節到手腕
+    Vec3 hand;      // 從手腕到指尖；零向量表示沒有手掌
 };
 
 struct HumanoidGait : public BipedGait {

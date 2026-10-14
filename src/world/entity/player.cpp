@@ -20,8 +20,9 @@ const anatomy::HumanoidSize PLAYER_SIZE = {
         Vec3(4.0f, 6.0f, 4.0f) * PX,   // lowerLeg
         4.0f * PX,                     // hipWidth：兩條腿並排貼在一起
     },
-    Vec3(4.0f, 6.0f, 4.0f) * PX,  // upperArm
-    Vec3(4.0f, 6.0f, 4.0f) * PX,  // lowerArm
+    Vec3(4.0f, 5.0f, 4.0f) * PX,  // upperArm
+    Vec3(4.0f, 4.0f, 4.0f) * PX,  // lowerArm
+    Vec3(4.0f, 3.0f, 4.0f) * PX,  // hand
 };
 const anatomy::HumanoidGait PLAYER_GAIT = {
     {

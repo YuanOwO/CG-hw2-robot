@@ -31,6 +31,13 @@ std::vector<Dof> jointDofs(const JointLimits& limits) {
     };
 }
 
+// 往下垂的一節繞著頂面的中央彎曲時，頂面的角會離開上一節，在彎曲的外側裂開一道縫。
+// 把方塊往上延伸厚度的一半蓋住關節，彎到 90 度左右都還接得上
+BoneShape coverJoint(BoneShape shape) {
+    shape.boundsMax.y += (shape.boundsMax.z - shape.boundsMin.z) / 2.0f;
+    return shape;
+}
+
 }  // namespace
 
 #pragma region Head
@@ -62,13 +69,10 @@ Limb::Limb(Skeleton& skeleton, BoneIndex parent, const BoneShape& upper, const L
     _upper = skeleton.addBone({upper, parent, jointDofs(SWING_LIMITS)});
 }
 
-// 下節繞著上節底面的中央彎曲，頂面的角會離開上節，在彎曲的外側裂開一道縫。
-// 把下節往上延伸厚度的一半蓋住關節，彎到 90 度左右都還接得上
-Limb::Limb(Skeleton& skeleton, BoneIndex parent, const BoneShape& upper, BoneShape lower, const LimbMotion& motion,
-           float strideLength)
+Limb::Limb(Skeleton& skeleton, BoneIndex parent, const BoneShape& upper, const BoneShape& lower,
+           const LimbMotion& motion, float strideLength)
     : Limb(skeleton, parent, upper, motion, strideLength) {
-    lower.boundsMax.y += (lower.boundsMax.z - lower.boundsMin.z) / 2.0f;
-    _lower = skeleton.addBone({lower, _upper, jointDofs(BEND_LIMITS)});
+    _lower = skeleton.addBone({coverJoint(lower), _upper, jointDofs(BEND_LIMITS)});
 }
 
 // 相位跟著走過的距離，停下時不再前進；擺幅跟著 walkAmount 慢慢收回，肢體才不會瞬間歸位。
@@ -84,6 +88,13 @@ void Limb::animate(const AnimationInput& input, Pose& pose) const {
 }
 
 #pragma endregion  // Limb
+
+#pragma region Hand
+
+Hand::Hand(Skeleton& skeleton, BoneIndex parent, const BoneShape& shape)
+    : _bone(skeleton.addBone({coverJoint(shape), parent, jointDofs(WRIST_LIMITS)})) {}
+
+#pragma endregion  // Hand
 
 #pragma region Wing
 

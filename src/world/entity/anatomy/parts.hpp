@@ -98,7 +98,7 @@ class Limb : public Part {
     // strideLength 為公尺，走這麼遠擺一個來回
     Limb(Skeleton& skeleton, BoneIndex parent, const BoneShape& upper, const LimbMotion& motion, float strideLength);
     // lower 的 parent 一定是 upper，由這裡接上；lower 的方塊會往上延伸，蓋住關節
-    Limb(Skeleton& skeleton, BoneIndex parent, const BoneShape& upper, BoneShape lower, const LimbMotion& motion,
+    Limb(Skeleton& skeleton, BoneIndex parent, const BoneShape& upper, const BoneShape& lower, const LimbMotion& motion,
          float strideLength);
 
     BoneIndex upper() const { return _upper; }
@@ -114,6 +114,26 @@ class Limb : public Part {
 };
 
 #pragma endregion  // Limb
+
+#pragma region Hand
+
+// 接在前臂末端的手掌，手腕三軸都能轉。目前走路時保持不動，跟著前臂走
+class Hand : public Part {
+   public:
+    static constexpr JointLimits WRIST_LIMITS = {20.0f, 70.0f, 90.0f};
+
+    // shape 的方塊會往上延伸，蓋住手腕
+    Hand(Skeleton& skeleton, BoneIndex parent, const BoneShape& shape);
+
+    BoneIndex bone() const { return _bone; }
+
+    void animate(const AnimationInput& /*input*/, Pose& /*pose*/) const override {}
+
+   private:
+    BoneIndex _bone;
+};
+
+#pragma endregion  // Hand
 
 #pragma region Wing
 

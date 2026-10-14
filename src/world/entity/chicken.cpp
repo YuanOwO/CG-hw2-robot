@@ -24,7 +24,7 @@ const anatomy::BirdSize CHICKEN_SIZE = {
 };
 const anatomy::BirdGait CHICKEN_GAIT = {
     {
-        0.4f,  // strideLength：腿短了步伐也跟著小，才不會像在滑
+        0.4f,  // strideLength
         35.0f,  // swing
         40.0f,  // kneeBend
         anatomy::KneeDirection::Forward,
