@@ -4,12 +4,6 @@
 
 namespace robot::world::entity::anatomy {
 
-namespace {
-
-const float EYE_HEIGHT = 0.75f;  // 頭高度的比例
-
-}  // namespace
-
 UprightQuadrupedRig::UprightQuadrupedRig(const QuadrupedSize& size, const QuadrupedGait& gait)
     : QuadrupedRig(size, gait) {
     const Vec3 halfBody = size.body / 2.0f;
@@ -18,7 +12,7 @@ UprightQuadrupedRig::UprightQuadrupedRig(const QuadrupedSize& size, const Quadru
     // 頭在軀幹正上方
     addMainHead(torso(), {"head", Vec3(0.0f, size.body.y, 0.0f), Vec3(0.0f, size.head.y, 0.0f),
                           Vec3(-halfHead.x, 0.0f, -halfHead.z), Vec3(halfHead.x, size.head.y, halfHead.z)});
-    addEye(Vec3(0.0f, size.head.y * EYE_HEIGHT, halfHead.z));
+    addEye(Vec3(0.0f, halfHead.y, halfHead.z));  // 臉的正面，頭高度的中間
 
     // 腿貼齊軀幹左右兩側。轉軸在軀幹底面的前緣或後緣，腿整個凸出在軀幹外，
     // 只以這條邊和軀幹相接，擺動時才不會離開身體

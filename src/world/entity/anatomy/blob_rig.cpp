@@ -2,12 +2,6 @@
 
 namespace robot::world::entity::anatomy {
 
-namespace {
-
-const float EYE_HEIGHT = 0.75f;  // 身體高度的比例
-
-}  // namespace
-
 BlobRig::BlobRig(const BlobSize& size) {
     const Vec3 half = size.body / 2.0f;
 
@@ -17,8 +11,8 @@ BlobRig::BlobRig(const BlobSize& size) {
                  Vec3(half.x, size.body.y, half.z)},
                 JointLimits{});
 
-    // 臉的正面
-    addEye(Vec3(0.0f, size.body.y * EYE_HEIGHT, half.z));
+    // 臉的正面，高度的中間
+    addEye(Vec3(0.0f, half.y, half.z));
 }
 
 }  // namespace robot::world::entity::anatomy
