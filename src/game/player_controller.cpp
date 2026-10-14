@@ -8,18 +8,17 @@ world::entity::PlayerCommand PlayerController::read(const engine::Input& input, 
     }
 
     world::entity::PlayerCommand command;
-    const auto& keyboard = input.keyboard();
 
-    if (keyboard.isDown(Key::W)) {
+    if (input.held(Key::W)) {
         command.forward += 1.0f;
     }
-    if (keyboard.isDown(Key::S)) {
+    if (input.held(Key::S)) {
         command.forward -= 1.0f;
     }
-    if (keyboard.isDown(Key::D)) {
+    if (input.held(Key::D)) {
         command.strafe += 1.0f;
     }
-    if (keyboard.isDown(Key::A)) {
+    if (input.held(Key::A)) {
         command.strafe -= 1.0f;
     }
 

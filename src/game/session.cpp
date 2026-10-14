@@ -27,10 +27,10 @@ void Session::tick(float dt, const engine::Input& input) {
 void Session::updateCamera(float dt, const engine::Input& input) {
     // 用按住的狀態而不是按下事件：按住多久就轉多少，轉速與幀率無關
     float direction = 0.0f;
-    if (input.keyboard().isDown(Key::Q)) {
+    if (input.held(Key::Q)) {
         direction += 1.0f;
     }
-    if (input.keyboard().isDown(Key::E)) {
+    if (input.held(Key::E)) {
         direction -= 1.0f;
     }
     _cameraRig.turn(direction * TURN_SPEED * dt);
@@ -48,10 +48,10 @@ void Session::updateCamera(float dt, const engine::Input& input) {
     }
 
     float zoomDirection = 0.0f;
-    if (input.keyboard().isDown(Key::Equal)) {
+    if (input.held(Key::Equal)) {
         zoomDirection += 1.0f;
     }
-    if (input.keyboard().isDown(Key::Minus)) {
+    if (input.held(Key::Minus)) {
         zoomDirection -= 1.0f;
     }
     // 以指數變化，不論目前的倍率，縮放的手感都一樣

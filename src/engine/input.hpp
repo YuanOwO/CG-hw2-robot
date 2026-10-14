@@ -20,6 +20,8 @@ class Input {
 
     bool pressed(Key key) const { return _pressed.count(key) > 0; }
     bool released(Key key) const { return _released.count(key) > 0; }
+    // 這個 tick 期間任何時刻按住過：兩個 tick 之間按下又放開的短按也算，至少產生一個 tick 的效果
+    bool held(Key key) const { return _keyboard.isDown(key) || pressed(key); }
 
    private:
     bool keyDown(Key key);  // 回傳是否為第一次按下，自動重複時為 false

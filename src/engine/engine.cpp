@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <stdexcept>
 
+#include "input/glut_keymap.hpp"
 #include "io/font_catalog.hpp"
 #include "platform/glut.hpp"
 
@@ -159,13 +160,8 @@ void Engine::onDisplay() {
 
 #pragma region Keyboard callbacks
 
-Key Engine::mapKeyboardKey(unsigned char key) const {
-    // 按住 Ctrl 時 GLUT 送出控制字元（Ctrl+A 為 1）
-    return _input.keyboard().isCtrlDown() ? mapCharacterWithCtrl(key) : mapCharacter(key);
-}
-
 void Engine::onKeyboard(unsigned char key, int x, int y) {
-    const Key mapped = mapKeyboardKey(key);
+    const Key mapped = fromGlutKeyboard(key, _input.keyboard().isCtrlDown());
     if (mapped == Key::Unknown) {
         return;
     }
@@ -178,7 +174,7 @@ void Engine::onKeyboard(unsigned char key, int x, int y) {
 }
 
 void Engine::onKeyboardUp(unsigned char key, int x, int y) {
-    const Key mapped = mapKeyboardKey(key);
+    const Key mapped = fromGlutKeyboard(key, _input.keyboard().isCtrlDown());
     if (mapped == Key::Unknown) {
         return;
     }
@@ -191,7 +187,7 @@ void Engine::onKeyboardUp(unsigned char key, int x, int y) {
 }
 
 void Engine::onSpecial(int key, int x, int y) {
-    const Key mapped = mapSpecialKey(key);
+    const Key mapped = fromGlutSpecial(key);
     if (mapped == Key::Unknown) {
         return;
     }
@@ -204,7 +200,7 @@ void Engine::onSpecial(int key, int x, int y) {
 }
 
 void Engine::onSpecialUp(int key, int x, int y) {
-    const Key mapped = mapSpecialKey(key);
+    const Key mapped = fromGlutSpecial(key);
     if (mapped == Key::Unknown) {
         return;
     }
@@ -221,7 +217,7 @@ void Engine::onSpecialUp(int key, int x, int y) {
 #pragma region Mouse callbacks
 
 void Engine::onMouse(int button, int state, int x, int y) {
-    const MouseButton mapped = mapMouseButton(button);
+    const MouseButton mapped = fromGlutMouseButton(button);
     if (mapped == MouseButton::Unknown) {
         return;
     }

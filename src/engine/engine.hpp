@@ -71,8 +71,6 @@ class Engine : private platform::WindowHandler {
     void frame();
     void updateStats(Clock::time_point now);
 
-    Key mapKeyboardKey(unsigned char key) const;
-
     // platform::WindowHandler
 
     void onClose() override;
