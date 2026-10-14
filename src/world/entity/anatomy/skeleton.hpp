@@ -27,9 +27,10 @@ struct Dof {
 // 只描述形狀；接在哪、怎麼轉由組裝的人和部件決定
 struct BoneShape {
     const char* name;
-    Vec3 pivot;                 // 相對於父骨頭的旋轉中心
-    Vec3 tail;                  // 相對於自己的末端位置
-    Vec3 boundsMin, boundsMax;  // 這個部位相對於自己的方塊
+    Vec3 pivot;  // 相對於父骨頭的旋轉中心
+    Vec3 tail;   // 相對於自己的末端位置
+    // 這個部位的碰撞箱，相對於自己。只描述物理上占的空間，外觀由繪製的一方決定，不必與它相同
+    Vec3 boundsMin, boundsMax;
 };
 
 struct Bone {

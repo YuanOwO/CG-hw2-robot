@@ -9,7 +9,10 @@
 namespace robot::world::entity::anatomy {
 
 Skeleton::Skeleton() {
-    _bones.push_back({{"root", Vec3(), Vec3(), Vec3(), Vec3()}, NO_BONE, {}});  // 根骨頭
+    _bones.push_back({
+        {"root", Vec3(), Vec3(), Vec3(), Vec3()},
+        NO_BONE, {}
+    });  // 根骨頭
 }
 
 const Bone& Skeleton::bone(BoneIndex index) const {
@@ -72,7 +75,7 @@ void Skeleton::computeTransforms(const Pose& pose, const Mat4& root, std::vector
     for (auto i = 1; i < boneCount(); i++) {
         const Bone& bone = _bones[i];
 
-        out[i] = out[bone.parent];          // 繼承父骨頭的變換矩陣
+        out[i] = out[bone.parent];                // 繼承父骨頭的變換矩陣
         out[i] *= translation(bone.shape.pivot);  // 移動到旋轉中心
         for (int j = 0; j < bone.dofs.size(); ++j) {
             const Dof& dof = bone.dofs[j];

@@ -2,6 +2,7 @@
 
 #include "math/random.hpp"
 #include "world/entity/creeper.hpp"
+#include "world/entity/pig.hpp"
 
 namespace robot::world {
 
@@ -24,6 +25,7 @@ World::World(std::uint64_t seed)
     _player = &_entityManager.spawn<entity::Player>(Vec3(0.0f, 0.0f, 0.0f), 0.0f);
     loadChunksAroundPlayer();
     _entityManager.spawn<entity::Creeper>(Vec3(4.0f, 0.0f, 0.0f), 0.0f);
+    _entityManager.spawn<entity::Pig>(Vec3(-4.0f, 0.0f, 0.0f), 0.0f);
 }
 
 void World::tick(float dt) {

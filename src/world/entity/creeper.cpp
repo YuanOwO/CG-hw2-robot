@@ -10,13 +10,13 @@ namespace {
 const float CREEPER_WALK_SPEED = 1.0f;      // 公尺 / 秒
 const float CREEPER_MAX_TURN_RATE = 90.0f;  // 度 / 秒
 
-const anatomy::UprightQuadrupedSize CREEPER_SIZE = {
+const anatomy::QuadrupedSize CREEPER_SIZE = {
     Vec3(8.0f, 12.0f, 4.0f) * PX,  // body
     Vec3(8.0f, 8.0f, 8.0f) * PX,   // head
     Vec3(4.0f, 6.0f, 4.0f) * PX,   // upperLeg
     {}                             // lowerLeg
 };
-const anatomy::QuadrupedGait CREEPER_GAIT = {1.5f, 30.0f};
+const anatomy::QuadrupedGait CREEPER_GAIT = {1.5f, 30.0f, 0.0f, 0.0f};
 
 }  // namespace
 

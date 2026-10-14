@@ -26,9 +26,9 @@ BipedRig::BipedRig(const BipedSize& size, const BipedGait& gait) {
     const Vec3 halfUpper = size.upperLeg / 2.0f;
     const Vec3 halfLower = size.lowerLeg / 2.0f;
 
-    _torso = add<Torso>(ROOT_BONE, BoneShape{"torso", Vec3(0.0f, hipY, 0.0f), Vec3(0.0f, size.body.y, 0.0f),
-                                             Vec3(-halfBody.x, 0.0f, -halfBody.z),
-                                             Vec3(halfBody.x, size.body.y, halfBody.z)})
+    _torso = add<Torso>(ROOT_BONE,
+                        BoneShape{"torso", Vec3(0.0f, hipY, 0.0f), Vec3(0.0f, size.body.y, 0.0f),
+                                  Vec3(-halfBody.x, 0.0f, -halfBody.z), Vec3(halfBody.x, size.body.y, halfBody.z)})
                  .bone();
 
     addMainHead(_torso, {"head", Vec3(0.0f, size.body.y, 0.0f), Vec3(0.0f, size.head.y, 0.0f),

@@ -47,8 +47,7 @@ class Rig {
     }
 
     // 主頭決定視線：身體與視線的最大夾角、眼睛的位置。最多一顆；其他的頭用 add<Head>
-    const Head& addMainHead(BoneIndex parent, const BoneShape& shape,
-                            const JointLimits& limits = Head::DEFAULT_LIMITS);
+    const Head& addMainHead(BoneIndex parent, const BoneShape& shape, const JointLimits& limits = Head::DEFAULT_LIMITS);
 
     MarkerIndex addMarker(const Marker& marker) { return _skeleton.addMarker(marker); }
     // 眼睛一定在主頭上，offset 相對於主頭
