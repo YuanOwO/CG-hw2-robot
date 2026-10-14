@@ -6,7 +6,7 @@ namespace robot::engine {
 
 bool Input::keyDown(Key key) {
     // 按住時的自動重複不算剛按下
-    const bool firstPress = _keyboard._press(key);
+    const bool firstPress = _keyboard.press(key);
     if (firstPress) {
         _pendingPressed.insert(key);
     }
@@ -14,32 +14,32 @@ bool Input::keyDown(Key key) {
 }
 
 void Input::keyUp(Key key) {
-    if (_keyboard._release(key)) {
+    if (_keyboard.release(key)) {
         _pendingReleased.insert(key);
     }
 }
 
 void Input::mouseDown(MouseButton button) {
-    _mouse._press(button);
+    _mouse.press(button);
 }
 
 void Input::mouseUp(MouseButton button) {
-    _mouse._release(button);
+    _mouse.release(button);
 }
 
 void Input::moveMouse(int x, int y) {
-    _mouse._setPosition(x, y);
+    _mouse.setPosition(x, y);
 }
 
 void Input::clear() {
-    _keyboard._clear();
-    _mouse._clear();
+    _keyboard.clear();
+    _mouse.clear();
     _pendingPressed.clear();
     _pendingReleased.clear();
 }
 
 void Input::clearMouseButtons() {
-    _mouse._clear();
+    _mouse.clear();
 }
 
 void Input::beginTick() {

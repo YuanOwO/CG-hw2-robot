@@ -5,16 +5,11 @@
 #include "common/point.hpp"
 #include "input/input_types.hpp"
 
-namespace robot::engine {
-class Input;
-}
-
 namespace robot {
 
+// 按鍵的按住狀態。修改用的函式雖然公開，持有者對外只給 const 參考，使用端因此只能查詢
 template <typename ButtonType>
 class InputState {
-    friend class engine::Input;
-
    public:
     bool isDown(ButtonType button) const;
     bool isUp(ButtonType button) const;
@@ -22,16 +17,16 @@ class InputState {
     bool isAllDown(const std::unordered_set<ButtonType>& buttons) const;
     bool isExactlyDown(const std::unordered_set<ButtonType>& buttons) const;
 
-   private:
-    std::unordered_set<ButtonType> _down;
-
     // 回傳是否真的發生 up -> down。
-    bool _press(ButtonType button);
+    bool press(ButtonType button);
 
     // 回傳是否真的發生 down -> up。
-    bool _release(ButtonType button);
+    bool release(ButtonType button);
 
-    void _clear();
+    void clear();
+
+   private:
+    std::unordered_set<ButtonType> _down;
 };
 
 class KeyboardState : public InputState<Key> {
@@ -58,8 +53,6 @@ class KeyboardState : public InputState<Key> {
 };
 
 class MouseState : public InputState<MouseButton> {
-    friend class engine::Input;
-
    public:
     using InputState<MouseButton>::InputState;
 
@@ -67,11 +60,11 @@ class MouseState : public InputState<MouseButton> {
     int y() const { return _mouseY; }
     Point position() const { return Point(_mouseX, _mouseY); }
 
+    void setPosition(int x, int y);
+
    private:
     int _mouseX = 0;
     int _mouseY = 0;
-
-    void _setPosition(int x, int y);
 };
 
 }  // namespace robot
