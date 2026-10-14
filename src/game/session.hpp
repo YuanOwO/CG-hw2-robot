@@ -1,10 +1,9 @@
 #pragma once
 
 #include <cstdint>
-#include <optional>
 
-#include "common/point.hpp"
 #include "engine/input.hpp"
+#include "game/camera_controller.hpp"
 #include "game/player_controller.hpp"
 #include "graphics/canvas.hpp"
 #include "view/camera_rig.hpp"
@@ -21,6 +20,8 @@ class Session {
     Session();
 
     void tick(float dt, const engine::Input& input);
+    // 有畫面蓋住、停止 tick 時呼叫，清掉停止期間會失效的操作狀態
+    void pause();
 
     // 分成兩段，讓 Game 能在 HUD 之上接著用同一個 2D 階段畫選單。
     void renderWorld(int width, int height) const;
@@ -31,12 +32,8 @@ class Session {
 
     world::World _world;
     view::CameraRig _cameraRig;
+    CameraController _cameraController;
     PlayerController _playerController;
-
-    // 拖曳視角時上一個 tick 的游標位置；沒有在拖曳時為空，按下的那一刻才記錄起點
-    std::optional<Point> _dragFrom;
-
-    void updateCamera(float dt, const engine::Input& input);
 
     view::WorldRenderer _worldRenderer;
     view::Hud _hud;

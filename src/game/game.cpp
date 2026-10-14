@@ -67,6 +67,9 @@ void Game::applyPendingRequests() {
     _screen = std::move(request.screen);  // 沒有交給新畫面保管的舊畫面在這裡銷毀
 
     if (_screen) {
+        if (_session) {
+            _session->pause();
+        }
         _screen->init(_engine.width(), _engine.height());
         // 游標不動就不會收到移動事件，新按鈕的懸停狀態要主動同步
         _screen->mouseMove(_engine.input().mouse().position());
