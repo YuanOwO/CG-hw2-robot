@@ -5,12 +5,15 @@
 
 #include "graphics/canvas.hpp"
 #include "graphics/stage.hpp"
+#include "io/font_catalog.hpp"
 #include "screen/pause_screen.hpp"
 #include "screen/title_screen.hpp"
 
 namespace robot::game {
 
 Game::Game(engine::Engine& engine) : _engine(engine) {
+    // 主選單建立按鈕時就要量文字寬度，字型必須先登記
+    io::registerFonts(engine.assetsPath() / "fonts" / "fonts.ini");
     setScreen(std::make_unique<screen::TitleScreen>(*this));
     applyPendingRequests();  // 第一幀可能早於任何 tick 或事件，主選單必須先就位
 }

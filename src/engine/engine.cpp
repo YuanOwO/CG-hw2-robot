@@ -1,11 +1,9 @@
 #include "engine/engine.hpp"
 
 #include <algorithm>
-#include <filesystem>
 #include <stdexcept>
 
 #include "input/glut_keymap.hpp"
-#include "io/font_catalog.hpp"
 #include "platform/glut.hpp"
 
 namespace robot::engine {
@@ -18,14 +16,12 @@ Engine* currentEngine = nullptr;
 }  // namespace
 
 Engine::Engine(int& argc, char** argv, const std::string& title, int width, int height)
-    : _width(width), _height(height) {
+    : _width(width),
+      _height(height),
+      _assetsPath(std::filesystem::weakly_canonical(std::filesystem::absolute(argv[0])).parent_path() / "assets") {
     if (currentEngine != nullptr) {
         throw std::runtime_error("Only one Engine instance is allowed.");
     }
-
-    // 載入失敗會拋出例外，因此在設定 currentEngine 之前執行
-    const auto executablePath = std::filesystem::weakly_canonical(std::filesystem::absolute(argv[0]));
-    io::registerFonts(executablePath.parent_path() / "assets" / "fonts" / "fonts.ini");
 
     currentEngine = this;
 

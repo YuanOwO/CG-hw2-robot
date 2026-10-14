@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <filesystem>
 #include <string>
 
 #include "engine/application.hpp"
@@ -35,6 +36,8 @@ class Engine : private platform::WindowHandler {
 
     int width() const { return _width; }
     int height() const { return _height; }
+    // 資源資料夾：執行檔旁的 assets/
+    const std::filesystem::path& assetsPath() const { return _assetsPath; }
 
     // 最近一秒實際的繪製次數與 tick 次數
     double framesPerSecond() const { return _framesPerSecond; }
@@ -48,6 +51,7 @@ class Engine : private platform::WindowHandler {
     int _windowId = 0;  // 0 表示視窗已關閉
     int _width;
     int _height;
+    std::filesystem::path _assetsPath;
 
     Application* _app = nullptr;
     Input _input;
