@@ -61,9 +61,12 @@ Limb::Limb(Skeleton& skeleton, BoneIndex parent, const BoneShape& upper, const L
     _upper = skeleton.addBone({upper, parent, jointDofs(SWING_LIMITS)});
 }
 
-Limb::Limb(Skeleton& skeleton, BoneIndex parent, const BoneShape& upper, const BoneShape& lower,
-           const LimbMotion& motion, float strideLength)
+// 下節繞著上節底面的中央彎曲，頂面的角會離開上節，在彎曲的外側裂開一道縫。
+// 把下節往上延伸厚度的一半蓋住關節，彎到 90 度左右都還接得上
+Limb::Limb(Skeleton& skeleton, BoneIndex parent, const BoneShape& upper, BoneShape lower, const LimbMotion& motion,
+           float strideLength)
     : Limb(skeleton, parent, upper, motion, strideLength) {
+    lower.boundsMax.y += (lower.boundsMax.z - lower.boundsMin.z) / 2.0f;
     _lower = skeleton.addBone({lower, _upper, jointDofs(BEND_LIMITS)});
 }
 

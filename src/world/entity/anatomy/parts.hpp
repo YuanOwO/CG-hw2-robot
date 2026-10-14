@@ -97,8 +97,8 @@ class Limb : public Part {
    public:
     // strideLength 為公尺，走這麼遠擺一個來回
     Limb(Skeleton& skeleton, BoneIndex parent, const BoneShape& upper, const LimbMotion& motion, float strideLength);
-    // lower 的 parent 一定是 upper，由這裡接上
-    Limb(Skeleton& skeleton, BoneIndex parent, const BoneShape& upper, const BoneShape& lower, const LimbMotion& motion,
+    // lower 的 parent 一定是 upper，由這裡接上；lower 的方塊會往上延伸，蓋住關節
+    Limb(Skeleton& skeleton, BoneIndex parent, const BoneShape& upper, BoneShape lower, const LimbMotion& motion,
          float strideLength);
 
     BoneIndex upper() const { return _upper; }
