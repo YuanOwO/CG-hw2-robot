@@ -115,4 +115,31 @@ class Limb : public Part {
 
 #pragma endregion  // Limb
 
+#pragma region Wing
+
+// 翅膀怎麼拍：走路時往外張開再收回，張開的程度跟著 walkAmount
+struct WingMotion {
+    float side;            // +1 為左（+x），決定往哪邊張開
+    float flap;            // 度，往外張開的最大角度
+    float beatsPerStride;  // 腿擺一個來回時翅膀拍幾下
+};
+
+// 貼在身體側面、往下垂的翅膀，以 roll 往外張開
+class Wing : public Part {
+   public:
+    // strideLength 為公尺，與腿相同，翅膀才會跟著步伐拍
+    Wing(Skeleton& skeleton, BoneIndex parent, const BoneShape& shape, const WingMotion& motion, float strideLength);
+
+    BoneIndex bone() const { return _bone; }
+
+    void animate(const AnimationInput& input, Pose& pose) const override;
+
+   private:
+    BoneIndex _bone;
+    WingMotion _motion;
+    float _strideLength;
+};
+
+#pragma endregion  // Wing
+
 }  // namespace robot::world::entity::anatomy

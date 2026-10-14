@@ -1,6 +1,7 @@
 #include "world/world.hpp"
 
 #include "math/random.hpp"
+#include "world/entity/chicken.hpp"
 #include "world/entity/creeper.hpp"
 #include "world/entity/pig.hpp"
 
@@ -26,6 +27,7 @@ World::World(std::uint64_t seed)
     loadChunksAroundPlayer();
     _entityManager.spawn<entity::Creeper>(Vec3(4.0f, 0.0f, 0.0f), 0.0f);
     _entityManager.spawn<entity::Pig>(Vec3(-4.0f, 0.0f, 0.0f), 0.0f);
+    _entityManager.spawn<entity::Chicken>(Vec3(0.0f, 0.0f, 4.0f), 0.0f);
 }
 
 void World::tick(float dt) {

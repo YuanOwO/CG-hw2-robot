@@ -19,6 +19,7 @@ const Vec3 Z(0.0f, 0.0f, 1.0f);
 // 肢體關節本身能轉的範圍，比走路的擺幅寬，之後其他動作才不會被夾住
 const JointLimits SWING_LIMITS = {0.0f, 90.0f, 0.0f};
 const JointLimits BEND_LIMITS = {0.0f, 150.0f, 0.0f};
+const JointLimits WING_LIMITS = {0.0f, 0.0f, 90.0f};
 
 // 依 JointAxis 的順序：先轉 yaw 再轉 pitch，低頭時才不會連帶歪向一邊。
 // 範圍為 0 的軸仍保留 DOF，角度會被夾在 0，每根骨頭的索引因此都一樣
@@ -83,5 +84,24 @@ void Limb::animate(const AnimationInput& input, Pose& pose) const {
 }
 
 #pragma endregion  // Limb
+
+#pragma region Wing
+
+Wing::Wing(Skeleton& skeleton, BoneIndex parent, const BoneShape& shape, const WingMotion& motion, float strideLength)
+    : _bone(skeleton.addBone({shape, parent, jointDofs(WING_LIMITS)})), _motion(motion), _strideLength(strideLength) {
+    if (strideLength <= 0.0f) {
+        throw std::invalid_argument("Stride length must be positive.");
+    }
+}
+
+// 往下垂的翅膀繞 +z 正轉時，下緣往 +x 甩出去，所以左翅張開是正的 roll、右翅是負的。
+// 張開的程度在 0 到 1 之間平滑來回，不會往內穿進身體
+void Wing::animate(const AnimationInput& input, Pose& pose) const {
+    const float cycle = input.walkDistance / _strideLength * _motion.beatsPerStride;
+    const float open = (1.0f - std::cos(2.0f * PI * cycle)) / 2.0f * input.walkAmount;
+    pose.setAngle(_bone, ROLL, _motion.side * _motion.flap * open);
+}
+
+#pragma endregion  // Wing
 
 }  // namespace robot::world::entity::anatomy
