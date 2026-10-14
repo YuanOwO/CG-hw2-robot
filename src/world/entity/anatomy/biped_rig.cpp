@@ -20,8 +20,8 @@ const LegLayout LEGS[] = {
 BipedRig::BipedRig(const BipedSize& size, const BipedGait& gait) {
     const float hipY = size.upperLeg.y + size.lowerLeg.y;  // 腿站在地上，髖在腿頂
     const Vec3 halfBody = size.body / 2.0f;
-    const Vec3 halfHead = size.head / 2.0f;
     const Vec3 halfUpper = size.upperLeg / 2.0f;
+    const float hipX = size.hipWidth / 2.0f;
     const Vec3 halfLower = size.lowerLeg / 2.0f;
 
     _torso = add<Torso>(ROOT_BONE,
@@ -29,14 +29,11 @@ BipedRig::BipedRig(const BipedSize& size, const BipedGait& gait) {
                                   Vec3(-halfBody.x, 0.0f, -halfBody.z), Vec3(halfBody.x, size.body.y, halfBody.z)})
                  .bone();
 
-    addMainHead(_torso, {"head", Vec3(0.0f, size.body.y, 0.0f), Vec3(0.0f, size.head.y, 0.0f),
-                         Vec3(-halfHead.x, 0.0f, -halfHead.z), Vec3(halfHead.x, size.head.y, halfHead.z)});
-    addEye(Vec3(0.0f, halfHead.y, halfHead.z));  // 臉的正面，頭高度的中間
-
-    // 兩條腿並排在軀幹正下方；腿往後擺時膝蓋往後彎，也就是負的 pitch
+    // 腿往後擺時膝蓋才彎；往後彎是負的 pitch，往前彎是正的
+    const float kneeBend = gait.knee == KneeDirection::Backward ? -gait.kneeBend : gait.kneeBend;
     for (const LegLayout& layout : LEGS) {
-        const LimbMotion motion = {layout.phase, gait.swing, 0.0f, 0.0f, -gait.kneeBend};
-        const BoneShape upper = {layout.upper, Vec3(layout.side * halfUpper.x, 0.0f, 0.0f),
+        const LimbMotion motion = {layout.phase, gait.swing, 0.0f, 0.0f, kneeBend};
+        const BoneShape upper = {layout.upper, Vec3(layout.side * hipX, 0.0f, 0.0f),
                                  Vec3(0.0f, -size.upperLeg.y, 0.0f), Vec3(-halfUpper.x, -size.upperLeg.y, -halfUpper.z),
                                  Vec3(halfUpper.x, 0.0f, halfUpper.z)};
         if (size.lowerLeg != Vec3()) {  // 零向量表示只有一節

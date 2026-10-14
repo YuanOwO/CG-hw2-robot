@@ -18,6 +18,11 @@ const ArmLayout ARMS[] = {
 }  // namespace
 
 HumanoidRig::HumanoidRig(const HumanoidSize& size, const HumanoidGait& gait) : BipedRig(size, gait) {
+    const Vec3 halfHead = size.head / 2.0f;
+    addMainHead(torso(), {"head", Vec3(0.0f, size.body.y, 0.0f), Vec3(0.0f, size.head.y, 0.0f),
+                          Vec3(-halfHead.x, 0.0f, -halfHead.z), Vec3(halfHead.x, size.head.y, halfHead.z)});
+    addEye(Vec3(0.0f, halfHead.y, halfHead.z));  // 臉的正面，頭高度的中間
+
     // 手臂貼在軀幹兩側，頂端與軀幹頂端齊平；手往前擺時手肘多彎，也就是正的 pitch
     const float shoulderX = (size.body.x + size.upperArm.x) / 2.0f;
     const Vec3 halfUpper = size.upperArm / 2.0f;
