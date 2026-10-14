@@ -15,10 +15,6 @@ const ColorRGBA JOINT_COLOR(0.9f, 0.2f, 0.2f);
 const float BONE_WIDTH = 3.0f;  // 像素
 const float JOINT_SIZE = 8.0f;  // 像素
 
-void vertex(const Vec3& point) {
-    glVertex3f(point.x, point.y, point.z);
-}
-
 }  // namespace
 
 void SkeletonRenderer::render(const world::entity::LivingEntity& entity) const {
@@ -29,10 +25,6 @@ void SkeletonRenderer::render(const world::entity::LivingEntity& entity) const {
     std::vector<Mat4> transforms;
     entity.computeBoneTransforms(transforms);
 
-    // 關掉深度測試，骨架才不會被地面或其他東西擋住
-    glPushAttrib(GL_ENABLE_BIT | GL_LINE_BIT | GL_POINT_BIT | GL_CURRENT_BIT);
-    // glDisable(GL_DEPTH_TEST);
-
     // 畫出實體的位置與朝向，方便看出骨架的相對位置
     glPushMatrix();
     glTranslatef(entity.position().x, entity.position().y, entity.position().z);
@@ -40,26 +32,16 @@ void SkeletonRenderer::render(const world::entity::LivingEntity& entity) const {
     graphics::drawAxes(0.5f);
     glPopMatrix();
 
-    // 畫出骨架
-    glLineWidth(BONE_WIDTH);
-    glColor4f(BONE_COLOR.r, BONE_COLOR.g, BONE_COLOR.b, BONE_COLOR.a);
-    glBegin(GL_LINES);
+    // 變換矩陣已經是世界座標，骨頭從關節畫到末端，關節畫成點
+    std::vector<graphics::LineSegment> bones;
+    std::vector<Vec3> joints;
     for (BoneIndex i = ROOT_BONE + 1; i < skeleton.boneCount(); ++i) {
-        vertex(transformPoint(transforms[i], Vec3()));
-        vertex(transformPoint(transforms[i], skeleton.bone(i).shape.tail));
+        const Vec3 joint = transformPoint(transforms[i], Vec3());
+        bones.push_back({joint, transformPoint(transforms[i], skeleton.bone(i).shape.tail)});
+        joints.push_back(joint);
     }
-    glEnd();
-
-    // 畫出關節
-    glPointSize(JOINT_SIZE);
-    glColor4f(JOINT_COLOR.r, JOINT_COLOR.g, JOINT_COLOR.b, JOINT_COLOR.a);
-    glBegin(GL_POINTS);
-    for (BoneIndex i = ROOT_BONE + 1; i < skeleton.boneCount(); ++i) {
-        vertex(transformPoint(transforms[i], Vec3()));
-    }
-    glEnd();
-
-    glPopAttrib();
+    graphics::drawLines(bones, BONE_COLOR, BONE_WIDTH);
+    graphics::drawPoints(joints, JOINT_COLOR, JOINT_SIZE);
 }
 
 }  // namespace robot::view::entity
