@@ -47,7 +47,7 @@ class LivingEntity : public Entity {
     float _walkAnimation = 0.0f;  // [0, 1]，速度會瞬間變化，這個值則慢慢跟上，停下時腿才不會瞬間歸位
 
     void travel(const MoveInput& input, float dt);
-    void turnBody(const Vec3& direction, float dt);
+    void turnBody(float forward, float strafe, float dt);
 };
 
 }  // namespace robot::world::entity

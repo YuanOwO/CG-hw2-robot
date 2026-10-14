@@ -75,19 +75,18 @@ void LivingEntity::travel(const MoveInput& input, float dt) {
     _walkDistance += _speed * dt;
     _walkAnimation += (_speed / _walkSpeed - _walkAnimation) * approach(WALK_ANIMATION_RATE, dt);
 
-    turnBody(direction, dt);
+    turnBody(forward, strafe, dt);
 }
 
-void LivingEntity::turnBody(const Vec3& direction, float dt) {
+void LivingEntity::turnBody(float forward, float strafe, float dt) {
     const float maxTwist = _rig.maxHeadYaw();
 
     // 沒在走時身體轉回頭的方向；往後退時身體維持朝前，而不是轉過去面向後方
     float offset = 0.0f;
     if (_speed > 0.0f) {
-        offset = wrapSignedDegrees(degrees(std::atan2(direction.x, direction.z)) - yaw());
-        if (std::abs(offset) > 90.0f) {
-            offset = wrapSignedDegrees(offset + 180.0f);
-        }
+        // 直接用輸入算相對於 yaw 的角度：純側移剛好是 ±90°，由世界座標換算回來會有浮點誤差，
+        // 越過 90° 就被當成後退而轉向另一邊
+        offset = forward < 0.0f ? degrees(std::atan2(strafe, -forward)) : degrees(std::atan2(-strafe, forward));
     }
     const float target = yaw() + std::clamp(offset, -maxTwist, maxTwist);
     float body = _bodyYaw + wrapSignedDegrees(target - _bodyYaw) * approach(BODY_TURN_RATE, dt);
