@@ -31,15 +31,15 @@ void drawAxes(float length) {
     glPopAttrib();
 }
 
-void drawLines(const std::vector<LineSegment>& segments, const ColorRGBA& color, float width) {
+void drawLines(const std::vector<LineSegment3D>& segments, const ColorRGBA& color, float width) {
     glPushAttrib(GL_LINE_BIT | GL_CURRENT_BIT);
     glLineWidth(width);
     glColor4f(color.r, color.g, color.b, color.a);
 
     glBegin(GL_LINES);
-    for (const LineSegment& segment : segments) {
-        glVertex3f(segment.from.x, segment.from.y, segment.from.z);
-        glVertex3f(segment.to.x, segment.to.y, segment.to.z);
+    for (const LineSegment3D& segment : segments) {
+        glVertex3f(segment.start.x, segment.start.y, segment.start.z);
+        glVertex3f(segment.end.x, segment.end.y, segment.end.z);
     }
     glEnd();
 
