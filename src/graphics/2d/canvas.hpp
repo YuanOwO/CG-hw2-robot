@@ -8,41 +8,57 @@
 
 namespace robot::graphics {
 
+/// 文字框沿某個方向的對齊方式
 enum class TextAlign {
-    START,   // 左 / 上
-    CENTER,  // 中央
-    END,     // 右 / 下
+    START,   ///< 左 / 上
+    CENTER,  ///< 中央
+    END,     ///< 右 / 下
 };
 
+/// 指定的位置是文字框的哪一點，例如 {CENTER, CENTER} 為文字框中心
 struct TextAnchor {
     TextAlign horizontal = TextAlign::START;
     TextAlign vertical = TextAlign::START;
 };
 
-// 畫布工具：在像素座標中繪製矩形、圓角矩形與文字。
-//
-// 座標單位為像素，原點在視窗左上角，y 向下為正。使用前須先呼叫 graphics::begin2D 切換到 2D 繪製。
-// 所有繪製都會套用目前的座標轉換，可以用 pushTransform / translate / popTransform 平移一組繪製。
+/// 在像素座標中繪製矩形、圓角矩形與文字。
+/// 座標單位為像素，原點在視窗左上角、y 向下，使用前須先呼叫 begin2D。
+/// 所有繪製都套用目前的座標轉換，可以用 pushTransform、translate、popTransform 平移一組繪製
 class Canvas {
    public:
-    void pushTransform();  // 保存目前的座標轉換狀態
-    void popTransform();   // 恢復上一個座標轉換狀態
+    ~Canvas() = default;
 
-    void translate(float x, float y);  // 平移目前座標系
+    /// 保存目前的座標轉換，與 popTransform 成對使用
+    void pushTransform();
+    /// 恢復到上一次 pushTransform 時的座標轉換
+    void popTransform();
+    /// 平移之後的繪製，單位為像素
+    void translate(float x, float y);
 
-    // 填滿左上角為 (x, y)、寬高為 width x height 像素的矩形。
+    /// 填滿矩形；寬或高不大於 0、或完全透明時不畫
+    /// @param x, y 左上角
+    /// @param width, height 寬高，像素
     void fillRect(int x, int y, int width, int height, const ColorRGBA& color);
 
-    // 填滿左上角為 (x, y)、寬高為 width x height 像素的圓角矩形；圓角以中點畫圓法逐列計算。
+    /// 填滿圓角矩形，邊緣逐像素對齊；寬或高不大於 0、或完全透明時不畫
+    /// @param x, y 左上角
+    /// @param width, height 寬高，像素
+    /// @param radius 圓角半徑，像素；超過能放下的大小時自動縮小，0 為直角
     void fillRoundedRect(int x, int y, int width, int height, int radius, const ColorRGBA& color);
 
-    // 繪製圓角矩形外框：只填滿外框與內縮 thickness 像素後的內圓角矩形之間的區域，內部保持不變。
-    // 內圓角半徑為 radius - thickness；radius 為 0 時即為直角外框。
+    /// 畫圓角矩形的外框，內部不畫；寬、高或粗細不大於 0、或完全透明時不畫。
+    /// 內框與 fillRoundedRect(x + thickness, y + thickness, ...) 的邊緣正好相接
+    /// @param x, y 左上角
+    /// @param width, height 外框的寬高，像素
+    /// @param radius 外框的圓角半徑，像素；超過能放下的大小時自動縮小，0 為直角。
+    ///               內框的圓角半徑為 radius - thickness
+    /// @param thickness 框線粗細，像素
     void strokeRoundedRect(int x, int y, int width, int height, int radius, int thickness, const ColorRGBA& color);
 
-    // 繪製多行文字，以 '\n' 換行，每行都靠文字框左緣。
-    // anchor 決定 position 是文字框的哪一點，例如 {CENTER, CENTER} 時 position 為文字框中心；
-    // 文字框的左上角會取整到整數像素，字形才不會因為落在像素之間而模糊或抖動。
+    /// 畫多行文字，以 '\n' 換行，每行靠文字框左緣。
+    /// 文字框的左上角會取整到整數像素，字形才不會落在像素之間而模糊或抖動
+    /// @param position 文字框上由 anchor 指定的那一點
+    /// @param anchor 預設 position 為文字框左上角
     void drawText(const std::string& text, const FontStyle& fontStyle, const ColorRGBA& color, const Point& position,
                   TextAnchor anchor = {});
 };
