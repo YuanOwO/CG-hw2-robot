@@ -1,5 +1,7 @@
 #include "math/bezier.hpp"
 
+#include <algorithm>
+
 #include "math/line_segment.hpp"
 #include "math/utils.hpp"
 
@@ -43,6 +45,34 @@ void subdivide(const Curve& curve, float tolerance, int depth, float t0, float t
     subdivide(right, tolerance, depth + 1, middle, t1, samples);
 }
 
+// 控制點與端點重合時，端點的導數是零向量，但曲線在那裡仍有方向：
+// 取極限後等於端點指向下一個不重合的控制點。曲線中間的尖點則以前後兩點的差近似
+template <typename Curve>
+Vec2 tangentOf(const Curve& curve, float t, const Vec2* points, int count) {
+    const Vec2 velocity = derivative(curve, t);
+    if (lengthSquared(velocity) > EPSILON * EPSILON) {
+        return normalize(velocity);
+    }
+
+    if (t <= 0.0f) {
+        for (int i = 1; i < count; ++i) {
+            if (points[i] != points[0]) {
+                return normalize(points[i] - points[0]);
+            }
+        }
+    } else if (t >= 1.0f) {
+        for (int i = count - 2; i >= 0; --i) {
+            if (points[i] != points[count - 1]) {
+                return normalize(points[count - 1] - points[i]);
+            }
+        }
+    } else {
+        const float step = 1e-3f;
+        return normalize(evaluate(curve, std::min(t + step, 1.0f)) - evaluate(curve, std::max(t - step, 0.0f)));
+    }
+    return Vec2();  // 所有點重合
+}
+
 }  // namespace
 
 #pragma region Evaluation
@@ -64,6 +94,16 @@ Vec2 derivative(const QuadraticBezier2D& curve, float t) {
 Vec2 derivative(const CubicBezier2D& curve, float t) {
     const QuadraticBezier2D hodograph = {curve.p1 - curve.p0, curve.p2 - curve.p1, curve.p3 - curve.p2};
     return evaluate(hodograph, t) * 3.0f;
+}
+
+Vec2 tangent(const QuadraticBezier2D& curve, float t) {
+    const Vec2 points[] = {curve.p0, curve.p1, curve.p2};
+    return tangentOf(curve, t, points, 3);
+}
+
+Vec2 tangent(const CubicBezier2D& curve, float t) {
+    const Vec2 points[] = {curve.p0, curve.p1, curve.p2, curve.p3};
+    return tangentOf(curve, t, points, 4);
 }
 
 #pragma endregion  // Evaluation

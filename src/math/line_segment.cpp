@@ -52,6 +52,14 @@ Vec3 derivative(const LineSegment3D& segment, float) {
     return segment.end - segment.start;
 }
 
+Vec2 tangent(const LineSegment2D& segment, float) {
+    return normalize(segment.end - segment.start);
+}
+
+Vec3 tangent(const LineSegment3D& segment, float) {
+    return normalize(segment.end - segment.start);
+}
+
 #pragma endregion  // Evaluation
 
 #pragma region Distance

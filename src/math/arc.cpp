@@ -25,6 +25,32 @@ Arc2D Arc2D::from(const Vec2& from, const Vec2& center, float sweepDegrees) {
     return {center, length(offset), degrees(std::atan2(offset.y, offset.x)), sweepDegrees};
 }
 
+// 與某方向相切且通過兩點的圓只有一個。圓心 C 在通過起點 P、垂直於切線的直線上：C = P + n * s，n 為切線左手邊的單位向量。
+// 由 |C - P| = |C - E| 解出 s = |E - P|² / (2 n·(E - P))；s 為正時圓心在左手邊，逆時針轉
+std::optional<Arc2D> Arc2D::fromTangent(const Vec2& from, const Vec2& direction, const Vec2& to) {
+    const Vec2 unit = normalize(direction);
+    const Vec2 left(-unit.y, unit.x);
+    const Vec2 chord = to - from;
+
+    const float offset = dot(left, chord);
+    if (unit == Vec2() || std::abs(offset) <= EPSILON * std::max(1.0f, length(chord))) {
+        return std::nullopt;  // 圓的半徑為無限大
+    }
+
+    const Vec2 center = from + left * (lengthSquared(chord) / (2.0f * offset));
+
+    // 起點與終點相對於圓心的夾角，再依轉的方向換成 (0, 360) 或 (-360, 0)
+    const Vec2 start = from - center;
+    const Vec2 end = to - center;
+    float sweep = degrees(std::atan2(cross(start, end), dot(start, end)));
+    if (offset > 0.0f && sweep < 0.0f) {
+        sweep += 360.0f;
+    } else if (offset < 0.0f && sweep > 0.0f) {
+        sweep -= 360.0f;
+    }
+    return Arc2D::from(from, center, sweep);
+}
+
 #pragma endregion  // Arc
 
 #pragma region Evaluation
@@ -39,6 +65,16 @@ Vec2 evaluate(const Arc2D& arc, float t) {
 Vec2 derivative(const Arc2D& arc, float t) {
     const float angle = angleAt(arc, t);
     return Vec2(-std::sin(angle), std::cos(angle)) * (arc.radius * radians(arc.sweepDegrees));
+}
+
+// 不由導數正規化而來，半徑或轉角很小時導數太短，正規化會被當成零向量
+Vec2 tangent(const Arc2D& arc, float t) {
+    if (arc.radius <= 0.0f || arc.sweepDegrees == 0.0f) {
+        return Vec2();
+    }
+    const float angle = angleAt(arc, t);
+    const float turn = arc.sweepDegrees > 0.0f ? 1.0f : -1.0f;  // 逆時針時是左轉 90° 的半徑方向
+    return Vec2(-std::sin(angle), std::cos(angle)) * turn;
 }
 
 #pragma endregion  // Evaluation

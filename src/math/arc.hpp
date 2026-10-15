@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <utility>
 #include <vector>
 
@@ -18,6 +19,10 @@ struct Arc2D {
 
     // 從 from 繞 center 轉 sweepDegrees 的圓弧，半徑是 from 到 center 的距離
     static Arc2D from(const Vec2& from, const Vec2& center, float sweepDegrees);
+
+    // 從 from 沿 direction 出發、通過 to 的圓弧，在 from 與 direction 相切。
+    // direction 不必是單位向量；to 落在 direction 所在的直線上時沒有這樣的圓弧，回傳 std::nullopt
+    static std::optional<Arc2D> fromTangent(const Vec2& from, const Vec2& direction, const Vec2& to);
 };
 
 #pragma endregion  // Arc
@@ -29,6 +34,8 @@ struct Arc2D {
 Vec2 evaluate(const Arc2D& arc, float t);
 // 對 t 的導數，大小為 radius × sweep（弧度），沒有轉動時是零向量
 Vec2 derivative(const Arc2D& arc, float t);
+// 單位切線方向，沿轉動的方向；沒有轉動或半徑為 0 時是零向量
+Vec2 tangent(const Arc2D& arc, float t);
 
 #pragma endregion  // Evaluation
 

@@ -32,6 +32,10 @@ Vec3 evaluate(const LineSegment3D& segment, float t);
 Vec2 derivative(const LineSegment2D& segment, float t);
 Vec3 derivative(const LineSegment3D& segment, float t);
 
+// 單位切線方向，與 t 無關；長度為 0 時是零向量
+Vec2 tangent(const LineSegment2D& segment, float t);
+Vec3 tangent(const LineSegment3D& segment, float t);
+
 #pragma endregion  // Evaluation
 
 #pragma region Distance

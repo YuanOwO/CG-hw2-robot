@@ -29,6 +29,11 @@ Vec2 evaluate(const CubicBezier2D& curve, float t);
 Vec2 derivative(const QuadraticBezier2D& curve, float t);
 Vec2 derivative(const CubicBezier2D& curve, float t);
 
+// 單位切線方向。導數為零向量處（控制點與端點重合、尖點）仍取曲線實際前進的方向；
+// 所有點重合時是零向量
+Vec2 tangent(const QuadraticBezier2D& curve, float t);
+Vec2 tangent(const CubicBezier2D& curve, float t);
+
 #pragma endregion  // Evaluation
 
 #pragma region Subdivision
