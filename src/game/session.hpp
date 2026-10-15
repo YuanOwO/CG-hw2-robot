@@ -5,7 +5,7 @@
 #include "engine/input.hpp"
 #include "game/camera_controller.hpp"
 #include "game/player_controller.hpp"
-#include "graphics/canvas.hpp"
+#include "graphics/2d/canvas.hpp"
 #include "view/camera_rig.hpp"
 #include "view/hud.hpp"
 #include "view/world_renderer.hpp"

@@ -7,7 +7,7 @@
 #include "common/color.hpp"
 #include "common/point.hpp"
 #include "font/font.hpp"
-#include "graphics/canvas.hpp"
+#include "graphics/2d/canvas.hpp"
 
 namespace robot::gui {
 

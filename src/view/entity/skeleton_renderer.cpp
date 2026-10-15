@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "common/color.hpp"
-#include "graphics/primitives.hpp"
+#include "graphics/3d/primitives.hpp"
 #include "math/curve/line_segment.hpp"
 #include "math/utils.hpp"
 #include "platform/glut.hpp"

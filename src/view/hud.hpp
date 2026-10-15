@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graphics/canvas.hpp"
+#include "graphics/2d/canvas.hpp"
 #include "view/camera_rig.hpp"
 
 namespace robot::view {

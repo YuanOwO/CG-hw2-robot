@@ -1,6 +1,6 @@
 #include "view/world_renderer.hpp"
 
-#include "graphics/primitives.hpp"
+#include "graphics/3d/primitives.hpp"
 #include "graphics/render_mode.hpp"
 #include "view/chunk/chunk_renderer.hpp"
 

@@ -1,6 +1,6 @@
-#include "graphics/primitives.hpp"
+#include "graphics/3d/primitives.hpp"
 
-#include "graphics/shading.hpp"
+#include "graphics/3d/shading.hpp"
 #include "platform/glut.hpp"
 
 namespace robot::graphics {

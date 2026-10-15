@@ -4,8 +4,8 @@
 
 #include "common/point.hpp"
 #include "font/font_library.hpp"
+#include "graphics/2d/canvas.hpp"
 #include "platform/glut.hpp"
-#include "graphics/canvas.hpp"
 
 namespace robot::graphics {
 

@@ -3,7 +3,7 @@
 #include <memory>
 #include <utility>
 
-#include "graphics/canvas.hpp"
+#include "graphics/2d/canvas.hpp"
 #include "graphics/render_mode.hpp"
 #include "io/font_catalog.hpp"
 #include "screen/pause_screen.hpp"

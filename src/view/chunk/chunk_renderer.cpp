@@ -1,7 +1,7 @@
 #include "view/chunk/chunk_renderer.hpp"
 
 #include "common/color.hpp"
-#include "graphics/primitives.hpp"
+#include "graphics/3d/primitives.hpp"
 #include "math/vec3.hpp"
 
 namespace robot::view::chunk {

@@ -6,9 +6,9 @@
 
 #include "common/bounding_box.hpp"
 #include "common/point.hpp"
+#include "graphics/2d/canvas.hpp"
 #include "gui/button.hpp"
 #include "input/input_types.hpp"
-#include "graphics/canvas.hpp"
 #include "screen/screen_host.hpp"
 
 namespace robot::screen {

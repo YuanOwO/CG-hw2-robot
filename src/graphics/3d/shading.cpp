@@ -1,4 +1,4 @@
-#include "graphics/shading.hpp"
+#include "graphics/3d/shading.hpp"
 
 namespace robot::graphics {
 

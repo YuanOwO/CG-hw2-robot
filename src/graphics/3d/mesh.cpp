@@ -1,8 +1,8 @@
-#include "graphics/mesh.hpp"
+#include "graphics/3d/mesh.hpp"
 
 #include <cassert>
 
-#include "graphics/shading.hpp"
+#include "graphics/3d/shading.hpp"
 #include "platform/glut.hpp"
 
 namespace robot::graphics {

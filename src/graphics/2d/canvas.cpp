@@ -1,4 +1,4 @@
-#include "graphics/canvas.hpp"
+#include "graphics/2d/canvas.hpp"
 
 #include <algorithm>
 #include <utility>
