@@ -1,4 +1,4 @@
-#include "graphics/stage.hpp"
+#include "graphics/render_mode.hpp"
 
 #include "platform/glut.hpp"
 

@@ -1,7 +1,7 @@
 #include "view/world_renderer.hpp"
 
 #include "graphics/primitives.hpp"
-#include "graphics/stage.hpp"
+#include "graphics/render_mode.hpp"
 #include "view/chunk/chunk_renderer.hpp"
 
 namespace robot::view {

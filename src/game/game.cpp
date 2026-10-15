@@ -4,7 +4,7 @@
 #include <utility>
 
 #include "graphics/canvas.hpp"
-#include "graphics/stage.hpp"
+#include "graphics/render_mode.hpp"
 #include "io/font_catalog.hpp"
 #include "screen/pause_screen.hpp"
 #include "screen/title_screen.hpp"
