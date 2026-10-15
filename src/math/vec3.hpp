@@ -6,6 +6,7 @@
 
 namespace robot {
 
+/// 3D 向量，== 比較時容許 EPSILON 的誤差
 struct Vec3 {
     float x, y, z;
 
@@ -40,8 +41,8 @@ float lengthSquared(const Vec3& vec);
 float distance(const Vec3& a, const Vec3& b);
 
 float dot(const Vec3& a, const Vec3& b);
-Vec3 cross(const Vec3& a, const Vec3& b);  // 右手定則：cross(X, Y) = Z
+Vec3 cross(const Vec3& a, const Vec3& b);  ///< 右手定則：cross(X, Y) = Z
 
-Vec3 normalize(const Vec3& vec);  // 零向量回傳零向量
+Vec3 normalize(const Vec3& vec);  ///< 單位向量；長度小於 EPSILON 時回傳零向量
 
 }  // namespace robot
