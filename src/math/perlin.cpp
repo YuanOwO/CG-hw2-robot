@@ -8,6 +8,9 @@
 #include "math/utils.hpp"
 
 namespace robot {
+
+// 梯度只由 seed 與整數格點座標決定，相鄰區塊各自取樣時共用邊界的梯度相同
+
 namespace {
 
 // 與同一 seed 的其他隨機用途分開，雜訊才不會和它們相關。
@@ -20,7 +23,7 @@ constexpr int GRADIENT_BITS = 4;
 constexpr int GRADIENT_COUNT = 1 << GRADIENT_BITS;
 
 // 只用 8 個方向時，單一 octave 就看得出 45° 紋路；16 個已幾乎看不出。
-// 預先建表，取樣時就不必計算三角函數。
+// 預先建表，取樣時就不必計算三角函數。單位向量使輸出範圍約為 [-0.71, 0.71]。
 const auto GRADIENTS_2D = [] {
     std::array<Vec2, GRADIENT_COUNT> table;
     for (int i = 0; i < GRADIENT_COUNT; ++i) {
@@ -32,6 +35,7 @@ const auto GRADIENTS_2D = [] {
 
 // 立方體 12 條邊中點的方向，投影到任何切面上都不整齊，因此看不出方向性。
 // 最後 4 個是重複的方向，只為湊滿 16 個；它們出現的機率略高，但肉眼看不出差異。
+// 長度為 √2 而未正規化，輸出範圍因此約為 [-1, 1]。
 const Vec3 GRADIENTS_3D[GRADIENT_COUNT] = {
     {1,  1,  0 },
     {-1, 1,  0 },
@@ -63,6 +67,8 @@ float fade(float t) {
 
 }  // namespace
 
+#pragma region Perlin1D
+
 Perlin1D::Perlin1D(std::uint64_t seed) : _random(seed) {}
 
 // 1D 不能像 2D、3D 一樣只用幾個固定梯度：斜率若只有 ±1，每一格的起伏都一樣高，
@@ -80,6 +86,10 @@ float Perlin1D::noise(float x) const {
 
     return lerp(n0, n1, fade(t));
 }
+
+#pragma endregion  // Perlin1D
+
+#pragma region Perlin2D
 
 Perlin2D::Perlin2D(std::uint64_t seed) : _random(seed) {}
 
@@ -108,6 +118,10 @@ float Perlin2D::noise(float x, float y) const {
 
     return lerp(edge[0], edge[1], u);
 }
+
+#pragma endregion  // Perlin2D
+
+#pragma region Perlin3D
 
 Perlin3D::Perlin3D(std::uint64_t seed) : _random(seed) {}
 
@@ -143,5 +157,7 @@ float Perlin3D::noise(float x, float y, float z) const {
 
     return lerp(face[0], face[1], u);
 }
+
+#pragma endregion  // Perlin3D
 
 }  // namespace robot

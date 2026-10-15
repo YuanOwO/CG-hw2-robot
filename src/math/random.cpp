@@ -46,20 +46,20 @@ std::uint64_t Random::valueAt1D(std::int64_t x, std::uint32_t stream, std::uint3
     return mix64(value ^ INDEX_TAG ^ index);
 }
 
+std::uint64_t Random::valueAt2D(std::int64_t x, std::int64_t y, std::uint32_t stream, std::uint32_t index) const {
+    std::uint64_t value = mix64(_seed ^ DOMAIN_2D);
+    value = mix64(value ^ static_cast<std::uint64_t>(x));
+    value = mix64(value ^ static_cast<std::uint64_t>(y));
+    value = mix64(value ^ STREAM_TAG ^ stream);
+    return mix64(value ^ INDEX_TAG ^ index);
+}
+
 std::uint64_t Random::valueAt3D(std::int64_t x, std::int64_t y, std::int64_t z, std::uint32_t stream,
                                 std::uint32_t index) const {
     std::uint64_t value = mix64(_seed ^ DOMAIN_3D);
     value = mix64(value ^ static_cast<std::uint64_t>(x));
     value = mix64(value ^ static_cast<std::uint64_t>(y));
     value = mix64(value ^ static_cast<std::uint64_t>(z));
-    value = mix64(value ^ STREAM_TAG ^ stream);
-    return mix64(value ^ INDEX_TAG ^ index);
-}
-
-std::uint64_t Random::valueAt2D(std::int64_t x, std::int64_t y, std::uint32_t stream, std::uint32_t index) const {
-    std::uint64_t value = mix64(_seed ^ DOMAIN_2D);
-    value = mix64(value ^ static_cast<std::uint64_t>(x));
-    value = mix64(value ^ static_cast<std::uint64_t>(y));
     value = mix64(value ^ STREAM_TAG ^ stream);
     return mix64(value ^ INDEX_TAG ^ index);
 }
