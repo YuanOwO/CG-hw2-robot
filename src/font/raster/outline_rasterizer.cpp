@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-#include "math/bezier.hpp"
+#include "math/curve/bezier.hpp"
 #include "math/utils.hpp"
 #include "math/vec2.hpp"
 

@@ -1,4 +1,4 @@
-#include "math/arc.hpp"
+#include "math/curve/arc.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -18,7 +18,7 @@ float angleAt(const Arc2D& arc, float t) {
 
 }  // namespace
 
-#pragma region Arc
+#pragma region Types
 
 Arc2D Arc2D::from(const Vec2& from, const Vec2& center, float sweepDegrees) {
     const Vec2 offset = from - center;
@@ -51,7 +51,7 @@ std::optional<Arc2D> Arc2D::fromTangent(const Vec2& from, const Vec2& direction,
     return Arc2D::from(from, center, sweep);
 }
 
-#pragma endregion  // Arc
+#pragma endregion  // Types
 
 #pragma region Evaluation
 

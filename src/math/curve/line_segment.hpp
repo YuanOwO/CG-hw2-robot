@@ -3,13 +3,13 @@
 #include <utility>
 #include <vector>
 
-#include "math/curve_sample.hpp"
+#include "math/curve/curve_sample.hpp"
 #include "math/vec2.hpp"
 #include "math/vec3.hpp"
 
 namespace robot {
 
-#pragma region Segments
+#pragma region Types
 
 struct LineSegment2D {
     Vec2 start, end;
@@ -19,7 +19,7 @@ struct LineSegment3D {
     Vec3 start, end;
 };
 
-#pragma endregion  // Segments
+#pragma endregion  // Types
 
 #pragma region Evaluation
 
@@ -52,7 +52,7 @@ float distance(const Vec3& point, const LineSegment3D& segment);
 std::pair<LineSegment2D, LineSegment2D> split(const LineSegment2D& segment, float t);
 std::pair<LineSegment3D, LineSegment3D> split(const LineSegment3D& segment, float t);
 
-// 只把終點加到 samples（不含 start）
+// 直線不必細分，只把終點加到 samples（不含起點），方便串接連續的曲線
 void flatten(const LineSegment2D& segment, float tolerance, std::vector<CurveSample2D>& samples);
 void flatten(const LineSegment3D& segment, float tolerance, std::vector<CurveSample3D>& samples);
 

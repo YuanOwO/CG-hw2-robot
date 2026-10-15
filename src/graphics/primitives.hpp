@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "common/color.hpp"
-#include "math/line_segment.hpp"
+#include "math/curve/line_segment.hpp"
 #include "math/vec3.hpp"
 
 // 呼叫當下直接用 glBegin 畫出的輔助圖形，不產生網格。

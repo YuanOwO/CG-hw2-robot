@@ -1,4 +1,4 @@
-#include "math/path2d.hpp"
+#include "math/curve/path2d.hpp"
 
 #include <cassert>
 #include <cmath>
@@ -20,7 +20,7 @@ Vec2 rightNormal(const Vec2& direction) {
 
 }  // namespace
 
-#pragma region Path2D
+#pragma region Types
 
 Path2D::Path2D(const Vec2& start) : _start(start), _end(start) {}
 
@@ -101,7 +101,7 @@ std::vector<std::vector<Path2D::Vertex>> Path2D::flatten(float tolerance) const 
 
 #pragma endregion  // Flattening
 
-#pragma endregion  // Path2D
+#pragma endregion  // Types
 
 #pragma region Segment
 
@@ -115,6 +115,15 @@ Vec2 derivative(const Path2D::Segment& segment, float t) {
 
 Vec2 tangent(const Path2D::Segment& segment, float t) {
     return std::visit([t](const auto& curve) { return tangent(curve, t); }, segment);
+}
+
+std::pair<Path2D::Segment, Path2D::Segment> split(const Path2D::Segment& segment, float t) {
+    return std::visit(
+        [t](const auto& curve) -> std::pair<Path2D::Segment, Path2D::Segment> {
+            const auto [first, second] = split(curve, t);
+            return {first, second};
+        },
+        segment);
 }
 
 void flatten(const Path2D::Segment& segment, float tolerance, std::vector<CurveSample2D>& samples) {

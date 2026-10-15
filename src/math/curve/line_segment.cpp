@@ -1,4 +1,4 @@
-#include "math/line_segment.hpp"
+#include "math/curve/line_segment.hpp"
 
 #include <algorithm>
 

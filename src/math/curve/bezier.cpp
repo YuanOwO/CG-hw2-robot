@@ -1,8 +1,8 @@
-#include "math/bezier.hpp"
+#include "math/curve/bezier.hpp"
 
 #include <algorithm>
 
-#include "math/line_segment.hpp"
+#include "math/curve/line_segment.hpp"
 #include "math/utils.hpp"
 
 namespace robot {
@@ -11,7 +11,7 @@ namespace {
 
 const int MAX_SUBDIVISION_DEPTH = 16;  // 最多切成 2^16 段，避免 NaN 或容許值為 0 時無限遞迴
 
-// 曲線位於控制點的凸包內，因此控制點到弦的距離都夠小時，曲線可以用弦代替。
+// 曲線位於控制點的凸包內，因此控制點到弦的距離都夠小時，曲線可以用弦代替
 bool isFlat(const QuadraticBezier2D& curve, float tolerance) {
     return distance(curve.p1, LineSegment2D{curve.p0, curve.p2}) <= tolerance;
 }
@@ -77,7 +77,7 @@ Vec2 tangentOf(const Curve& curve, float t, const Vec2* points, int count) {
 
 #pragma region Evaluation
 
-// 切分點 B(t) 即為左半段的終點。
+// 切分點 B(t) 即為左半段的終點
 Vec2 evaluate(const QuadraticBezier2D& curve, float t) {
     return split(curve, t).first.p2;
 }

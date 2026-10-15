@@ -1,17 +1,18 @@
 #pragma once
 
+#include <utility>
 #include <variant>
 #include <vector>
 
-#include "math/arc.hpp"
-#include "math/bezier.hpp"
-#include "math/curve_sample.hpp"
-#include "math/line_segment.hpp"
+#include "math/curve/arc.hpp"
+#include "math/curve/bezier.hpp"
+#include "math/curve/curve_sample.hpp"
+#include "math/curve/line_segment.hpp"
 #include "math/vec2.hpp"
 
 namespace robot {
 
-#pragma region Path2D
+#pragma region Types
 
 // 由畫筆指令組成的 2D 路徑。與 GOTL 輪廓相同，每段的起點是前一段的終點，
 // 曲線的最後一個點是終點，其餘是控制點。路徑本身不閉合，要不要接回起點由使用的一方決定
@@ -26,6 +27,7 @@ class Path2D {
     };
 
     explicit Path2D(const Vec2& start);
+    ~Path2D() = default;
 
 #pragma region Drawing
 
@@ -63,7 +65,7 @@ class Path2D {
     std::vector<Segment> _segments;
 };
 
-#pragma endregion  // Path2D
+#pragma endregion  // Types
 
 #pragma region Segment
 
@@ -73,6 +75,7 @@ Vec2 evaluate(const Path2D::Segment& segment, float t);
 Vec2 derivative(const Path2D::Segment& segment, float t);
 Vec2 tangent(const Path2D::Segment& segment, float t);
 
+std::pair<Path2D::Segment, Path2D::Segment> split(const Path2D::Segment& segment, float t);
 void flatten(const Path2D::Segment& segment, float tolerance, std::vector<CurveSample2D>& samples);
 
 #pragma endregion  // Segment

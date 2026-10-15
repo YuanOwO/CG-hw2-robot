@@ -5,7 +5,7 @@
 
 #include "common/color.hpp"
 #include "graphics/primitives.hpp"
-#include "math/line_segment.hpp"
+#include "math/curve/line_segment.hpp"
 #include "math/utils.hpp"
 #include "platform/glut.hpp"
 

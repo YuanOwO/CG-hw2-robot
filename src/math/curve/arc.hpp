@@ -4,12 +4,12 @@
 #include <utility>
 #include <vector>
 
-#include "math/curve_sample.hpp"
+#include "math/curve/curve_sample.hpp"
 #include "math/vec2.hpp"
 
 namespace robot {
 
-#pragma region Arc
+#pragma region Types
 
 struct Arc2D {
     Vec2 center;
@@ -25,7 +25,7 @@ struct Arc2D {
     static std::optional<Arc2D> fromTangent(const Vec2& from, const Vec2& direction, const Vec2& to);
 };
 
-#pragma endregion  // Arc
+#pragma endregion  // Types
 
 #pragma region Evaluation
 
@@ -50,8 +50,8 @@ float distance(const Vec2& point, const Arc2D& arc);  // 點到圓弧的最短�
 // 在 t 處切成兩段，兩段的圓心與半徑不變，轉角依 t 分配
 std::pair<Arc2D, Arc2D> split(const Arc2D& arc, float t);
 
-// 切成折線，弦與圓弧的距離不超過 tolerance。
-// 只把各段的終點依序加到 samples（不含起點），方便串接連續的線段
+// 切成折線，折線與曲線的距離不超過 tolerance。
+// 只把各段的終點依序加到 samples（不含起點），方便串接連續的曲線
 void flatten(const Arc2D& arc, float tolerance, std::vector<CurveSample2D>& samples);
 
 #pragma endregion  // Subdivision

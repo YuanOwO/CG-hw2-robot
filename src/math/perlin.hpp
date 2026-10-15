@@ -9,9 +9,9 @@
 namespace robot {
 
 // Perlin 梯度雜訊。輸出只由 seed 與座標決定，與取樣順序無關，
-// 因此分開生成的相鄰區塊在共用邊界上會得到相同的值。
+// 因此分開生成的相鄰區塊在共用邊界上會得到相同的值
 
-// 輸出範圍 [-0.5, 0.5]。
+// 輸出範圍 [-0.5, 0.5]
 class Perlin1D {
    public:
     explicit Perlin1D(std::uint64_t seed);
@@ -25,7 +25,7 @@ class Perlin1D {
     float gradientAt(std::int64_t x) const;
 };
 
-// 輸出範圍約 [-0.71, 0.71]。
+// 輸出範圍約 [-0.71, 0.71]
 class Perlin2D {
    public:
     explicit Perlin2D(std::uint64_t seed);
@@ -39,7 +39,7 @@ class Perlin2D {
     Vec2 gradientAt(std::int64_t x, std::int64_t y) const;
 };
 
-// 輸出範圍約 [-1, 1]。
+// 輸出範圍約 [-1, 1]
 class Perlin3D {
    public:
     explicit Perlin3D(std::uint64_t seed);
