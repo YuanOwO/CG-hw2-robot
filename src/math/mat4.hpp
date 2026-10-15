@@ -21,6 +21,6 @@ Mat4 translation(const Vec3& offset);
 Mat4 rotation(float degrees, const Vec3& axis);  // 與 glRotatef 相同：角度、右手定則，axis 不必是單位向量
 
 Vec3 transformPoint(const Mat4& mat, const Vec3& point);          // w = 1，受平移影響
-Vec3 transformDirection(const Mat4& mat, const Vec3& direction);  // w = 0，只受旋轉影響
+Vec3 transformVector(const Mat4& mat, const Vec3& vector);  // w = 0，不受平移影響
 
 }  // namespace robot

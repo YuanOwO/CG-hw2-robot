@@ -55,13 +55,13 @@ Mat4 rotation(float degrees, const Vec3& axis) {
 }
 
 Vec3 transformPoint(const Mat4& mat, const Vec3& point) {
-    return transformDirection(mat, point) + Vec3(mat.at(0, 3), mat.at(1, 3), mat.at(2, 3));
+    return transformVector(mat, point) + Vec3(mat.at(0, 3), mat.at(1, 3), mat.at(2, 3));
 }
 
-Vec3 transformDirection(const Mat4& mat, const Vec3& direction) {
-    float x = mat.at(0, 0) * direction.x + mat.at(0, 1) * direction.y + mat.at(0, 2) * direction.z;
-    float y = mat.at(1, 0) * direction.x + mat.at(1, 1) * direction.y + mat.at(1, 2) * direction.z;
-    float z = mat.at(2, 0) * direction.x + mat.at(2, 1) * direction.y + mat.at(2, 2) * direction.z;
+Vec3 transformVector(const Mat4& mat, const Vec3& vector) {
+    float x = mat.at(0, 0) * vector.x + mat.at(0, 1) * vector.y + mat.at(0, 2) * vector.z;
+    float y = mat.at(1, 0) * vector.x + mat.at(1, 1) * vector.y + mat.at(1, 2) * vector.z;
+    float z = mat.at(2, 0) * vector.x + mat.at(2, 1) * vector.y + mat.at(2, 2) * vector.z;
     return Vec3(x, y, z);
 }
 
