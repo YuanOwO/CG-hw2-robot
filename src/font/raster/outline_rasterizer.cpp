@@ -186,12 +186,12 @@ class OutlineTracer {
     void lineTo(const GotlData::OutlinePoint& point) { lineToPixel(toPixel(point)); }
 
     void quadTo(const GotlData::OutlinePoint& control, const GotlData::OutlinePoint& end) {
-        flattenTo(QuadraticBezier{_current, toPixel(control), toPixel(end)});
+        flattenTo(QuadraticBezier2D{_current, toPixel(control), toPixel(end)});
     }
 
     void cubicTo(const GotlData::OutlinePoint& control1, const GotlData::OutlinePoint& control2,
                  const GotlData::OutlinePoint& end) {
-        flattenTo(CubicBezier{_current, toPixel(control1), toPixel(control2), toPixel(end)});
+        flattenTo(CubicBezier2D{_current, toPixel(control1), toPixel(control2), toPixel(end)});
     }
 
     // GOTL 沒有 Close 指令，輪廓一律封閉；沒閉合的輪廓會讓那一列的累加和不歸零，
@@ -220,11 +220,11 @@ class OutlineTracer {
     // 控制點已換算成像素座標，細分的容許誤差因此以像素計，字號越大切得越細。
     template <typename Curve>
     void flattenTo(const Curve& curve) {
-        _vertices.clear();
-        flatten(curve, FLATTEN_TOLERANCE, _vertices);
+        _samples.clear();
+        flatten(curve, FLATTEN_TOLERANCE, _samples);
 
-        for (const Vec2& vertex : _vertices) {
-            lineToPixel(vertex);
+        for (const CurveSample2D& sample : _samples) {
+            lineToPixel(sample.position);
         }
     }
 
@@ -238,7 +238,7 @@ class OutlineTracer {
     Vec2 _current;
     bool _hasContour = false;
 
-    std::vector<Vec2> _vertices;  // 重複使用，避免每段曲線都重新配置
+    std::vector<CurveSample2D> _samples;  // 重複使用，避免每段曲線都重新配置
 };
 
 #pragma endregion  // Outline tracing

@@ -43,6 +43,5 @@ float dot(const Vec3& a, const Vec3& b);
 Vec3 cross(const Vec3& a, const Vec3& b);  // 右手定則：cross(X, Y) = Z
 
 Vec3 normalize(const Vec3& vec);  // 零向量回傳零向量
-Vec3 lerp(const Vec3& a, const Vec3& b, float t);
 
 }  // namespace robot
