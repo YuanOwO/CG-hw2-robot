@@ -29,8 +29,6 @@ class Path2D {
     explicit Path2D(const Vec2& start);
     ~Path2D() = default;
 
-#pragma region Drawing
-
     Path2D& lineTo(const Vec2& end);
     Path2D& quadTo(const Vec2& control, const Vec2& end);
     Path2D& cubicTo(const Vec2& control1, const Vec2& control2, const Vec2& end);
@@ -40,24 +38,14 @@ class Path2D {
     // 前面須至少有一段；end 落在切線上時改畫直線
     Path2D& tangentArcTo(const Vec2& end);
 
-#pragma endregion  // Drawing
-
-#pragma region Queries
-
     const Vec2& start() const { return _start; }
     const Vec2& end() const { return _end; }  // 目前畫筆的位置，下一段的起點
     const std::vector<Segment>& segments() const { return _segments; }
-
-#pragma endregion  // Queries
-
-#pragma region Flattening
 
     // 切成折線，折線與曲線的距離不超過 tolerance，法向量是曲線上的精確值而非由折線估計。
     // 兩段相接處切線方向不連續時（折角）在該處斷開，回傳多條折線：
     // 同一條內法向量是平滑的，不同條之間的邊是銳利的
     std::vector<std::vector<Vertex>> flatten(float tolerance) const;
-
-#pragma endregion  // Flattening
 
    private:
     Vec2 _start;

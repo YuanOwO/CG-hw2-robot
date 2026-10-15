@@ -34,8 +34,7 @@ Vec3 gazeDirection(float yaw, float pitch) {
 }
 
 // 把骨頭座標系裡的方塊換到世界座標，加入它的 12 條邊。骨頭會轉，所以方塊不一定和世界的軸對齊
-void addBoxEdges(std::vector<LineSegment3D>& edges, const Mat4& transform, const Vec3& min,
-                 const Vec3& max) {
+void addBoxEdges(std::vector<LineSegment3D>& edges, const Mat4& transform, const Vec3& min, const Vec3& max) {
     // 第 i 個角的 x、y、z 依 i 的第 0、1、2 個位元取 min 或 max
     Vec3 corners[8];
     for (int i = 0; i < 8; ++i) {
@@ -95,7 +94,8 @@ void SkeletonRenderer::render(const world::entity::LivingEntity& entity) const {
     if (entity.rig().eye() != world::entity::anatomy::NO_MARKER) {
         const Vec3 eye = skeleton.markerPosition(transforms, entity.rig().eye());
         const Vec3 gaze = eye + gazeDirection(entity.yaw(), entity.pitch()) * GAZE_LENGTH;
-        graphics::drawLines({{eye, gaze}}, GAZE_COLOR, GAZE_WIDTH);
+        const LineSegment3D gazeLine{eye, gaze};
+        graphics::drawLines({gazeLine}, GAZE_COLOR, GAZE_WIDTH);
     }
 }
 
