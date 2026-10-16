@@ -35,8 +35,10 @@ void drawLines(const std::vector<LineSegment3D>& segments, const ColorRGBA& colo
 
     glBegin(GL_LINES);
     for (const LineSegment3D& segment : segments) {
-        glVertex3f(segment.start.x, segment.start.y, segment.start.z);
-        glVertex3f(segment.end.x, segment.end.y, segment.end.z);
+        const Vec3 start = segment.startPoint();
+        const Vec3 end = segment.endPoint();
+        glVertex3f(start.x, start.y, start.z);
+        glVertex3f(end.x, end.y, end.z);
     }
     glEnd();
 

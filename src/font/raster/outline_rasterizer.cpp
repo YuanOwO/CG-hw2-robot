@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "math/curve/bezier.hpp"
+#include "math/curve/flatten.hpp"
 #include "math/utils.hpp"
 #include "math/vec2.hpp"
 
@@ -223,8 +224,9 @@ class OutlineTracer {
         _samples.clear();
         flatten(curve, FLATTEN_TOLERANCE, _samples);
 
-        for (const CurveSample2D& sample : _samples) {
-            lineToPixel(sample.position);
+        // 第一個點是曲線的起點，也就是目前位置，已經畫到了
+        for (auto sample = _samples.begin() + 1; sample != _samples.end(); ++sample) {
+            lineToPixel(sample->point);
         }
     }
 

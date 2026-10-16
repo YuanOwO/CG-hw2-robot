@@ -2,134 +2,94 @@
 
 #include <cassert>
 #include <cmath>
-#include <optional>
 
+#include "math/curve/flatten.hpp"
 #include "math/utils.hpp"
 
 namespace robot {
-
 namespace {
 
-// 兩段相接處切線的夾角在這以內視為平滑。手算的座標與 cos、sin 都有誤差，不能要求完全相等
-const float SMOOTH_JOIN_DEGREES = 1.0f;
+// 兩段相接處法向量的夾角在 1° 以內視為平順；切線由 sin、cos 算出，不會剛好相等
+const float SMOOTH_JOIN_COSINE = std::cos(radians(1.0f));
 
-// 前進方向的右手邊，direction 須為單位向量
-Vec2 rightNormal(const Vec2& direction) {
-    return Vec2(direction.y, -direction.x);
+Vec2 rightNormal(const Vec2& tangent) {
+    return Vec2(tangent.y, -tangent.x);
 }
 
 }  // namespace
 
-#pragma region Types
-
-Path2D::Path2D(const Vec2& start) : _start(start), _end(start) {}
-
-#pragma region Drawing
+Path2D::Path2D(Vec2 start) : _start(start), _end(start) {}
 
 Path2D& Path2D::lineTo(const Vec2& end) {
-    _segments.push_back(LineSegment2D{_end, end});
+    _curves.emplace_back(LineSegment2D(_end, end));
     _end = end;
     return *this;
 }
 
-Path2D& Path2D::quadTo(const Vec2& control, const Vec2& end) {
-    _segments.push_back(QuadraticBezier2D{_end, control, end});
-    _end = end;
-    return *this;
-}
+Path2D& Path2D::arcTo(const Vec2& center, Vec2 end, bool clockwise) {
+    auto arc = Arc2D::around(_end, center, end, clockwise);
 
-Path2D& Path2D::cubicTo(const Vec2& control1, const Vec2& control2, const Vec2& end) {
-    _segments.push_back(CubicBezier2D{_end, control1, control2, end});
-    _end = end;
-    return *this;
-}
+    assert(arc.has_value());
 
-Path2D& Path2D::arcAround(const Vec2& center, float sweepDegrees) {
-    assert(center != _end && "圓心與目前位置重合，半徑為 0");
-
-    const Arc2D arc = Arc2D::from(_end, center, sweepDegrees);
-    _segments.push_back(arc);
-    _end = evaluate(arc, 1.0f);
+    if (arc) {
+        _curves.emplace_back(*arc);
+        _end = arc->endPoint();
+    }
     return *this;
 }
 
 Path2D& Path2D::tangentArcTo(const Vec2& end) {
-    assert(!_segments.empty() && "第一段沒有可以沿用的切線方向");
-
-    const std::optional<Arc2D> arc = Arc2D::fromTangent(_end, tangent(_segments.back(), 1.0f), end);
-    if (!arc) {
-        return lineTo(end);
+    Vec2 direction = _curves.empty() ? Vec2(1.0f, 0.0f) : _curves.back().tangent(1.0f);
+    auto arc = Arc2D::tangentAtStart(_end, direction, end);
+    if (arc) {
+        _curves.emplace_back(*arc);
+        _end = end;
+    } else {
+        // 無法建立圓弧，改用直線
+        _curves.emplace_back(LineSegment2D(_end, end));
+        _end = end;
     }
-
-    _segments.push_back(*arc);
-    _end = end;  // 直接用指定的終點，不用算出來的，免得之後接上的點有誤差
     return *this;
 }
 
-#pragma endregion  // Drawing
+Path2D& Path2D::quadraticBezierTo(const Vec2& control, const Vec2& end) {
+    _curves.emplace_back(QuadraticBezier2D(_end, control, end));
+    _end = end;
+    return *this;
+}
 
-#pragma region Flattening
+Path2D& Path2D::cubicBezierTo(const Vec2& control1, const Vec2& control2, const Vec2& end) {
+    _curves.emplace_back(CubicBezier2D(_end, control1, control2, end));
+    _end = end;
+    return *this;
+}
 
-std::vector<std::vector<Path2D::Vertex>> Path2D::flatten(float tolerance) const {
-    const float smoothCosine = std::cos(radians(SMOOTH_JOIN_DEGREES));
+std::vector<Path2D::Vertex> Path2D::flatten(float tolerance) const {
+    std::vector<Vertex> vertices;
 
-    std::vector<std::vector<Vertex>> strips;
-    Vec2 previousDirection;  // 前一段終點的方向，判斷相接處是否平滑
-    std::vector<CurveSample2D> samples;  // 重複使用，避免每段都重新配置
-
-    for (const Segment& segment : _segments) {
-        const Vec2 direction = tangent(segment, 0.0f);
-        if (direction == Vec2()) {
-            continue;  // 長度為 0 的線段沒有方向，也不影響形狀
+    for (const auto& curve : _curves) {
+        if (curve.tangent(0.0f) == Vec2(0.0f, 0.0f)) {
+            // 曲線起點的切線為零向量，無法決定法線方向，跳過這個曲線
+            continue;
         }
 
-        // 第一段或折角處開始新的一條；平滑時沿用前一條，接點已經由前一段加過了
-        if (strips.empty() || dot(previousDirection, direction) < smoothCosine) {
-            strips.push_back({{evaluate(segment, 0.0f), rightNormal(direction)}});
+        std::vector<CurveSample2D> samples;
+        robot::flatten(curve, tolerance, samples);
+        if (!vertices.empty() && vertices.back().point == samples.front().point) {
+            Vec2 normal = rightNormal(curve.tangent(samples.front().t));
+            // 如果前一個頂點的法線與這個頂點的法線相同，刪掉這個頂點，避免重複
+            if (dot(vertices.back().normal, normal) > SMOOTH_JOIN_COSINE) {
+                samples.erase(samples.begin());
+            }
         }
 
-        samples.clear();
-        robot::flatten(segment, tolerance, samples);  // 成員函式同名，會遮住自由函式
-        for (const CurveSample2D& sample : samples) {
-            strips.back().push_back({sample.position, rightNormal(tangent(segment, sample.t))});
+        for (const auto& sample : samples) {
+            Vec2 normal = rightNormal(curve.tangent(sample.t));
+            vertices.emplace_back(Vertex{sample.point, normal});
         }
-
-        previousDirection = tangent(segment, 1.0f);
     }
-    return strips;
+
+    return vertices;
 }
-
-#pragma endregion  // Flattening
-
-#pragma endregion  // Types
-
-#pragma region Segment
-
-Vec2 evaluate(const Path2D::Segment& segment, float t) {
-    return std::visit([t](const auto& curve) { return evaluate(curve, t); }, segment);
-}
-
-Vec2 derivative(const Path2D::Segment& segment, float t) {
-    return std::visit([t](const auto& curve) { return derivative(curve, t); }, segment);
-}
-
-Vec2 tangent(const Path2D::Segment& segment, float t) {
-    return std::visit([t](const auto& curve) { return tangent(curve, t); }, segment);
-}
-
-std::pair<Path2D::Segment, Path2D::Segment> split(const Path2D::Segment& segment, float t) {
-    return std::visit(
-        [t](const auto& curve) -> std::pair<Path2D::Segment, Path2D::Segment> {
-            const auto [first, second] = split(curve, t);
-            return {first, second};
-        },
-        segment);
-}
-
-void flatten(const Path2D::Segment& segment, float tolerance, std::vector<CurveSample2D>& samples) {
-    std::visit([&](const auto& curve) { flatten(curve, tolerance, samples); }, segment);
-}
-
-#pragma endregion  // Segment
 
 }  // namespace robot

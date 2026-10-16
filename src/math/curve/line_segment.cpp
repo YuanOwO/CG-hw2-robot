@@ -6,93 +6,88 @@
 
 namespace robot {
 
-namespace {
+#pragma region LineSegment2D
 
-// 2D 與 3D 只差在向量型別，共用同一份實作
-template <typename Segment>
-std::pair<Segment, Segment> splitSegment(const Segment& segment, float t) {
-    const auto middle = evaluate(segment, t);
-    return {
-        {segment.start, middle     },
-        {middle,        segment.end}
-    };
+LineSegment2D::LineSegment2D(const Vec2& start, const Vec2& end) : _start(start), _end(end) {}
+
+Vec2 LineSegment2D::evaluate(float t) const {
+    return lerp(_start, _end, t);
 }
 
-template <typename Point, typename Segment>
-float distanceToSegment(const Point& point, const Segment& segment) {
-    const auto direction = segment.end - segment.start;
-    const float lengthSquaredOfSegment = lengthSquared(direction);
+Vec2 LineSegment2D::derivative(float t) const {
+    return _end - _start;
+}
 
-    if (lengthSquaredOfSegment < EPSILON * EPSILON) {
-        return distance(point, segment.start);  // 線段退化成一點
+Vec2 LineSegment2D::tangent(float t) const {
+    return normalize(derivative(t));
+}
+
+float LineSegment2D::distance(const Vec2& point) const {
+    if (_start == _end) {
+        return length(point - _start);
     }
 
-    // 投影到線段所在直線上，再夾回端點之間
-    const float t = std::clamp(dot(point - segment.start, direction) / lengthSquaredOfSegment, 0.0f, 1.0f);
-    return distance(point, evaluate(segment, t));
+    Vec2 ab = _end - _start;
+    Vec2 ap = point - _start;
+    auto t = std::clamp(dot(ap, ab) / dot(ab, ab), 0.0f, 1.0f);
+    Vec2 closest = evaluate(t);
+    return length(point - closest);
 }
 
-}  // namespace
-
-#pragma region Evaluation
-
-Vec2 evaluate(const LineSegment2D& segment, float t) {
-    return lerp(segment.start, segment.end, t);
+std::pair<LineSegment2D, LineSegment2D> LineSegment2D::split(float t) const {
+    Vec2 mid = evaluate(t);
+    LineSegment2D first(_start, mid);
+    LineSegment2D second(mid, _end);
+    return {first, second};
 }
 
-Vec3 evaluate(const LineSegment3D& segment, float t) {
-    return lerp(segment.start, segment.end, t);
+bool LineSegment2D::isFlat(float tolerance) const {
+    // 直線段永遠是平的
+    return true;
 }
 
-Vec2 derivative(const LineSegment2D& segment, float) {
-    return segment.end - segment.start;
+#pragma endregion  // LineSegment2D
+
+#pragma region LineSegment3D
+
+LineSegment3D::LineSegment3D(const Vec3& start, const Vec3& end) : _start(start), _end(end) {}
+
+Vec3 LineSegment3D::evaluate(float t) const {
+    return lerp(_start, _end, t);
 }
 
-Vec3 derivative(const LineSegment3D& segment, float) {
-    return segment.end - segment.start;
+Vec3 LineSegment3D::derivative(float t) const {
+    return _end - _start;
 }
 
-Vec2 tangent(const LineSegment2D& segment, float) {
-    return normalize(segment.end - segment.start);
+float LineSegment3D::distance(const Vec3& point) const {
+    if (_start == _end) {
+        return length(point - _start);
+    }
+
+    Vec3 ab = _end - _start;
+    Vec3 ap = point - _start;
+    auto t = std::clamp(dot(ap, ab) / dot(ab, ab), 0.0f, 1.0f);
+    Vec3 closest = evaluate(t);
+    return length(point - closest);
 }
 
-Vec3 tangent(const LineSegment3D& segment, float) {
-    return normalize(segment.end - segment.start);
+Vec3 LineSegment3D::tangent(float t) const {
+    return normalize(derivative(t));
 }
 
-#pragma endregion  // Evaluation
-
-#pragma region Distance
-
-float distance(const Vec2& point, const LineSegment2D& segment) {
-    return distanceToSegment(point, segment);
+std::pair<LineSegment3D, LineSegment3D> LineSegment3D::split(float t) const {
+    Vec3 mid = evaluate(t);
+    LineSegment3D first(_start, mid);
+    LineSegment3D second(mid, _end);
+    return {first, second};
 }
 
-float distance(const Vec3& point, const LineSegment3D& segment) {
-    return distanceToSegment(point, segment);
+bool LineSegment3D::isFlat(float tolerance) const {
+    // 直線段永遠是平的
+    return true;
 }
 
-#pragma endregion  // Distance
-
-#pragma region Subdivision
-
-std::pair<LineSegment2D, LineSegment2D> split(const LineSegment2D& segment, float t) {
-    return splitSegment(segment, t);
-}
-
-std::pair<LineSegment3D, LineSegment3D> split(const LineSegment3D& segment, float t) {
-    return splitSegment(segment, t);
-}
-
-// 直線不必細分，整段就是一條折線
-void flatten(const LineSegment2D& segment, float, std::vector<CurveSample2D>& samples) {
-    samples.push_back({segment.end, 1.0f});
-}
-
-void flatten(const LineSegment3D& segment, float, std::vector<CurveSample3D>& samples) {
-    samples.push_back({segment.end, 1.0f});
-}
-
-#pragma endregion  // Subdivision
+#pragma endregion  // LineSegment3D
 
 }  // namespace robot

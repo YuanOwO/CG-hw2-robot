@@ -1,124 +1,167 @@
 #include "math/curve/arc.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 
+#include "math/constants.hpp"
 #include "math/utils.hpp"
 
 namespace robot {
 
-namespace {
-
-// 每段至少轉這麼多，tolerance 為 0 或極小時才不會切成無限多段
-const float MIN_STEP_DEGREES = 1.0f;
-
-float angleAt(const Arc2D& arc, float t) {
-    return radians(arc.startDegrees + arc.sweepDegrees * t);
+Arc2D::Arc2D(const Vec2& center, float radius, float startDegree, float sweepDegree)
+    : _center(center), _radius(radius), _startDegree(startDegree), _sweepDegree(sweepDegree) {
+    assert(radius >= 0.0f);
+    assert(std::isfinite(radius));
+    assert(std::isfinite(startDegree));
+    assert(std::isfinite(sweepDegree));
 }
 
-}  // namespace
-
-#pragma region Types
-
-Arc2D Arc2D::from(const Vec2& from, const Vec2& center, float sweepDegrees) {
-    const Vec2 offset = from - center;
-    return {center, length(offset), degrees(std::atan2(offset.y, offset.x)), sweepDegrees};
+std::optional<Arc2D> Arc2D::around(const Vec2& start, const Vec2& center, float sweepDegree) {
+    Vec2 dir = start - center;
+    float radius = length(dir);
+    if (radius <= EPSILON) {
+        return std::nullopt;
+    }
+    float startDegree = degrees(std::atan2(dir.y, dir.x));
+    return Arc2D(center, radius, startDegree, sweepDegree);
 }
 
-// 與某方向相切且通過兩點的圓只有一個。圓心 C 在通過起點 P、垂直於切線的直線上：C = P + n * s，n 為切線左手邊的單位向量。
-// 由 |C - P| = |C - E| 解出 s = |E - P|² / (2 n·(E - P))；s 為正時圓心在左手邊，逆時針轉
-std::optional<Arc2D> Arc2D::fromTangent(const Vec2& from, const Vec2& direction, const Vec2& to) {
-    const Vec2 unit = normalize(direction);
-    const Vec2 left(-unit.y, unit.x);
-    const Vec2 chord = to - from;
-
-    const float offset = dot(left, chord);
-    if (unit == Vec2() || std::abs(offset) <= EPSILON * std::max(1.0f, length(chord))) {
-        return std::nullopt;  // 圓的半徑為無限大
+std::optional<Arc2D> Arc2D::around(const Vec2& start, const Vec2& center, const Vec2& end, bool clockwise) {
+    Vec2 startDir = start - center;
+    Vec2 endDir = end - center;
+    float radius = length(startDir);
+    if (radius <= EPSILON || length(endDir) <= EPSILON) {
+        return std::nullopt;
     }
 
-    const Vec2 center = from + left * (lengthSquared(chord) / (2.0f * offset));
+    float startDegree = degrees(std::atan2(startDir.y, startDir.x));
+    float endDegree = degrees(std::atan2(endDir.y, endDir.x));
 
-    // 起點與終點相對於圓心的夾角，再依轉的方向換成 (0, 360) 或 (-360, 0)
-    const Vec2 start = from - center;
-    const Vec2 end = to - center;
-    float sweep = degrees(std::atan2(cross(start, end), dot(start, end)));
-    if (offset > 0.0f && sweep < 0.0f) {
-        sweep += 360.0f;
-    } else if (offset < 0.0f && sweep > 0.0f) {
-        sweep -= 360.0f;
+    if (startDegree == endDegree) {
+        // 方向相同時轉一整圈
+        return Arc2D(center, radius, startDegree, clockwise ? -360.0f : 360.0f);
     }
-    return Arc2D::from(from, center, sweep);
-}
 
-#pragma endregion  // Types
-
-#pragma region Evaluation
-
-Vec2 evaluate(const Arc2D& arc, float t) {
-    const float angle = angleAt(arc, t);
-    return arc.center + Vec2(std::cos(angle), std::sin(angle)) * arc.radius;
-}
-
-// 位置為 center + r (cos θ, sin θ)，θ = θ0 + sweep · t，對 t 微分後多乘 sweep；
-// sweep 的正負號同時決定了切線往哪邊
-Vec2 derivative(const Arc2D& arc, float t) {
-    const float angle = angleAt(arc, t);
-    return Vec2(-std::sin(angle), std::cos(angle)) * (arc.radius * radians(arc.sweepDegrees));
-}
-
-// 不由導數正規化而來，半徑或轉角很小時導數太短，正規化會被當成零向量
-Vec2 tangent(const Arc2D& arc, float t) {
-    if (arc.radius <= 0.0f || arc.sweepDegrees == 0.0f) {
-        return Vec2();
+    float sweepDegree = wrapDegrees(endDegree - startDegree);
+    if (clockwise) {
+        sweepDegree = sweepDegree - 360.0f;
     }
-    const float angle = angleAt(arc, t);
-    const float turn = arc.sweepDegrees > 0.0f ? 1.0f : -1.0f;  // 逆時針時是左轉 90° 的半徑方向
-    return Vec2(-std::sin(angle), std::cos(angle)) * turn;
+    return Arc2D(center, radius, startDegree, sweepDegree);
 }
 
-#pragma endregion  // Evaluation
+std::optional<Arc2D> Arc2D::through(const Vec2& start, const Vec2& via, const Vec2& end) {
+    Vec2 ab = via - start;
+    Vec2 ac = end - start;
+    float abLen = length(ab);
+    float acLen = length(ac);
+    float denom = cross(ab, ac);
 
-#pragma region Distance
-
-// 點所在方向落在圓弧的轉角內時，最近點在同一方向的弧上；否則最近點是兩端之一
-float distance(const Vec2& point, const Arc2D& arc) {
-    const Vec2 offset = point - arc.center;
-    const float direction = degrees(std::atan2(offset.y, offset.x));
-    // 從起點往轉動方向量到點的方向，換到 [0, 360)
-    const float turned = wrapDegrees(arc.sweepDegrees >= 0.0f ? direction - arc.startDegrees
-                                                                : arc.startDegrees - direction);
-
-    if (std::abs(arc.sweepDegrees) >= 360.0f || turned <= std::abs(arc.sweepDegrees)) {
-        return std::abs(length(offset) - arc.radius);
+    // 三點共線或其中兩點重合
+    if (std::abs(denom) <= EPSILON * abLen * acLen) {
+        // 三點共線或其中兩點重合
+        return std::nullopt;
     }
-    return std::min(distance(point, evaluate(arc, 0.0f)), distance(point, evaluate(arc, 1.0f)));
-}
 
-#pragma endregion  // Distance
+    // 計算通過三點的圓弧
+    float abLenSq = abLen * abLen;
+    float acLenSq = acLen * acLen;
+    float x = (abLenSq * ac.y - acLenSq * ab.y) / (2.0f * denom);
+    float y = (acLenSq * ab.x - abLenSq * ac.x) / (2.0f * denom);
+    Vec2 center = start + Vec2(x, y);
 
-#pragma region Subdivision
-
-std::pair<Arc2D, Arc2D> split(const Arc2D& arc, float t) {
-    const float sweep = arc.sweepDegrees * t;
-    return {
-        {arc.center, arc.radius, arc.startDegrees,         sweep                   },
-        {arc.center, arc.radius, arc.startDegrees + sweep, arc.sweepDegrees - sweep}
-    };
-}
-
-// 等角度切分。轉 θ 的弦與圓弧的最大距離為 r(1 - cos(θ/2))，令它不超過 tolerance 求出每段最多轉多少
-void flatten(const Arc2D& arc, float tolerance, std::vector<CurveSample2D>& samples) {
-    const float cosine = std::clamp(1.0f - tolerance / arc.radius, -1.0f, 1.0f);
-    const float maxStep = std::max(degrees(2.0f * std::acos(cosine)), MIN_STEP_DEGREES);
-    const int count = std::max(1, static_cast<int>(std::ceil(std::abs(arc.sweepDegrees) / maxStep)));
-
-    for (int i = 1; i <= count; ++i) {
-        const float t = static_cast<float>(i) / static_cast<float>(count);
-        samples.push_back({evaluate(arc, t), t});
+    if (denom > 0.0f) {
+        // 逆時針方向
+        return around(start, center, end, false);
+    } else {
+        // 順時針方向
+        return around(start, center, end, true);
     }
 }
 
-#pragma endregion  // Subdivision
+std::optional<Arc2D> Arc2D::tangentAtStart(const Vec2& start, const Vec2& direction, const Vec2& end) {
+    Vec2 m = normalize(Vec2(-direction.y, direction.x));  // 與 direction 垂直的單位向量
+    Vec2 ab = end - start;
+    float denom = dot(m, ab);
+    if (std::abs(denom) <= EPSILON * length(ab)) {
+        // end 落在從 start 沿 direction 延伸的直線上
+        return std::nullopt;
+    }
+
+    float s = lengthSquared(ab) / (2.0f * denom);
+    Vec2 center = start + m * s;
+    if (s > 0.0f) {
+        // 逆時針方向
+        return around(start, center, end, false);
+    } else {
+        // 順時針方向
+        return around(start, center, end, true);
+    }
+}
+
+std::optional<Arc2D> Arc2D::tangentAtEnd(const Vec2& start, const Vec2& end, const Vec2& direction) {
+    Vec2 m = normalize(Vec2(-direction.y, direction.x));  // 與 direction 垂直的單位向量
+    Vec2 ba = start - end;
+    float denom = dot(m, ba);
+    if (std::abs(denom) <= EPSILON * length(ba)) {
+        // start 落在通過 end、沿 direction 延伸的直線上
+        return std::nullopt;
+    }
+
+    float s = lengthSquared(ba) / (2.0f * denom);
+    Vec2 center = end + m * s;
+    if (s > 0.0f) {
+        // 逆時針方向
+        return around(start, center, end, false);
+    } else {
+        // 順時針方向
+        return around(start, center, end, true);
+    }
+}
+
+Vec2 Arc2D::evaluate(float t) const {
+    float angle = _startDegree + _sweepDegree * t;
+    float rad = radians(angle);
+    Vec2 r(_radius * std::cos(rad), _radius * std::sin(rad));
+    return _center + r;
+}
+
+Vec2 Arc2D::derivative(float t) const {
+    if (_radius == 0 || _sweepDegree == 0) {
+        return Vec2(0.0f, 0.0f);
+    }
+    float angle = _startDegree + _sweepDegree * t;
+    float rad = radians(angle);
+    Vec2 dir(-std::sin(rad), std::cos(rad));
+    return dir * (_radius * radians(_sweepDegree));
+}
+
+Vec2 Arc2D::tangent(float t) const {
+    if (_radius == 0 || _sweepDegree == 0) {
+        return Vec2(0.0f, 0.0f);
+    }
+    float angle = _startDegree + _sweepDegree * t;
+    float rad = radians(angle);
+    Vec2 dir(-std::sin(rad), std::cos(rad));
+    if (_sweepDegree < 0) {
+        dir = -dir;  // 順時針方向
+    }
+    return dir;
+}
+
+std::pair<Arc2D, Arc2D> Arc2D::split(float t) const {
+    float midDegree = _startDegree + _sweepDegree * t;
+    float endDegree = _startDegree + _sweepDegree;
+    Arc2D first(_center, _radius, _startDegree, midDegree - _startDegree);
+    Arc2D second(_center, _radius, midDegree, endDegree - midDegree);
+    return {first, second};
+}
+
+bool Arc2D::isFlat(float tolerance) const {
+    float halfAngle = std::abs(_sweepDegree) / 2.0f;
+    float rad = radians(halfAngle);
+    float error = _radius * (1.0f - std::cos(rad));
+    return error <= tolerance;
+}
 
 }  // namespace robot
