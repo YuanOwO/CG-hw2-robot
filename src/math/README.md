@@ -10,8 +10,10 @@ graph BT
     random; perlin
 
     subgraph curve/
-        curve_sample[curve_sample.hpp]
-        line_segment; arc; bezier; path2d
+        line_segment; arc; bezier
+        curve[curve.hpp]
+        flatten[flatten.hpp]
+        path2d
     end
 
     utils --> constants
@@ -19,14 +21,15 @@ graph BT
     vec3 --> constants
     mat4 --> vec3
     perlin --> random & vec2 & vec3
-    curve_sample --> vec2 & vec3
-    line_segment --> curve_sample
-    arc --> curve_sample
-    bezier --> curve_sample
-    path2d --> line_segment & arc & bezier
+    line_segment --> vec2 & vec3
+    arc --> vec2
+    bezier --> vec2
+    flatten --> vec2 & vec3
+    curve --> line_segment & arc & bezier
+    path2d --> curve
 ```
 
-箭頭是 header 之間的 include。`utils` 只在各模組的 `.cpp` 裡使用，不會經由其他 header 傳出去。
+箭頭是 header 之間的 include。`utils` 只在各模組的 `.cpp` 裡使用，不會經由其他 header 傳出去。`flatten` 不依賴任何曲線，只要求曲線提供它用到的成員函式。
 
 ## 共通約定
 
@@ -38,7 +41,7 @@ graph BT
 | 浮點比較 | `Vec2`、`Vec3` 的 `==` 容許每個分量相差 `EPSILON` $= 10^{-6}$                                    |
 | 曲線參數 | $t \in [0, 1]$，$t = 0$ 為起點、$t = 1$ 為終點                                                   |
 | 命名     | 幾何型別一律帶維度後綴（`LineSegment2D`、`Arc2D`）；向量、矩陣沿用 GLSL 的名稱（`Vec3`、`Mat4`） |
-| 函式     | 純資料的 struct 搭配自由函式，以重載區分型別，例如 `evaluate(arc, t)`、`evaluate(curve, t)`      |
+| 函式     | 向量與矩陣是純資料的 struct 搭配自由函式，例如 `dot(a, b)`；曲線是 class，各種曲線提供同名的成員函式 |
 
 ## 向量：`vec2.hpp`、`vec3.hpp`
 
@@ -200,4 +203,4 @@ $f$ 在 $t = 0$ 與 $t = 1$ 的一階、二階導數都是 0，跨格子時曲�
 
 ## 曲線：`curve/`
 
-線段、圓弧、貝茲曲線與畫筆式的 `Path2D`，共用 `evaluate`、`tangent`、`split`、`flatten` 等介面。說明見 [curve/README.md](curve/README.md)。
+線段、圓弧與二次、三次貝茲曲線，各自提供 `evaluate`、`derivative`、`tangent`、`split`、`isFlat` 等成員函式；`flatten` 把任一種曲線切成折線，`Path2D` 用畫筆指令把它們接成路徑，再切成帶法向量的折線。說明見 [curve/README.md](curve/README.md)。
