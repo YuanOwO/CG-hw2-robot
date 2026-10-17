@@ -1,15 +1,21 @@
 #pragma once
 
 #include <filesystem>
+#include <vector>
 
-#include "font/gfnt_font.hpp"
+#include "font/data/gfnt_data.hpp"
+#include "font/data/gotl_data.hpp"
+#include "io/font_manifest.hpp"
 
 namespace robot::io {
 
+// 讀取字型相關檔案。整份檔案驗證通過才回傳，失敗時拋出帶有檔名的例外。
 class FontStorage {
    public:
-    // 讀取、解析、驗證成功後才回傳；失敗拋出例外。
-    static GfntFont readGfnt(const std::filesystem::path& filename);
+    static GfntData readGfnt(const std::filesystem::path& filename);
+    static GotlData readGotl(const std::filesystem::path& filename);
+
+    static std::vector<FontManifestFace> readFontManifest(const std::filesystem::path& filename);
 };
 
 }  // namespace robot::io

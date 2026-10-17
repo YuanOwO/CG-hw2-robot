@@ -1,0 +1,40 @@
+{
+    // 同一層的模組用同一色系，一眼就能看出目錄屬於哪一層
+    "material-icon-theme.folders.customClones": [
+        // 基礎工具：藍灰
+        { "name": "common", "base": "shared", "color": "blue-grey-400", "folderNames": ["common"] },
+        { "name": "math", "base": "functions", "color": "blue-grey-400", "folderNames": ["math"] },
+
+        // I/O：青色
+        { "name": "io", "base": "connection", "color": "cyan-600", "folderNames": ["io"] },
+        { "name": "serializer", "base": "json", "color": "cyan-400", "folderNames": ["serializer"] },
+        { "name": "serializer-core", "base": "core", "color": "cyan-300", "folderNames": ["core"] },
+        { "name": "format", "base": "syntax", "color": "cyan-300", "folderNames": ["format"] },
+
+        // 平台與輸入：靛藍
+        { "name": "platform", "base": "desktop", "color": "indigo-400", "folderNames": ["platform"] },
+        { "name": "apple", "base": "macos", "color": "indigo-300", "folderNames": ["apple"] },
+        { "name": "freeglut", "base": "plugin", "color": "indigo-300", "folderNames": ["freeglut"] },
+        { "name": "src-input", "base": "input", "color": "indigo-400", "folderNames": ["input"] },
+
+        // 繪圖與字型：紫色
+        { "name": "graphics", "base": "shader", "color": "deep-purple-400", "folderNames": ["graphics"] },
+        { "name": "src-font", "base": "font", "color": "purple-400", "folderNames": ["font"] },
+        { "name": "data", "base": "database", "color": "purple-300", "folderNames": ["data"] },
+        { "name": "raster", "base": "images", "color": "purple-300", "folderNames": ["raster"] },
+
+        // 引擎與介面：橘色
+        { "name": "engine", "base": "core", "color": "deep-orange-400", "folderNames": ["engine"] },
+        { "name": "gui", "base": "ui", "color": "orange-400", "folderNames": ["gui"] },
+        { "name": "screen", "base": "layout", "color": "amber-600", "folderNames": ["screen"] },
+        { "name": "view", "base": "views", "color": "amber-600", "folderNames": ["view"] },
+
+        // 遊戲內容：綠色
+        { "name": "game", "base": "gamemaker", "color": "green-500", "folderNames": ["game"] },
+        { "name": "world", "base": "global", "color": "light-green-500", "folderNames": ["world"] },
+
+        // 文件：黃色
+        { "name": "figures", "base": "images", "color": "yellow-700", "folderNames": ["figures"] },
+        { "name": "figures-src", "base": "scripts", "color": "yellow-700", "folderNames": ["figures-src"] }
+    ]
+}

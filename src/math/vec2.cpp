@@ -32,8 +32,4 @@ Vec2 normalize(const Vec2& vec) {
     return vec / len;
 }
 
-Vec2 lerp(const Vec2& a, const Vec2& b, float t) {
-    return a + (b - a) * t;
-}
-
 }  // namespace robot

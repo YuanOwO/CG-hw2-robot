@@ -28,7 +28,7 @@ bool InputState<ButtonType>::isExactlyDown(const std::unordered_set<ButtonType>&
 }
 
 template <typename ButtonType>
-bool InputState<ButtonType>::_press(ButtonType button) {
+bool InputState<ButtonType>::press(ButtonType button) {
     if (button == ButtonType::Unknown) {
         return false;  // 忽略未知按鈕
     }
@@ -38,7 +38,7 @@ bool InputState<ButtonType>::_press(ButtonType button) {
 }
 
 template <typename ButtonType>
-bool InputState<ButtonType>::_release(ButtonType button) {
+bool InputState<ButtonType>::release(ButtonType button) {
     if (button == ButtonType::Unknown) {
         return false;  // 忽略未知按鈕
     }
@@ -48,7 +48,7 @@ bool InputState<ButtonType>::_release(ButtonType button) {
 }
 
 template <typename ButtonType>
-void InputState<ButtonType>::_clear() {
+void InputState<ButtonType>::clear() {
     _down.clear();
 }
 
@@ -73,7 +73,7 @@ bool KeyboardState::isDown(Mod mod) const {
     }
 }
 
-void MouseState::_setPosition(int x, int y) {
+void MouseState::setPosition(int x, int y) {
     _mouseX = x;
     _mouseY = y;
 }

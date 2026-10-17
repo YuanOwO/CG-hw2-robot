@@ -6,6 +6,7 @@
 
 namespace robot {
 
+/// 2D 向量，== 比較時容許 EPSILON 的誤差
 struct Vec2 {
     float x, y;
 
@@ -40,9 +41,8 @@ float lengthSquared(const Vec2& vec);
 float distance(const Vec2& a, const Vec2& b);
 
 float dot(const Vec2& a, const Vec2& b);
-float cross(const Vec2& a, const Vec2& b);  // 2D 外積為純量（z 分量）
+float cross(const Vec2& a, const Vec2& b);  ///< 2D 外積為純量，即 3D 外積的 z 分量
 
-Vec2 normalize(const Vec2& vec);  // 零向量回傳零向量
-Vec2 lerp(const Vec2& a, const Vec2& b, float t);
+Vec2 normalize(const Vec2& vec);  ///< 單位向量；長度小於 EPSILON 時回傳零向量
 
 }  // namespace robot

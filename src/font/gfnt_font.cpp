@@ -1,37 +1,31 @@
 #include "font/gfnt_font.hpp"
 
-#include <algorithm>
-#include <utility>
-
 namespace robot {
 
-GfntFont::GfntFont(const Metrics& metrics, std::vector<Glyph> glyphs, std::vector<std::uint8_t> bitmapData)
-    : _metrics(metrics), _glyphs(std::move(glyphs)), _bitmapData(std::move(bitmapData)) {}
+GfntFont::GfntFont(const GfntData& data, int scale) : _data(data), _scale(scale) {}
 
-const GfntFont::Glyph* GfntFont::findGlyph(char32_t codepoint) const {
-    // Glyph Table 在載入時已確認為 codepoint 遞增排列。
-    const auto it = std::lower_bound(_glyphs.begin(), _glyphs.end(), codepoint,
-                                     [](const Glyph& glyph, char32_t searchedCodepoint) {
-                                         return glyph.codepoint < searchedCodepoint;
-                                     });
-
-    if (it == _glyphs.end() || it->codepoint != codepoint) {
-        return nullptr;
-    }
-
-    return &*it;
+FontMetrics GfntFont::metrics() const {
+    const auto& metrics = _data.metrics();
+    return FontMetrics{metrics.pixelSize * _scale, metrics.ascender * _scale, metrics.descender * _scale};
 }
 
-const GfntFont::Glyph* GfntFont::findGlyphOrFallback(char32_t codepoint) const {
-    if (const auto* glyph = findGlyph(codepoint)) {
-        return glyph;
+std::optional<Glyph> GfntFont::glyph(char32_t codepoint) const {
+    const GfntData::Glyph* glyph = _data.findGlyphOrFallback(codepoint);
+    if (glyph == nullptr) {
+        return std::nullopt;
     }
 
-    if (const auto* glyph = findGlyph(U'\uFFFD')) {
-        return glyph;
-    }
-
-    return findGlyph(U'?');
+    return Glyph{
+        glyph->width * _scale,
+        glyph->height * _scale,
+        glyph->bearingX * _scale,
+        glyph->bearingY * _scale,
+        glyph->advanceX * _scale,
+        glyph->width,
+        glyph->height,
+        _scale,
+        _data.bitmap(*glyph),
+    };
 }
 
 }  // namespace robot

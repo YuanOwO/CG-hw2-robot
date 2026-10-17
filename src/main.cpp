@@ -1,17 +1,11 @@
-#include "app/application.hpp"
-#include "app/windows/world.hpp"
-
-using namespace robot;
-using namespace robot::app;
+#include "engine/engine.hpp"
+#include "game/game.hpp"
 
 int main(int argc, char** argv) {
-    Application app(argc, argv);
+    robot::engine::Engine engine(argc, argv, "A Moving Robot", 960, 720);
+    robot::game::Game game(engine);
 
-    // 在這裡創建視窗
-    app.createWindow<WorldWindow>("My World", 800, 600);
-
-    // 運行應用程序
-    app.run();
+    engine.run(game);
 
     return 0;
 }
