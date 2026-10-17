@@ -1,12 +1,12 @@
-#include "math/curve/path2d.hpp"
+#include "geometry/curve/path2d.hpp"
 
 #include <cassert>
 #include <cmath>
 
-#include "math/curve/flatten.hpp"
+#include "geometry/curve/flatten.hpp"
 #include "math/utils.hpp"
 
-namespace robot {
+namespace robot::geometry {
 namespace {
 
 // 兩段相接處法向量的夾角在 1° 以內視為平順；切線由 sin、cos 算出，不會剛好相等
@@ -74,7 +74,7 @@ std::vector<Path2D::Vertex> Path2D::flatten(float tolerance) const {
         }
 
         std::vector<CurveSample2D> samples;
-        robot::flatten(curve, tolerance, samples);
+        geometry::flatten(curve, tolerance, samples);
 
         for (const auto& sample : samples) {
             Vec2 normal = rightNormal(curve.tangent(sample.t));
@@ -94,4 +94,4 @@ std::vector<Path2D::Vertex> Path2D::flatten(float tolerance) const {
     return vertices;
 }
 
-}  // namespace robot
+}  // namespace robot::geometry

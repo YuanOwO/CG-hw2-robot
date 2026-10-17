@@ -4,6 +4,7 @@
         // 基礎工具：藍灰
         { "name": "common", "base": "shared", "color": "blue-grey-400", "folderNames": ["common"] },
         { "name": "math", "base": "functions", "color": "blue-grey-400", "folderNames": ["math"] },
+        { "name": "geometry", "base": "svg", "color": "blue-grey-400", "folderNames": ["geometry"] },
 
         // I/O：青色
         { "name": "io", "base": "connection", "color": "cyan-600", "folderNames": ["io"] },

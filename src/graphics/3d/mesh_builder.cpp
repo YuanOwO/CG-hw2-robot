@@ -9,6 +9,9 @@
 
 namespace robot::graphics {
 
+using geometry::ArcDirection;
+using geometry::Path2D;
+
 MeshBuilder::MeshBuilder(int segments, float tolerance) : _segments(segments), _tolerance(tolerance) {}
 
 Mesh MeshBuilder::build() const {

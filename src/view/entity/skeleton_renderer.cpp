@@ -4,12 +4,14 @@
 #include <vector>
 
 #include "common/color.hpp"
+#include "geometry/curve/line_segment.hpp"
 #include "graphics/3d/primitives.hpp"
-#include "math/curve/line_segment.hpp"
 #include "math/utils.hpp"
 #include "platform/glut.hpp"
 
 namespace robot::view::entity {
+
+using geometry::LineSegment3D;
 
 namespace {
 

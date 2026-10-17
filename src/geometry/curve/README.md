@@ -11,7 +11,7 @@
 | `flatten.hpp`      | `flatten`：把任一種曲線切成折線      |
 | `path2d.hpp`       | `Path2D`                             |
 
-角度單位與座標系等約定見 [math/README.md](../README.md#共通約定)。
+全部位於 `robot::geometry` namespace。角度單位與座標系等約定見 [math/README.md](../../math/README.md#共通約定)。
 
 ## 符號
 

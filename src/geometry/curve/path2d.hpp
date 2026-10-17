@@ -2,10 +2,10 @@
 
 #include <vector>
 
-#include "math/curve/curve.hpp"
+#include "geometry/curve/curve.hpp"
 #include "math/vec2.hpp"
 
-namespace robot {
+namespace robot::geometry {
 
 /// 由畫筆指令組成的 2D 路徑：每段從畫筆目前的位置開始，畫完後畫筆移到該段的終點。路徑不會自動閉合
 class Path2D {
@@ -49,4 +49,4 @@ class Path2D {
     std::vector<Curve2D> _curves;
 };
 
-}  // namespace robot
+}  // namespace robot::geometry

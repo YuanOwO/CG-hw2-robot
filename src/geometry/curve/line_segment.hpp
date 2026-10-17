@@ -5,7 +5,7 @@
 #include "math/vec2.hpp"
 #include "math/vec3.hpp"
 
-namespace robot {
+namespace robot::geometry {
 
 /// 從 start 到 end 的線段。參數 t 從 0 到 1，與走過的距離成正比
 class LineSegment2D {
@@ -65,4 +65,4 @@ class LineSegment3D {
     Vec3 _start, _end;
 };
 
-}  // namespace robot
+}  // namespace robot::geometry

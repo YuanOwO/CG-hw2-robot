@@ -4,7 +4,7 @@
 
 #include "math/vec2.hpp"
 
-namespace robot {
+namespace robot::geometry {
 
 /// 二次貝茲曲線：從 p0 出發、往 p1 的方向彎、到達 p2。參數 t 從 0 到 1
 class QuadraticBezier2D {
@@ -69,4 +69,4 @@ class CubicBezier2D {
     Vec2 _p0, _p1, _p2, _p3;
 };
 
-}  // namespace robot
+}  // namespace robot::geometry

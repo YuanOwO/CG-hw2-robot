@@ -1,11 +1,11 @@
-#include "math/curve/bezier.hpp"
+#include "geometry/curve/bezier.hpp"
 
 #include <initializer_list>
 
-#include "math/curve/line_segment.hpp"
+#include "geometry/curve/line_segment.hpp"
 #include "math/utils.hpp"
 
-namespace robot {
+namespace robot::geometry {
 
 #pragma region QuadraticBezier2D
 
@@ -129,4 +129,4 @@ bool CubicBezier2D::isFlat(float tolerance) const {
 
 #pragma endregion  // CubicBezier2D
 
-}  // namespace robot
+}  // namespace robot::geometry

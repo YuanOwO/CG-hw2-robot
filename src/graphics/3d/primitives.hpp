@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "common/color.hpp"
-#include "math/curve/line_segment.hpp"
+#include "geometry/curve/line_segment.hpp"
 #include "math/vec3.hpp"
 
 // 呼叫當下直接用 glBegin 畫出的輔助圖形，不產生網格。
@@ -16,7 +16,7 @@ void drawAxes(float length);
 
 /// 一組相同顏色與粗細的線段
 /// @param width 線寬，像素，不隨縮放改變
-void drawLines(const std::vector<LineSegment3D>& segments, const ColorRGBA& color, float width);
+void drawLines(const std::vector<geometry::LineSegment3D>& segments, const ColorRGBA& color, float width);
 
 /// 一組相同顏色與大小的方形點
 /// @param size 邊長，像素，不隨縮放改變

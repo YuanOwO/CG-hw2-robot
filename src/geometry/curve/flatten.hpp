@@ -5,7 +5,7 @@
 #include "math/vec2.hpp"
 #include "math/vec3.hpp"
 
-namespace robot {
+namespace robot::geometry {
 namespace detail {
 
 // 最多切成 2^10 段，避免 tolerance 為 0 或座標為 NaN 時無限遞迴；到達上限時誤差可能超過 tolerance
@@ -52,4 +52,4 @@ void flatten(const Curve& curve, float tolerance, std::vector<CurveSample>& poin
     detail::flatten(curve, tolerance, 0.0f, 1.0f, 0, points);
 }
 
-}  // namespace robot
+}  // namespace robot::geometry

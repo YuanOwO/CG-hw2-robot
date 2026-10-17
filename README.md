@@ -67,6 +67,7 @@ src/
 ├── input/      按鍵代碼與輸入狀態
 ├── io/         檔案讀寫（字型、設定檔）
 ├── math/       向量、數學常數與角度轉換、內插等工具函式
+├── geometry/   不涉及繪圖 API 的幾何：曲線與路徑
 └── platform/   GLUT 平台層：FreeGLUT 與 Apple GLUT 的差異
 assets/fonts/   字型檔與字型設定（fonts.ini）
 docs/           報告各章節、圖片與圖片原始檔

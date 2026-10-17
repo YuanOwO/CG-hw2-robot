@@ -5,7 +5,7 @@
 
 #include "math/vec2.hpp"
 
-namespace robot {
+namespace robot::geometry {
 
 enum class ArcDirection {
     Clockwise,
@@ -76,4 +76,4 @@ class Arc2D {
     float _sweepDegree;
 };
 
-}  // namespace robot
+}  // namespace robot::geometry

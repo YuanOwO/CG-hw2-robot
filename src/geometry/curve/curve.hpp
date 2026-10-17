@@ -3,11 +3,11 @@
 #include <utility>
 #include <variant>
 
-#include "math/curve/arc.hpp"
-#include "math/curve/bezier.hpp"
-#include "math/curve/line_segment.hpp"
+#include "geometry/curve/arc.hpp"
+#include "geometry/curve/bezier.hpp"
+#include "geometry/curve/line_segment.hpp"
 
-namespace robot {
+namespace robot::geometry {
 
 class Curve2D {
    public:
@@ -55,4 +55,4 @@ class Curve2D {
     std::variant<LineSegment2D, Arc2D, QuadraticBezier2D, CubicBezier2D> _curve;
 };
 
-}  // namespace robot
+}  // namespace robot::geometry

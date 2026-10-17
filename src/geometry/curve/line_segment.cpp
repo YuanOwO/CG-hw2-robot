@@ -1,10 +1,10 @@
-#include "math/curve/line_segment.hpp"
+#include "geometry/curve/line_segment.hpp"
 
 #include <algorithm>
 
 #include "math/utils.hpp"
 
-namespace robot {
+namespace robot::geometry {
 
 #pragma region LineSegment2D
 
@@ -90,4 +90,4 @@ bool LineSegment3D::isFlat(float tolerance) const {
 
 #pragma endregion  // LineSegment3D
 
-}  // namespace robot
+}  // namespace robot::geometry

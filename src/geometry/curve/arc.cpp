@@ -1,4 +1,4 @@
-#include "math/curve/arc.hpp"
+#include "geometry/curve/arc.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -7,7 +7,7 @@
 #include "math/constants.hpp"
 #include "math/utils.hpp"
 
-namespace robot {
+namespace robot::geometry {
 
 Arc2D::Arc2D(const Vec2& center, float radius, float startDegree, float sweepDegree)
     : _center(center), _radius(radius), _startDegree(startDegree), _sweepDegree(sweepDegree) {
@@ -164,4 +164,4 @@ bool Arc2D::isFlat(float tolerance) const {
     return error <= tolerance;
 }
 
-}  // namespace robot
+}  // namespace robot::geometry

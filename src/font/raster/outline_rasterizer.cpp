@@ -7,8 +7,8 @@
 #include <utility>
 #include <vector>
 
-#include "math/curve/bezier.hpp"
-#include "math/curve/flatten.hpp"
+#include "geometry/curve/bezier.hpp"
+#include "geometry/curve/flatten.hpp"
 #include "math/utils.hpp"
 #include "math/vec2.hpp"
 
@@ -187,12 +187,12 @@ class OutlineTracer {
     void lineTo(const GotlData::OutlinePoint& point) { lineToPixel(toPixel(point)); }
 
     void quadTo(const GotlData::OutlinePoint& control, const GotlData::OutlinePoint& end) {
-        flattenTo(QuadraticBezier2D{_current, toPixel(control), toPixel(end)});
+        flattenTo(geometry::QuadraticBezier2D{_current, toPixel(control), toPixel(end)});
     }
 
     void cubicTo(const GotlData::OutlinePoint& control1, const GotlData::OutlinePoint& control2,
                  const GotlData::OutlinePoint& end) {
-        flattenTo(CubicBezier2D{_current, toPixel(control1), toPixel(control2), toPixel(end)});
+        flattenTo(geometry::CubicBezier2D{_current, toPixel(control1), toPixel(control2), toPixel(end)});
     }
 
     // GOTL 沒有 Close 指令，輪廓一律封閉；沒閉合的輪廓會讓那一列的累加和不歸零，
@@ -222,7 +222,7 @@ class OutlineTracer {
     template <typename Curve>
     void flattenTo(const Curve& curve) {
         _samples.clear();
-        flatten(curve, FLATTEN_TOLERANCE, _samples);
+        geometry::flatten(curve, FLATTEN_TOLERANCE, _samples);
 
         // 第一個點是曲線的起點，也就是目前位置，已經畫到了
         for (auto sample = _samples.begin() + 1; sample != _samples.end(); ++sample) {
@@ -240,7 +240,7 @@ class OutlineTracer {
     Vec2 _current;
     bool _hasContour = false;
 
-    std::vector<CurveSample2D> _samples;  // 重複使用，避免每段曲線都重新配置
+    std::vector<geometry::CurveSample2D> _samples;  // 重複使用，避免每段曲線都重新配置
 };
 
 #pragma endregion  // Outline tracing

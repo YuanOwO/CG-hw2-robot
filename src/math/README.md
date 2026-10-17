@@ -1,6 +1,6 @@
 # math
 
-不依賴其他模組的數學函式庫：向量與矩陣、角度與內插、可重現的亂數與雜訊、2D 曲線與路徑。全部位於 `robot` namespace。
+不依賴其他模組的數學函式庫：向量與矩陣、角度與內插、可重現的亂數與雜訊。全部位於 `robot` namespace。曲線與路徑等幾何物件在 [geometry/curve](../geometry/curve/README.md)，同樣遵守這裡的約定。
 
 ```mermaid
 graph BT
@@ -9,27 +9,14 @@ graph BT
     vec2; vec3; mat4
     random; perlin
 
-    subgraph curve/
-        line_segment; arc; bezier
-        curve[curve.hpp]
-        flatten[flatten.hpp]
-        path2d
-    end
-
     utils --> constants
     vec2 --> constants
     vec3 --> constants
     mat4 --> vec3
     perlin --> random & vec2 & vec3
-    line_segment --> vec2 & vec3
-    arc --> vec2
-    bezier --> vec2
-    flatten --> vec2 & vec3
-    curve --> line_segment & arc & bezier
-    path2d --> curve
 ```
 
-箭頭是 header 之間的 include。`utils` 只在各模組的 `.cpp` 裡使用，不會經由其他 header 傳出去。`flatten` 不依賴任何曲線，只要求曲線提供它用到的成員函式。
+箭頭是 header 之間的 include。`utils` 只在各模組的 `.cpp` 裡使用，不會經由其他 header 傳出去。
 
 ## 共通約定
 
@@ -200,7 +187,3 @@ $f$ 在 $t = 0$ 與 $t = 1$ 的一階、二階導數都是 0，跨格子時曲�
 | `Perlin3D` | 立方體 12 條邊中點的方向（長度 $\sqrt2$），補 4 個重複的湊滿 16 個 | 約 $[-1, 1]$       |
 
 1D 的斜率若只有 $\pm 1$，每一格的起伏都一樣高，看得出週期，所以斜率大小也取隨機值。
-
-## 曲線：`curve/`
-
-線段、圓弧與二次、三次貝茲曲線，各自提供 `evaluate`、`derivative`、`tangent`、`split`、`isFlat` 等成員函式；`flatten` 把任一種曲線切成折線，`Path2D` 用畫筆指令把它們接成路徑，再切成帶法向量的折線。說明見 [curve/README.md](curve/README.md)。

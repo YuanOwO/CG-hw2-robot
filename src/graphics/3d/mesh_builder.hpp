@@ -1,8 +1,8 @@
 #pragma once
 
 #include "common/color.hpp"
+#include "geometry/curve/path2d.hpp"
 #include "graphics/3d/mesh.hpp"
-#include "math/curve/path2d.hpp"
 #include "math/mat4.hpp"
 #include "math/vec3.hpp"
 
@@ -61,7 +61,7 @@ class MeshBuilder {
     /// 剖面繞 y 軸轉一圈得到的旋轉體，表面平滑。
     /// 剖面須在 x >= 0 的一側，沿前進方向的右手邊為外側，例如由下往上畫；
     /// 起點或終點落在 y 軸上時，該端自然封口，否則留下開口
-    MeshBuilder& lathe(const Path2D& profile);
+    MeshBuilder& lathe(const geometry::Path2D& profile);
 
    private:
     Mesh _mesh;
@@ -72,7 +72,7 @@ class MeshBuilder {
 
     /// lathe 的實作，可指定欄數
     /// @param smooth false 時每個面各自使用面的法向量，用於稜柱等平面組成的形狀；剖面須由直線組成
-    void addLathe(const Path2D& profile, int segments, bool smooth = true);
+    void addLathe(const geometry::Path2D& profile, int segments, bool smooth = true);
 };
 
 }  // namespace robot::graphics

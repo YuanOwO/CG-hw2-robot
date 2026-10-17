@@ -28,13 +28,13 @@ void drawAxes(float length) {
     glPopAttrib();
 }
 
-void drawLines(const std::vector<LineSegment3D>& segments, const ColorRGBA& color, float width) {
+void drawLines(const std::vector<geometry::LineSegment3D>& segments, const ColorRGBA& color, float width) {
     glPushAttrib(GL_LINE_BIT | GL_CURRENT_BIT);
     glLineWidth(width);
     glColor4f(color.r, color.g, color.b, color.a);
 
     glBegin(GL_LINES);
-    for (const LineSegment3D& segment : segments) {
+    for (const auto& segment : segments) {
         const Vec3 start = segment.startPoint();
         const Vec3 end = segment.endPoint();
         glVertex3f(start.x, start.y, start.z);
