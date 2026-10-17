@@ -61,13 +61,13 @@ src/
 ├── view/       依世界狀態繪製場景與 HUD
 ├── screen/     選單畫面（主選單、暫停、操作說明）
 ├── gui/        通用介面元件（按鈕）
-├── graphics/   不認識世界的繪圖工具：2D 畫布、座標軸、繪製階段、相機與投影參數、三角形網格與長方體
+├── graphics/   不認識世界的繪圖工具：2D 畫布、座標軸、繪製階段、相機與投影參數、畫出網格
 ├── common/     顏色、座標、矩形與 UTF-8
 ├── font/       字型的量測與排版（見 src/font/README.md）
 ├── input/      按鍵代碼與輸入狀態
 ├── io/         檔案讀寫（字型、設定檔）
 ├── math/       向量、數學常數與角度轉換、內插等工具函式
-├── geometry/   不涉及繪圖 API 的幾何：曲線與路徑
+├── geometry/   不涉及繪圖 API 的幾何：曲線與路徑、三角形網格與 MeshBuilder
 └── platform/   GLUT 平台層：FreeGLUT 與 Apple GLUT 的差異
 assets/fonts/   字型檔與字型設定（fonts.ini）
 docs/           報告各章節、圖片與圖片原始檔

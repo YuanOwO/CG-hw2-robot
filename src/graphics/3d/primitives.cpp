@@ -78,7 +78,7 @@ void drawQuad(const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d, const 
     glPopAttrib();
 }
 
-void drawMesh(const Mesh& mesh) {
+void drawMesh(const geometry::Mesh& mesh) {
     const auto& vertices = mesh.vertices();
     const auto& indices = mesh.indices();
 

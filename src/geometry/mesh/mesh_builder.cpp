@@ -1,4 +1,4 @@
-#include "graphics/3d/mesh_builder.hpp"
+#include "geometry/mesh/mesh_builder.hpp"
 
 #include <cassert>
 #include <cmath>
@@ -7,10 +7,7 @@
 #include "math/mat4.hpp"
 #include "math/utils.hpp"
 
-namespace robot::graphics {
-
-using geometry::ArcDirection;
-using geometry::Path2D;
+namespace robot::geometry {
 
 MeshBuilder::MeshBuilder(int segments, float tolerance) : _segments(segments), _tolerance(tolerance) {}
 
@@ -258,4 +255,4 @@ void MeshBuilder::addLathe(const Path2D& profile, int segments, bool smooth) {
 
 #pragma endregion  // Lathe Implementation
 
-}  // namespace robot::graphics
+}  // namespace robot::geometry

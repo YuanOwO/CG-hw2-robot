@@ -4,7 +4,7 @@
 
 #include "common/color.hpp"
 #include "geometry/curve/line_segment.hpp"
-#include "graphics/3d/mesh.hpp"
+#include "geometry/mesh/mesh.hpp"
 #include "math/vec3.hpp"
 
 // 呼叫當下直接用 glBegin 畫出的輔助圖形，不產生網格。
@@ -30,6 +30,6 @@ void drawQuad(const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d, const 
 
 /// 以目前的 MODELVIEW 畫出網格。顏色取自各頂點，再依法向量決定明暗；
 /// 法向量屬於網格自己的座標系，所以明暗會跟著物體轉
-void drawMesh(const Mesh& mesh);
+void drawMesh(const geometry::Mesh& mesh);
 
 }  // namespace robot::graphics

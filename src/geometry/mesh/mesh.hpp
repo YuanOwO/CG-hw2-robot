@@ -6,7 +6,7 @@
 #include "common/color.hpp"
 #include "math/vec3.hpp"
 
-namespace robot::graphics {
+namespace robot::geometry {
 
 /// 三角形網格：頂點只存一次，三角形以編號參照，相鄰的三角形可以共用頂點。
 /// 每個頂點帶有自己的顏色，同一個網格可以有多種顏色。
@@ -39,4 +39,4 @@ class Mesh {
     std::vector<std::uint32_t> _indices;
 };
 
-}  // namespace robot::graphics
+}  // namespace robot::geometry
