@@ -27,9 +27,9 @@ class Path2D {
     Path2D& lineTo(const Vec2& end);
     /// 繞 center 畫圓弧，轉到 end 所在的方向；半徑是目前位置到 center 的距離，end 不必剛好在圓上，
     /// 畫筆停在圓弧實際的終點。end 與目前位置方向相同時畫一整圈
-    /// @param clockwise false 為逆時針
+    /// @param direction 弧的方向
     /// @note 目前位置或 end 與 center 重合時方向無法決定，須避免
-    Path2D& arcTo(const Vec2& center, Vec2 end, bool clockwise = false);
+    Path2D& arcTo(const Vec2& center, Vec2 end, ArcDirection direction = ArcDirection::CounterClockwise);
     /// 沿著上一段終點的切線方向畫圓弧到 end，與上一段平滑相接。
     /// 還沒有任何一段時以 +x 為起始方向；end 落在切線上時改畫直線
     Path2D& tangentArcTo(const Vec2& end);

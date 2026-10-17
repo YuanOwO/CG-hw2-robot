@@ -7,6 +7,11 @@
 
 namespace robot {
 
+enum class ArcDirection {
+    Clockwise,
+    CounterClockwise,
+};
+
 /// 圓弧：從起點繞圓心轉過一個角度。參數 t 從 0 到 1，與轉過的角度成正比
 class Arc2D {
    public:
@@ -23,9 +28,10 @@ class Arc2D {
 
     /// 從 start 繞 center 轉到 end 所在的方向。半徑由 start 決定，end 只用來決定終點的方向，不必剛好在圓上。
     /// start 與 end 方向相同時轉一整圈
-    /// @param clockwise false 為逆時針
+    /// @param direction 弧的方向
     /// @return start 或 end 與 center 重合時方向無法決定，回傳 std::nullopt
-    static std::optional<Arc2D> around(const Vec2& start, const Vec2& center, const Vec2& end, bool clockwise = false);
+    static std::optional<Arc2D> around(const Vec2& start, const Vec2& center, const Vec2& end,
+                                       ArcDirection direction = ArcDirection::CounterClockwise);
 
     /// 從 start 經過 via 到 end 的圓弧，三點都在弧上
     /// @return 三點共線或其中兩點重合時沒有這樣的圓弧，回傳 std::nullopt

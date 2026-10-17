@@ -27,7 +27,7 @@ std::optional<Arc2D> Arc2D::around(const Vec2& start, const Vec2& center, float 
     return Arc2D(center, radius, startDegree, sweepDegree);
 }
 
-std::optional<Arc2D> Arc2D::around(const Vec2& start, const Vec2& center, const Vec2& end, bool clockwise) {
+std::optional<Arc2D> Arc2D::around(const Vec2& start, const Vec2& center, const Vec2& end, ArcDirection direction) {
     Vec2 startDir = start - center;
     Vec2 endDir = end - center;
     float radius = length(startDir);
@@ -40,11 +40,11 @@ std::optional<Arc2D> Arc2D::around(const Vec2& start, const Vec2& center, const 
 
     if (startDegree == endDegree) {
         // 方向相同時轉一整圈
-        return Arc2D(center, radius, startDegree, clockwise ? -360.0f : 360.0f);
+        return Arc2D(center, radius, startDegree, direction == ArcDirection::Clockwise ? -360.0f : 360.0f);
     }
 
     float sweepDegree = wrapDegrees(endDegree - startDegree);
-    if (clockwise) {
+    if (direction == ArcDirection::Clockwise) {
         sweepDegree = sweepDegree - 360.0f;
     }
     return Arc2D(center, radius, startDegree, sweepDegree);
@@ -72,10 +72,10 @@ std::optional<Arc2D> Arc2D::through(const Vec2& start, const Vec2& via, const Ve
 
     if (denom > 0.0f) {
         // 逆時針方向
-        return around(start, center, end, false);
+        return around(start, center, end, ArcDirection::CounterClockwise);
     } else {
         // 順時針方向
-        return around(start, center, end, true);
+        return around(start, center, end, ArcDirection::Clockwise);
     }
 }
 
@@ -92,10 +92,10 @@ std::optional<Arc2D> Arc2D::tangentAtStart(const Vec2& start, const Vec2& direct
     Vec2 center = start + m * s;
     if (s > 0.0f) {
         // 逆時針方向
-        return around(start, center, end, false);
+        return around(start, center, end, ArcDirection::CounterClockwise);
     } else {
         // 順時針方向
-        return around(start, center, end, true);
+        return around(start, center, end, ArcDirection::Clockwise);
     }
 }
 
@@ -112,10 +112,10 @@ std::optional<Arc2D> Arc2D::tangentAtEnd(const Vec2& start, const Vec2& end, con
     Vec2 center = end + m * s;
     if (s > 0.0f) {
         // 逆時針方向
-        return around(start, center, end, false);
+        return around(start, center, end, ArcDirection::CounterClockwise);
     } else {
         // 順時針方向
-        return around(start, center, end, true);
+        return around(start, center, end, ArcDirection::Clockwise);
     }
 }
 

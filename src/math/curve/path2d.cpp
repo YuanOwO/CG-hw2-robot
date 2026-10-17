@@ -26,8 +26,8 @@ Path2D& Path2D::lineTo(const Vec2& end) {
     return *this;
 }
 
-Path2D& Path2D::arcTo(const Vec2& center, Vec2 end, bool clockwise) {
-    auto arc = Arc2D::around(_end, center, end, clockwise);
+Path2D& Path2D::arcTo(const Vec2& center, Vec2 end, ArcDirection direction) {
+    auto arc = Arc2D::around(_end, center, end, direction);
 
     assert(arc.has_value());
 
