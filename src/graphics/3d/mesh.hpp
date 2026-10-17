@@ -12,7 +12,14 @@ namespace robot::graphics {
 /// 建立一次後可以重複畫，三角形從外側看須為逆時針
 class Mesh {
    public:
+    struct Vertex {
+        Vec3 position;
+        Vec3 normal;
+    };
+
     ~Mesh() = default;
+
+    const std::vector<Vertex>& vertices() const { return _vertices; }
 
     /// @param position, normal 網格自己座標系中的位置與法向量
     /// @return 這個頂點的編號，給 addTriangle 使用
@@ -25,8 +32,7 @@ class Mesh {
     void draw(const ColorRGBA& color) const;
 
    private:
-    std::vector<Vec3> _positions;
-    std::vector<Vec3> _normals;
+    std::vector<Vertex> _vertices;
     std::vector<std::uint32_t> _indices;
 };
 
