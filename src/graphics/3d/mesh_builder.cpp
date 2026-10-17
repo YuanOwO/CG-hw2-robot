@@ -15,6 +15,11 @@ Mesh MeshBuilder::build() const {
     return _mesh;
 }
 
+MeshBuilder& MeshBuilder::setColor(const ColorRGBA& color) {
+    _currentColor = color;
+    return *this;
+}
+
 MeshBuilder& MeshBuilder::transform(const Mat4& mat) {
     _transform = mat;
     return *this;
@@ -67,10 +72,10 @@ MeshBuilder& MeshBuilder::cuboid(const Vec3& min, const Vec3& max) {
         const Vec3& normal = normals[i];
         const int* quad = faceIndices[i];
 
-        std::uint32_t a = _mesh.addVertex(vertices[quad[0]], normal);
-        std::uint32_t b = _mesh.addVertex(vertices[quad[1]], normal);
-        std::uint32_t c = _mesh.addVertex(vertices[quad[2]], normal);
-        std::uint32_t d = _mesh.addVertex(vertices[quad[3]], normal);
+        std::uint32_t a = _mesh.addVertex(vertices[quad[0]], normal, _currentColor);
+        std::uint32_t b = _mesh.addVertex(vertices[quad[1]], normal, _currentColor);
+        std::uint32_t c = _mesh.addVertex(vertices[quad[2]], normal, _currentColor);
+        std::uint32_t d = _mesh.addVertex(vertices[quad[3]], normal, _currentColor);
 
         _mesh.addTriangle(a, b, c);
         _mesh.addTriangle(a, c, d);
@@ -205,12 +210,12 @@ void MeshBuilder::addLathe(const Path2D& profile, int segments, bool smooth) {
             Vec3 n_trans = normalize(transformVector(nTransform[j], n));
 
             if (smooth) {
-                ringIndices[i].push_back(_mesh.addVertex(p_trans, n_trans));
+                ringIndices[i].push_back(_mesh.addVertex(p_trans, n_trans, _currentColor));
             } else {
                 // 每個面各存左右兩個頂點，相鄰的面在稜線上不共用，法向量才能各自不同
-                ringIndices[i].push_back(_mesh.addVertex(p_trans, n_trans));
+                ringIndices[i].push_back(_mesh.addVertex(p_trans, n_trans, _currentColor));
                 Vec3 p_next = transformPoint(vTransform[(j + 1) % segments], p);
-                ringIndices[i].push_back(_mesh.addVertex(p_next, n_trans));
+                ringIndices[i].push_back(_mesh.addVertex(p_next, n_trans, _currentColor));
             }
         }
     }

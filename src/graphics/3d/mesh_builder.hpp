@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common/color.hpp"
 #include "graphics/3d/mesh.hpp"
 #include "math/curve/path2d.hpp"
 #include "math/mat4.hpp"
@@ -7,7 +8,7 @@
 
 namespace robot::graphics {
 
-/// 把多個形狀組成一個網格。每個形狀先在自己的座標系中建立，再經過目前的變換放進網格。
+/// 把多個形狀組成一個網格。每個形狀先在自己的座標系中建立，再經過目前的變換、帶著目前的顏色放進網格。
 /// 旋轉體都繞自己的 y 軸；有底面的形狀以底面中心為原點，往 +y 長，球以球心為原點。
 /// 長方體例外，直接以兩個對角決定位置
 class MeshBuilder {
@@ -16,6 +17,12 @@ class MeshBuilder {
     /// @param tolerance 剖面切成折線時容許的最大距離，須大於 0
     explicit MeshBuilder(int segments = 32, float tolerance = 0.01f);
     ~MeshBuilder() = default;
+
+    /// 目前累積的網格。builder 可以繼續加入形狀，不影響已取出的網格
+    Mesh build() const;
+
+    /// 之後加入的形狀都使用這個顏色，直到下一次呼叫；一開始為白色
+    MeshBuilder& setColor(const ColorRGBA& color);
 
     /// 之後加入的形狀都先經過 mat 再放進網格；取代目前的變換，不與之前的疊加。
     /// 法向量用同一個矩陣變換，所以只支援旋轉、平移與等比例縮放，大小請用各形狀的參數決定
@@ -56,12 +63,10 @@ class MeshBuilder {
     /// 起點或終點落在 y 軸上時，該端自然封口，否則留下開口
     MeshBuilder& lathe(const Path2D& profile);
 
-    /// 目前累積的網格。builder 可以繼續加入形狀，不影響已取出的網格
-    Mesh build() const;
-
    private:
     Mesh _mesh;
     Mat4 _transform = Mat4();
+    ColorRGBA _currentColor = Color::White;
     int _segments;
     float _tolerance;
 
