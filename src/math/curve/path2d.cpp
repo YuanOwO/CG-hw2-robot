@@ -75,16 +75,18 @@ std::vector<Path2D::Vertex> Path2D::flatten(float tolerance) const {
 
         std::vector<CurveSample2D> samples;
         robot::flatten(curve, tolerance, samples);
-        if (!vertices.empty() && vertices.back().point == samples.front().point) {
-            Vec2 normal = rightNormal(curve.tangent(samples.front().t));
-            // 如果前一個頂點的法線與這個頂點的法線相同，刪掉這個頂點，避免重複
-            if (dot(vertices.back().normal, normal) > SMOOTH_JOIN_COSINE) {
-                samples.erase(samples.begin());
-            }
-        }
 
         for (const auto& sample : samples) {
             Vec2 normal = rightNormal(curve.tangent(sample.t));
+
+            if (!vertices.empty()) {
+                auto& prev = vertices.back();
+                if (prev.point == sample.point && dot(prev.normal, normal) > SMOOTH_JOIN_COSINE) {
+                    // 連續兩個頂點位置相同，且法向量方向相近 => 平順，保留前一個頂點的法向量，略過這個頂點
+                    continue;
+                }
+            }
+
             vertices.emplace_back(Vertex{sample.point, normal});
         }
     }
