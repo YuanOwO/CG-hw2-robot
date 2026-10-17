@@ -23,15 +23,15 @@ const float BASE_HALF_HEIGHT = 40.0f;
 
 }  // namespace
 
-void CameraRig::turn(float degrees) {
-    _yaw = std::fmod(_yaw + degrees, 360.0f);
+void CameraRig::turn(float degree) {
+    _yaw = std::fmod(_yaw + degree, 360.0f);
     if (_yaw < 0.0f) {
         _yaw += 360.0f;  // fmod 保留被除數的正負號
     }
 }
 
-void CameraRig::tilt(float degrees) {
-    _pitch = std::clamp(_pitch + degrees, MIN_PITCH, MAX_PITCH);
+void CameraRig::tilt(float degree) {
+    _pitch = std::clamp(_pitch + degree, MIN_PITCH, MAX_PITCH);
 }
 
 void CameraRig::pan(float forward, float right) {

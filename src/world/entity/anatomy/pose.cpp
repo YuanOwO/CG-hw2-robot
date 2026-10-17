@@ -26,9 +26,9 @@ float Pose::angle(BoneIndex boneIndex, int dofIndex) const {
     return _angles[boneIndex][dofIndex];
 }
 
-void Pose::setAngle(BoneIndex boneIndex, int dofIndex, float degrees) {
+void Pose::setAngle(BoneIndex boneIndex, int dofIndex, float degree) {
     const Dof& dof = _skeleton.dof(boneIndex, dofIndex);
-    _angles[boneIndex][dofIndex] = std::clamp(degrees, dof.min, dof.max);
+    _angles[boneIndex][dofIndex] = std::clamp(degree, dof.min, dof.max);
 }
 
 }  // namespace robot::world::entity::anatomy

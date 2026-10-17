@@ -12,10 +12,10 @@ class CameraRig {
     void setTarget(const Vec3& target) { _target = target; }
 
     // 正值為從上方看逆時針，與 glRotatef 繞 y 軸的方向相同。
-    void turn(float degrees);
+    void turn(float degree);
 
     // 正值為抬頭，不會到達正上方或正下方。
-    void tilt(float degrees);
+    void tilt(float degree);
 
     // 沿畫面方向水平移動目標點。距離會除以放大倍率，畫面上的移動速度因此不隨縮放改變。
     void pan(float forward, float right);

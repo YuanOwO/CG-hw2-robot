@@ -22,9 +22,9 @@ struct Mat4 {
 
 /// 平移 offset 的矩陣
 Mat4 translation(const Vec3& offset);
-/// 繞 axis 轉 degrees 的矩陣，與 glRotatef 相同：角度、右手定則
+/// 繞 axis 轉 degree 的矩陣，與 glRotatef 相同：角度、右手定則
 /// @param axis 不必是單位向量
-Mat4 rotation(float degrees, const Vec3& axis);
+Mat4 rotation(float degree, const Vec3& axis);
 
 /// 變換一個點（w = 1），會受平移影響
 Vec3 transformPoint(const Mat4& mat, const Vec3& point);

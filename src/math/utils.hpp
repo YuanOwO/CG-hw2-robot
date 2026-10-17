@@ -10,8 +10,8 @@ namespace robot {
 #pragma region Angles
 
 /// 角度換成弧度。glRotatef 使用角度，std::sin、std::cos 使用弧度
-inline float radians(float degrees) {
-    return degrees * (PI / 180.0f);
+inline float radians(float degree) {
+    return degree * (PI / 180.0f);
 }
 
 /// 弧度換成角度
@@ -20,23 +20,23 @@ inline float degrees(float radians) {
 }
 
 /// 換到 [0, 360) 內的同一個方向
-inline float wrapDegrees(float degrees) {
-    degrees = std::fmod(degrees, 360.0f);
-    if (degrees < 0.0f) {
-        degrees += 360.0f;  // fmod 保留被除數的正負號，負角度要再加一圈
+inline float wrapDegrees(float degree) {
+    degree = std::fmod(degree, 360.0f);
+    if (degree < 0.0f) {
+        degree += 360.0f;  // fmod 保留被除數的正負號，負角度要再加一圈
     }
-    return degrees < 360.0f ? degrees : 0.0f;  // 極小的負數加上 360 會被 float 進位成 360
+    return degree < 360.0f ? degree : 0.0f;  // 極小的負數加上 360 會被 float 進位成 360
 }
 
 /// 換到 (-180, 180] 內的同一個方向，用來判斷往哪邊轉比較近
-inline float wrapSignedDegrees(float degrees) {
-    degrees = std::fmod(degrees, 360.0f);
-    if (degrees > 180.0f) {
-        degrees -= 360.0f;
-    } else if (degrees <= -180.0f) {
-        degrees += 360.0f;
+inline float wrapSignedDegrees(float degree) {
+    degree = std::fmod(degree, 360.0f);
+    if (degree > 180.0f) {
+        degree -= 360.0f;
+    } else if (degree <= -180.0f) {
+        degree += 360.0f;
     }
-    return degrees;
+    return degree;
 }
 
 #pragma endregion  // Angles

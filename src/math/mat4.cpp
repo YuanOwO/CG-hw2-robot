@@ -33,10 +33,10 @@ Mat4 translation(const Vec3& offset) {
     return result;
 }
 
-Mat4 rotation(float degrees, const Vec3& axis) {
+Mat4 rotation(float degree, const Vec3& axis) {
     const Vec3 n = normalize(axis);
-    const float c = std::cos(radians(degrees));
-    const float s = std::sin(radians(degrees));
+    const float c = std::cos(radians(degree));
+    const float s = std::sin(radians(degree));
     const float t = 1.0f - c;
 
     Mat4 result;

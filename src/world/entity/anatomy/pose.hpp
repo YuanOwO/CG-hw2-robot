@@ -14,7 +14,7 @@ class Pose {
     ~Pose() = default;
 
     float angle(BoneIndex boneIndex, int dofIndex) const;
-    void setAngle(BoneIndex boneIndex, int dofIndex, float degrees);  // 夾在範圍內
+    void setAngle(BoneIndex boneIndex, int dofIndex, float degree);  // 夾在範圍內
 
    private:
     const Skeleton& _skeleton;
