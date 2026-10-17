@@ -78,4 +78,25 @@ void drawQuad(const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d, const 
     glPopAttrib();
 }
 
+void drawMesh(const Mesh& mesh) {
+    const auto& vertices = mesh.vertices();
+    const auto& indices = mesh.indices();
+
+    glPushAttrib(GL_CURRENT_BIT);
+
+    glBegin(GL_TRIANGLES);
+    for (std::uint32_t index : indices) {
+        const Vec3& position = vertices[index].position;
+        const Vec3& normal = vertices[index].normal;
+        const ColorRGBA& color = vertices[index].color;
+        const float shade = shadeOf(normal);
+        glColor4f(color.r * shade, color.g * shade, color.b * shade, color.a);
+        glNormal3f(normal.x, normal.y, normal.z);
+        glVertex3f(position.x, position.y, position.z);
+    }
+    glEnd();
+
+    glPopAttrib();
+}
+
 }  // namespace robot::graphics
