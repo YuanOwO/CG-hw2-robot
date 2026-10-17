@@ -15,15 +15,18 @@ void Session::tick(float dt, const engine::Input& input) {
 }
 
 void Session::pause() {
-    _cameraController.reset();
+    _cameraController.reset();  // 停止拖曳時要重新記錄游標起點
 }
 
 void Session::renderWorld(int width, int height) const {
-    _worldRenderer.render(_world, _cameraRig, width, height);
+    _worldRenderer.render(_world, _cameraRig.camera(), _cameraRig.projection(), width, height);
 }
 
 void Session::renderHud(graphics::Canvas& canvas, double framesPerSecond, double ticksPerSecond) const {
-    _hud.render(canvas, framesPerSecond, ticksPerSecond, _cameraRig);
+    view::HudInfo info{framesPerSecond, ticksPerSecond, _cameraRig.yaw(), _cameraRig.pitch(),
+                       _world.player().position()};
+
+    _hud.render(canvas, info);
 }
 
 }  // namespace robot::game

@@ -2,7 +2,7 @@
 
 namespace robot::game {
 
-world::entity::PlayerCommand PlayerController::read(const engine::Input& input, const view::CameraRig& camera) {
+world::entity::PlayerCommand PlayerController::read(const engine::Input& input, const CameraRig& camera) {
     if (input.pressed(Key::L)) {
         _followCamera = !_followCamera;
     }

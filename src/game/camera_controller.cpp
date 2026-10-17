@@ -12,7 +12,7 @@ const float ZOOM_SPEED = 4.0f;        // 按住一秒放大或縮小的倍數
 
 }  // namespace
 
-void CameraController::update(float dt, const engine::Input& input, view::CameraRig& camera) {
+void CameraController::update(float dt, const engine::Input& input, CameraRig& camera) {
     // 用按住的狀態而不是按下事件：按住多久就轉多少，轉速與幀率無關
     float direction = 0.0f;
     if (input.held(Key::Q)) {

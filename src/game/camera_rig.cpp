@@ -1,11 +1,11 @@
-#include "view/camera_rig.hpp"
+#include "game/camera_rig.hpp"
 
 #include <algorithm>
 #include <cmath>
 
 #include "math/utils.hpp"
 
-namespace robot::view {
+namespace robot::game {
 
 namespace {
 
@@ -66,9 +66,9 @@ graphics::OrthoProjection CameraRig::projection() const {
     projection.bottom = -BASE_HALF_HEIGHT / _zoom;
     projection.top = BASE_HALF_HEIGHT / _zoom;
 
-    // 眼睛在目標點後方 _distance = 75，目標點之後還能看到約 125 公尺
+    // 眼睛在目標點後方 _distance 處，farPlane 要比它遠，目標點之後的地形才畫得出來
     projection.farPlane = 200.0f;
     return projection;
 }
 
-}  // namespace robot::view
+}  // namespace robot::game

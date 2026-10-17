@@ -15,11 +15,11 @@ const FontStyle HUD_FONT = GlyphFontStyle{GlyphFont::UNIFONT, 16};
 
 }  // namespace
 
-void Hud::render(graphics::Canvas& canvas, double framesPerSecond, double ticksPerSecond,
-                 const CameraRig& camera) const {
-    char buffer[96];
-    std::snprintf(buffer, sizeof(buffer), "FPS %.2f · TPS %.2f\nYaw %.1f° · Pitch %.1f°", framesPerSecond,
-                  ticksPerSecond, camera.yaw(), camera.pitch());
+void Hud::render(graphics::Canvas& canvas, const HudInfo& info) const {
+    char buffer[1024];
+    std::snprintf(buffer, sizeof(buffer), "FPS %.2f · TPS %.2f\nYaw %.1f° · Pitch %.1f°\nX: %.2f · Y: %.2f · Z: %.2f",
+                  info.framesPerSecond, info.ticksPerSecond, info.cameraYaw, info.cameraPitch, info.playerPosition.x,
+                  info.playerPosition.y, info.playerPosition.z);
     const std::string text = buffer;
 
     const int textWidth = static_cast<int>(std::ceil(getFontWidth(HUD_FONT, text)));

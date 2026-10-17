@@ -4,9 +4,9 @@
 
 #include "engine/input.hpp"
 #include "game/camera_controller.hpp"
+#include "game/camera_rig.hpp"
 #include "game/player_controller.hpp"
 #include "graphics/2d/canvas.hpp"
-#include "view/camera_rig.hpp"
 #include "view/hud.hpp"
 #include "view/world_renderer.hpp"
 #include "world/world.hpp"
@@ -30,10 +30,11 @@ class Session {
    private:
     std::uint64_t _seed = 24622192;  // 隨便挑的數字，讓每次遊戲都一樣
 
-    world::World _world;
-    view::CameraRig _cameraRig;
+    CameraRig _cameraRig;
     CameraController _cameraController;
     PlayerController _playerController;
+
+    world::World _world;
 
     view::WorldRenderer _worldRenderer;
     view::Hud _hud;
