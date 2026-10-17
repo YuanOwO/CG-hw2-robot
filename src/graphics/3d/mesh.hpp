@@ -16,7 +16,7 @@ class Mesh {
     /// 網格的一個頂點，位置與法向量屬於網格自己的座標系
     struct Vertex {
         Vec3 position;
-        Vec3 normal;  ///< 單位向量
+        Vec3 normal;  ///< 單位向量，addVertex 存入時已正規化
         ColorRGBA color;
     };
 
@@ -25,7 +25,7 @@ class Mesh {
     /// 已加入的頂點，順序即 addVertex 回傳的編號
     const std::vector<Vertex>& vertices() const { return _vertices; }
 
-    /// @param position, normal 網格自己座標系中的位置與法向量，法向量須為單位向量
+    /// @param position, normal 網格自己座標系中的位置與法向量；法向量不必是單位向量，存入時會正規化
     /// @param color 頂點的基本顏色，畫的時候再依法向量調整明暗
     /// @return 這個頂點的編號，給 addTriangle 使用
     std::uint32_t addVertex(const Vec3& position, const Vec3& normal, const ColorRGBA& color);

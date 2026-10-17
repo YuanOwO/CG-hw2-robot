@@ -8,7 +8,8 @@
 namespace robot::graphics {
 
 std::uint32_t Mesh::addVertex(const Vec3& position, const Vec3& normal, const ColorRGBA& color) {
-    _vertices.push_back({position, normal, color});
+    // 存入時正規化一次，畫的時候 shadeOf 與 glNormal 都能直接使用
+    _vertices.push_back({position, normalize(normal), color});
     return static_cast<std::uint32_t>(_vertices.size() - 1);
 }
 
