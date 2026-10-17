@@ -54,6 +54,18 @@ Mat4 rotation(float degree, const Vec3& axis) {
     return result;
 }
 
+Mat4 scale(float sx, float sy, float sz) {
+    Mat4 result;
+    result.at(0, 0) = sx;
+    result.at(1, 1) = sy;
+    result.at(2, 2) = sz;
+    return result;
+}
+
+Mat4 scale(float s) {
+    return scale(s, s, s);
+}
+
 Vec3 transformPoint(const Mat4& mat, const Vec3& point) {
     return transformVector(mat, point) + Vec3(mat.at(0, 3), mat.at(1, 3), mat.at(2, 3));
 }

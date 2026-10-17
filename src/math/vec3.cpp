@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include "math/mat4.hpp"
+
 namespace robot {
 
 float length(const Vec3& vec) {
@@ -30,6 +32,21 @@ Vec3 normalize(const Vec3& vec) {
         return Vec3(0.0f, 0.0f, 0.0f);  // 避免除以零
     }
     return vec / len;
+}
+
+Vec3 rotateAroundX(const Vec3& vec, float degree) {
+    auto mat = rotation(degree, Vec3(1.0f, 0.0f, 0.0f));
+    return transformVector(mat, vec);
+}
+
+Vec3 rotateAroundY(const Vec3& vec, float degree) {
+    auto mat = rotation(degree, Vec3(0.0f, 1.0f, 0.0f));
+    return transformVector(mat, vec);
+}
+
+Vec3 rotateAroundZ(const Vec3& vec, float degree) {
+    auto mat = rotation(degree, Vec3(0.0f, 0.0f, 1.0f));
+    return transformVector(mat, vec);
 }
 
 }  // namespace robot

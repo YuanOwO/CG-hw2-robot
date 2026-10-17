@@ -45,4 +45,8 @@ Vec3 cross(const Vec3& a, const Vec3& b);  ///< 右手定則：cross(X, Y) = Z
 
 Vec3 normalize(const Vec3& vec);  ///< 單位向量；長度小於 EPSILON 時回傳零向量
 
+Vec3 rotateAroundX(const Vec3& vec, float degree);
+Vec3 rotateAroundY(const Vec3& vec, float degree);
+Vec3 rotateAroundZ(const Vec3& vec, float degree);
+
 }  // namespace robot
