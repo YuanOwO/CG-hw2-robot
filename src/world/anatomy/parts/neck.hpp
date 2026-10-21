@@ -18,7 +18,6 @@ namespace robot::world::anatomy {
 struct NeckSpec {
     Vec3 size;
     JointLimits yaw, pitch, roll;
-
     std::optional<geometry::Mesh> neckMesh;
 };
 

@@ -18,7 +18,6 @@ namespace robot::world::anatomy {
 struct HeadSpec {
     Vec3 size;
     JointLimits yaw, pitch;
-
     std::optional<geometry::Mesh> headMesh;
 };
 

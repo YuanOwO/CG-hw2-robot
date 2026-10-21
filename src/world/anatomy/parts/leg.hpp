@@ -17,13 +17,14 @@ namespace robot::world::anatomy {
 
 struct LegSpec {
     Vec3 thighSize;
-    Vec3 shinSize;
-
     JointLimits hipYaw, hipPitch, hipRoll;
-    JointLimits kneePitch;
-
     std::optional<geometry::Mesh> thighMesh;
+
+    std::optional<Vec3> shinSize;
+    std::optional<JointLimits> kneePitch;
     std::optional<geometry::Mesh> shinMesh;
+
+    float length() const { return thighSize.y + (shinSize.has_value() ? shinSize->y : 0.0f); }
 };
 
 class Leg final : public Part {
@@ -33,8 +34,13 @@ class Leg final : public Part {
             throw std::invalid_argument("LegSpec thighSize must be positive");
         }
 
-        if (spec.shinSize.x <= 0.0f || spec.shinSize.y <= 0.0f || spec.shinSize.z <= 0.0f) {
+        if (spec.shinSize.has_value() &&
+            (spec.shinSize->x <= 0.0f || spec.shinSize->y <= 0.0f || spec.shinSize->z <= 0.0f)) {
             throw std::invalid_argument("LegSpec shinSize must be positive");
+        }
+
+        if (_legSpec.shinSize.has_value() != _legSpec.kneePitch.has_value()) {
+            throw std::invalid_argument("LegSpec shinSize and kneePitch must be both present or both absent");
         }
 
         // 傳入的關節限制是針對左腿的，右腿的限制需要反向
@@ -56,7 +62,10 @@ class Leg final : public Part {
 
     Socket ankle() const {
         requireAttached();
-        return Socket(_shin, Vec3(0.0f, -_legSpec.shinSize.y, 0.0f));
+        if (_shin == NO_BONE) {
+            return Socket(_thigh, Vec3(0.0f, -_legSpec.thighSize.y, 0.0f));
+        }
+        return Socket(_shin, Vec3(0.0f, -_legSpec.shinSize->y, 0.0f));
     }
 
    protected:
@@ -66,9 +75,13 @@ class Leg final : public Part {
 
         _thigh = builder.addBone(Bone(name() + "_thigh", socket.bone, socket.offset, thighSpec));
 
+        if (!_legSpec.shinSize.has_value()) {
+            return;
+        }
+
         Vec3 kneeOffset(0.0f, -_legSpec.thighSize.y, 0.0f);
-        collision::Box shinBox(Vec3(0.0f, -_legSpec.shinSize.y * 0.5f, 0.0f), _legSpec.shinSize * 0.5f);
-        BoneSpec shinSpec{Joint(JointLimits(), _legSpec.kneePitch, JointLimits()), shinBox, _legSpec.shinMesh};
+        collision::Box shinBox(Vec3(0.0f, -_legSpec.shinSize->y * 0.5f, 0.0f), _legSpec.shinSize.value() * 0.5f);
+        BoneSpec shinSpec{Joint(JointLimits(), _legSpec.kneePitch.value(), JointLimits()), shinBox, _legSpec.shinMesh};
 
         _shin = builder.addBone(Bone(name() + "_shin", _thigh, kneeOffset, shinSpec));
     }
