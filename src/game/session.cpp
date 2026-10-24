@@ -1,31 +1,32 @@
 #include "game/session.hpp"
 
+#include "world/entity/robot.hpp"
+
 namespace robot::game {
 
-Session::Session() : _world(_seed) {
-    // _cameraRig.setTarget(_world.player().eyePosition());
+Session::Session() : _world(_seed), _player(_world, Vec3{0, 10, 0}) {
+    _player.follow();
 }
 
 void Session::tick(float dt, const engine::Input& input) {
-    // 先轉相機，指令才用這個 tick 的視線；世界走完後相機再跟上玩家的位置，畫面才不會慢一拍
-    _cameraController.update(dt, input, _cameraRig);
-    // _world.setPlayerCommand(_playerController.read(input, _cameraRig));
+    _player.update(dt, input);
     _world.tick(dt);
-    // _cameraRig.setTarget(_world.player().eyePosition());
+    _player.follow();
+    _world.setFocus(_player.info().position);
 }
 
 void Session::pause() {
-    _cameraController.reset();  // 停止拖曳時要重新記錄游標起點
+    _player.resetCamera();
 }
 
 void Session::renderWorld(int width, int height) const {
-    _worldRenderer.render(_world, _cameraRig.camera(), _cameraRig.projection(), width, height);
+    _worldRenderer.render(_world, _player.camera(), _player.projection(), width, height);
 }
 
 void Session::renderHud(graphics::Canvas& canvas, double framesPerSecond, double ticksPerSecond) const {
-    view::HudInfo info{
-        framesPerSecond, ticksPerSecond, _cameraRig.yaw(), _cameraRig.pitch(), Vec3{0, 0, 0}
-    };
+    auto _playerInfo = _player.info();
+    view::HudInfo info{framesPerSecond,   ticksPerSecond,       _playerInfo.yaw,
+                       _playerInfo.pitch, _playerInfo.velocity, _playerInfo.position};
 
     _hud.render(canvas, info);
 }

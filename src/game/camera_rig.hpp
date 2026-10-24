@@ -11,13 +11,15 @@ class CameraRig {
    public:
     void setTarget(const Vec3& target) { _target = target; }
 
+    void setYaw(float degree);
+    void setPitch(float degree);
+    void setDistance(float distance);
+
     /// 水平轉向，正值為從上方看逆時針
     void turn(float degree);
     /// 抬頭或低頭，正值抬頭；會停在接近正上方或正下方的地方
     void tilt(float degree);
-    /// 沿畫面方向水平移動目標點，畫面上的移動速度不隨縮放改變
-    /// @param forward, right 倍率為 1 時的移動距離，公尺
-    void pan(float forward, float right);
+
     /// @param factor 大於 1 拉近、小於 1 拉遠
     void zoom(float factor);
 

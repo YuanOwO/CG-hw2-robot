@@ -1,33 +1,30 @@
-// #include "game/player_controller.hpp"
+#include "game/player_controller.hpp"
 
-// namespace robot::game {
+namespace robot::game {
 
-// world::entity::PlayerCommand PlayerController::read(const engine::Input& input, const CameraRig& camera) {
-//     if (input.pressed(Key::L)) {
-//         _followCamera = !_followCamera;
-//     }
+world::entity::brain::Intent PlayerController::read(const engine::Input& input) {
+    world::entity::brain::Intent intent;
 
-//     world::entity::PlayerCommand command;
+    if (input.held(Key::W)) {
+        intent.surge += 1.0f;
+    }
+    if (input.held(Key::S)) {
+        intent.surge -= 1.0f;
+    }
+    if (input.held(Key::D)) {
+        intent.sway += 1.0f;
+    }
+    if (input.held(Key::A)) {
+        intent.sway -= 1.0f;
+    }
+    if (input.held(Key::LeftShift)) {
+        intent.sprint = true;
+    }
+    if (input.held(Key::Space)) {
+        intent.jump = true;
+    }
 
-//     if (input.held(Key::W)) {
-//         command.forward += 1.0f;
-//     }
-//     if (input.held(Key::S)) {
-//         command.forward -= 1.0f;
-//     }
-//     if (input.held(Key::D)) {
-//         command.strafe += 1.0f;
-//     }
-//     if (input.held(Key::A)) {
-//         command.strafe -= 1.0f;
-//     }
+    return intent;
+}
 
-//     if (_followCamera) {
-//         // 相機 yaw 為 0 時看向 -z，實體則面向 +z；pitch 兩者都是正值抬頭
-//         command.look = {camera.yaw() + 180.0f, camera.pitch()};
-//     }
-
-//     return command;
-// }
-
-// }  // namespace robot::game
+}  // namespace robot::game

@@ -1,14 +1,11 @@
 #pragma once
 
-#include <cstdint>
-
 #include "engine/input.hpp"
-#include "game/camera_controller.hpp"
-#include "game/camera_rig.hpp"
-#include "game/player_controller.hpp"
+#include "game/player.hpp"
 #include "graphics/2d/canvas.hpp"
 #include "view/hud.hpp"
 #include "view/world_renderer.hpp"
+#include "world/types.hpp"
 #include "world/world.hpp"
 
 namespace robot::game {
@@ -28,16 +25,13 @@ class Session {
     void renderHud(graphics::Canvas& canvas, double framesPerSecond, double ticksPerSecond) const;
 
    private:
-    std::uint64_t _seed = 24622192;  // 隨便挑的數字，讓每次遊戲都一樣
-
-    CameraRig _cameraRig;
-    CameraController _cameraController;
-    // PlayerController _playerController;
-
+    world::Seed _seed = 24622192;  // 隨便挑的數字，讓每次遊戲都一樣
     world::World _world;
 
     view::WorldRenderer _worldRenderer;
     view::Hud _hud;
+
+    Player _player;
 };
 
 }  // namespace robot::game

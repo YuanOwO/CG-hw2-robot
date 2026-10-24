@@ -11,6 +11,7 @@ struct HudInfo {
     double ticksPerSecond;
     float cameraYaw;
     float cameraPitch;
+    Vec3 playerVelocity;
     Vec3 playerPosition;
 };
 
