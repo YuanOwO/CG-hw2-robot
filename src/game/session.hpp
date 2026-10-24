@@ -32,7 +32,7 @@ class Session {
 
     CameraRig _cameraRig;
     CameraController _cameraController;
-    PlayerController _playerController;
+    // PlayerController _playerController;
 
     world::World _world;
 

@@ -1,17 +1,13 @@
 #include "world/world.hpp"
 
 #include "math/random.hpp"
-#include "world/entity/chicken.hpp"
-#include "world/entity/creeper.hpp"
-#include "world/entity/pig.hpp"
 
 namespace robot::world {
 
 namespace {
 
 // 各子系統以不同的 stream 衍生 seed，改動其中一個的取亂數方式不會影響其他子系統
-constexpr std::uint32_t CHUNK_SEED_STREAM = 0x43484e4bu;   // "CHNK"
-constexpr std::uint32_t ENTITY_SEED_STREAM = 0x454e5459u;  // "ENTY"
+constexpr std::uint32_t CHUNK_SEED_STREAM = 0x43484e4bu;  // "CHNK"
 
 std::uint64_t deriveSeed(std::uint64_t seed, std::uint32_t stream) {
     return Random(seed).valueAt(stream);
@@ -19,25 +15,10 @@ std::uint64_t deriveSeed(std::uint64_t seed, std::uint32_t stream) {
 
 }  // namespace
 
-World::World(std::uint64_t seed)
-    : _seed(seed),
-      _chunkManager(deriveSeed(seed, CHUNK_SEED_STREAM)),
-      _entityManager(deriveSeed(seed, ENTITY_SEED_STREAM)) {
-    _player = &_entityManager.spawn<entity::Player>(Vec3(0.0f, 0.0f, 0.0f), 0.0f);
-    loadChunksAroundPlayer();
-    _entityManager.spawn<entity::Creeper>(Vec3(4.0f, 0.0f, 0.0f), 0.0f);
-    _entityManager.spawn<entity::Pig>(Vec3(-4.0f, 0.0f, 0.0f), 0.0f);
-    _entityManager.spawn<entity::Chicken>(Vec3(0.0f, 0.0f, 4.0f), 0.0f);
+World::World(std::uint64_t seed) : _seed(seed), _chunkManager(deriveSeed(seed, CHUNK_SEED_STREAM)) {
+    _chunkManager.update({0, 0});  // 先載入原點
 }
 
-void World::tick(float dt) {
-    _entityManager.tick(dt, *this);
-    loadChunksAroundPlayer();
-}
-
-void World::loadChunksAroundPlayer() {
-    const Vec3& position = _player->position();
-    _chunkManager.update(chunk::ChunkPos::containing(position.x, position.z));
-}
+void World::tick(float dt) {}
 
 }  // namespace robot::world

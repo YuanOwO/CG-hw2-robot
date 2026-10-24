@@ -18,8 +18,8 @@ void WorldRenderer::render(const world::World& world, const graphics::Camera& ca
 
     world.chunks().forEach([](const world::chunk::Chunk& c) { chunk::drawChunk(c); });
 
-    world.entities().forEach<world::entity::LivingEntity>(
-        [this](const world::entity::LivingEntity& entity) { _skeletonRenderer.render(entity); });
+    // world.entities().forEach<world::entity::LivingEntity>(
+    //     [this](const world::entity::LivingEntity& entity) { _skeletonRenderer.render(entity); });
 
     graphics::drawAxes(AXIS_LENGTH);
 }
