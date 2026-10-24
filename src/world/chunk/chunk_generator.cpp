@@ -2,11 +2,10 @@
 
 namespace robot::world::chunk {
 
-ChunkGenerator::ChunkGenerator(std::uint64_t seed) : _seed(seed) {}
+ChunkGenerator::ChunkGenerator(Seed seed) : _seed(seed) {}
 
 std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
-    auto chunk = std::make_unique<Chunk>();
-    chunk->pos = pos;
+    auto chunk = std::make_unique<Chunk>(pos, Chunk::Heights{});
     return chunk;
 }
 

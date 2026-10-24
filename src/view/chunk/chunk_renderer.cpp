@@ -16,10 +16,10 @@ const ColorRGBA GRASS_DARK{0.48f, 0.68f, 0.34f};
 void drawChunk(const world::chunk::Chunk& chunk) {
     using world::chunk::CHUNK_SIZE;
 
-    const int originX = chunk.pos.x * CHUNK_SIZE;
-    const int originZ = chunk.pos.z * CHUNK_SIZE;
+    const int originX = chunk.pos().x * CHUNK_SIZE;
+    const int originZ = chunk.pos().z * CHUNK_SIZE;
     auto corner = [&](int localX, int localZ) {
-        return Vec3(static_cast<float>(originX + localX), chunk.heightAt(localX, localZ),
+        return Vec3(static_cast<float>(originX + localX), chunk.vertexHeight(localX, localZ),
                     static_cast<float>(originZ + localZ));
     };
 

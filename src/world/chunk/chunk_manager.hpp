@@ -5,12 +5,13 @@
 
 #include "world/chunk/chunk.hpp"
 #include "world/chunk/chunk_generator.hpp"
+#include "world/types.hpp"
 
 namespace robot::world::chunk {
 
 class ChunkManager {
    public:
-    explicit ChunkManager(std::uint64_t seed);
+    explicit ChunkManager(Seed seed);
     ~ChunkManager() = default;
 
     void update(ChunkPos center);

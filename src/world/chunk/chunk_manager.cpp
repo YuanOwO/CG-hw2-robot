@@ -10,12 +10,12 @@ constexpr int CHUNK_LOAD_RADIUS = 4;
 bool withinLoadRadius(ChunkPos pos, ChunkPos center) {
     const int dx = pos.x - center.x;
     const int dz = pos.z - center.z;
-    return dx * dx + dz * dz <= CHUNK_LOAD_RADIUS * CHUNK_LOAD_RADIUS;
+    return dx * dx + dz * dz < CHUNK_LOAD_RADIUS * CHUNK_LOAD_RADIUS;
 }
 
 }  // namespace
 
-ChunkManager::ChunkManager(std::uint64_t seed) : _generator(seed) {}
+ChunkManager::ChunkManager(Seed seed) : _generator(seed) {}
 
 const Chunk* ChunkManager::chunkAt(ChunkPos pos) const {
     auto it = _chunks.find(pos);
