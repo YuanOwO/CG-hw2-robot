@@ -73,10 +73,22 @@ inline std::int64_t floorDiv(std::int64_t numerator, std::int64_t denominator) {
     return quotient;
 }
 
+/// 向負無窮取整的浮點數除法
+/// @param denominator 不可為 0
+inline float floorDiv(float numerator, float denominator) {
+    return std::floor(numerator / denominator);
+}
+
 /// 向正無窮取整的整數除法
 /// @param denominator 不可為 0
 inline std::int64_t ceilDiv(std::int64_t numerator, std::int64_t denominator) {
     return -floorDiv(-numerator, denominator);
+}
+
+/// 向正無窮取整的浮點數除法
+/// @param denominator 不可為 0
+inline float ceilDiv(float numerator, float denominator) {
+    return std::ceil(numerator / denominator);
 }
 
 #pragma endregion  // Integer division
