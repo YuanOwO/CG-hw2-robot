@@ -1,6 +1,12 @@
 #pragma once
 
+#include <optional>
+
 #include "world/chunk/chunk_manager.hpp"
+#include "world/collision/collision.hpp"
+#include "world/entity/brain/player_brain.hpp"
+#include "world/entity/entity_manager.hpp"
+#include "world/entity/robot.hpp"
 #include "world/types.hpp"
 
 namespace robot::world {
@@ -11,13 +17,23 @@ class World {
     explicit World(Seed seed);
     void tick(float dt);
 
+    void setFocus(Vec3 position);
+
     bool blockedAt(float worldX, float worldZ, float radius) const { return false; }  // TODO
+    /// 地面高度；該處的 chunk 還沒載入時沒有值
+    std::optional<float> heightAt(float worldX, float worldZ) const;
 
     const chunk::ChunkManager& chunks() const { return _chunkManager; }
+    entity::EntityManager& entities() { return _entityManager; }
+    const entity::EntityManager& entities() const { return _entityManager; }
+
+    MotionResult resolveMotion(const collision::UprightCylinder& collider, const Motion& motion,
+                               bool wasOnGround) const;
 
    private:
     Seed _seed;
     chunk::ChunkManager _chunkManager;
+    entity::EntityManager _entityManager;
 };
 
 }  // namespace robot::world
