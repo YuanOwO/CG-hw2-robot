@@ -1,19 +1,14 @@
-#include "view/chunk/chunk_renderer.hpp"
+#include "view/chunk_renderer.hpp"
 
-#include "common/color.hpp"
 #include "graphics/3d/primitives.hpp"
 #include "math/vec3.hpp"
 
-namespace robot::view::chunk {
+namespace robot::view {
 
-namespace {
+const ColorRGBA ChunkRenderer::GRASS_LIGHT{0.56f, 0.76f, 0.40f};
+const ColorRGBA ChunkRenderer::GRASS_DARK{0.48f, 0.68f, 0.34f};
 
-const ColorRGBA GRASS_LIGHT{0.56f, 0.76f, 0.40f};
-const ColorRGBA GRASS_DARK{0.48f, 0.68f, 0.34f};
-
-}  // namespace
-
-void drawChunk(const world::chunk::Chunk& chunk) {
+void ChunkRenderer::render(const world::chunk::Chunk& chunk) const {
     using world::chunk::CHUNK_SIZE;
 
     const int originX = chunk.pos().x * CHUNK_SIZE;
@@ -34,4 +29,4 @@ void drawChunk(const world::chunk::Chunk& chunk) {
     }
 }
 
-}  // namespace robot::view::chunk
+}  // namespace robot::view

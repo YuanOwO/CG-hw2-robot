@@ -1,6 +1,7 @@
 #pragma once
 
 #include "graphics/camera.hpp"
+#include "view/chunk_renderer.hpp"
 #include "view/entity_renderer.hpp"
 #include "world/world.hpp"
 
@@ -13,6 +14,7 @@ class WorldRenderer {
                 int width, int height) const;
 
    private:
+    ChunkRenderer _chunkRenderer;
     EntityRenderer _entityRenderer;
 };
 

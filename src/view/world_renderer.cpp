@@ -2,8 +2,6 @@
 
 #include "graphics/3d/primitives.hpp"
 #include "graphics/render_mode.hpp"
-#include "view/chunk/chunk_renderer.hpp"
-#include "view/collider_renderer.hpp"
 
 namespace robot::view {
 
@@ -17,7 +15,7 @@ void WorldRenderer::render(const world::World& world, const graphics::Camera& ca
                            const graphics::OrthoProjection& projection, int width, int height) const {
     graphics::begin3D(width, height, camera, projection);
 
-    world.chunks().forEach([](const world::chunk::Chunk& c) { chunk::drawChunk(c); });
+    world.chunks().forEach([this](const world::chunk::Chunk& c) { _chunkRenderer.render(c); });
 
     world.entities().forEach([this](const world::entity::Entity& e) { _entityRenderer.render(e); });
 
