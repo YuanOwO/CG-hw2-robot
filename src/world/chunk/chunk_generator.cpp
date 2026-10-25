@@ -23,7 +23,7 @@ constexpr float TEMPERATURE_SCALE = 384.0f;
 constexpr float HUMIDITY_SCALE = 128.0f;
 constexpr float ROUGHNESS_SCALE = 512.0f;
 constexpr float MOUNTAIN_SCALE = 128.0f;
-constexpr float DETAIL_SCALE = 32.0f;
+constexpr float DETAIL_SCALE = 36.0f;
 
 constexpr float SEA_LEVEL_BIAS = 0.3010299956639812f;
 
@@ -97,19 +97,25 @@ std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
 }
 
 float ChunkGenerator::heightAt(float worldX, float worldZ) const {
-    return terrainHeight(worldX, worldZ, sampleClimate(worldX, worldZ));
+    return terrainHeight(worldX, worldZ, sampleContinent(worldX, worldZ));
 }
 
-ChunkGenerator::ClimateSample ChunkGenerator::sampleClimate(float worldX, float worldZ) const {
+ChunkGenerator::ClimateSample ChunkGenerator::sampleContinent(float worldX, float worldZ) const {
     ClimateSample sample;
 
     sample.continent = _mainNoise.fbm(worldX / CONTINENT_SCALE, worldZ / CONTINENT_SCALE, 4) * 2.0f;
-    sample.temperature = _temperatureNoise.fbm(worldX / TEMPERATURE_SCALE, worldZ / TEMPERATURE_SCALE, 6) + 0.5f;
-    sample.humidity = _humidityNoise.fbm(worldX / HUMIDITY_SCALE, worldZ / HUMIDITY_SCALE, 6) + 0.5f;
-    sample.roughness = _roughnessNoise.fbm(worldX / ROUGHNESS_SCALE, worldZ / ROUGHNESS_SCALE, 2) + 0.5f;
 
     // 大陸性的修正值
     sample.continent = sample.continent + SEA_LEVEL_BIAS;
+
+    return sample;
+}
+
+ChunkGenerator::ClimateSample ChunkGenerator::sampleClimate(float worldX, float worldZ) const {
+    ClimateSample sample = sampleContinent(worldX, worldZ);
+
+    sample.temperature = _temperatureNoise.fbm(worldX / TEMPERATURE_SCALE, worldZ / TEMPERATURE_SCALE, 6) + 0.5f;
+    sample.humidity = _humidityNoise.fbm(worldX / HUMIDITY_SCALE, worldZ / HUMIDITY_SCALE, 6) + 0.5f;
 
     return sample;
 }
@@ -121,10 +127,25 @@ float ChunkGenerator::terrainHeight(float worldX, float worldZ, const ClimateSam
     // 海底往下比陸地往上陡，海岸附近才會是平緩的平原
     float base = land < 0.0f ? land * 25.0f : land * 10.0f;
 
+    // 海平面附近的起伏會讓陸地反覆穿過 0，海岸碎成水窪；越接近海岸線起伏越小
+    float coastMask = smoothStep(0.0f, 0.35f, std::abs(land));
+    float detail = _detailNoise.fbm(worldX / DETAIL_SCALE, worldZ / DETAIL_SCALE, 5);
+
+    base += coastMask * 6.0f * detail;
+
     // 同時位於內陸且崎嶇才長山：沿海保持平原，內陸不崎嶇的地方也是平地
     float inlandMask = smoothStep(0.2f, 0.7f, land);
-    float roughnessMask = smoothStep(0.4f, 0.78f, climate.roughness);
-    float mountainMask = inlandMask * roughnessMask;
+
+    if (inlandMask <= 0.0f) {
+        return base;
+    }
+
+    float roughness = _roughnessNoise.fbm(worldX / ROUGHNESS_SCALE, worldZ / ROUGHNESS_SCALE, 2) + 0.5f;
+    float mountainMask = inlandMask * smoothStep(0.4f, 0.78f, roughness);
+
+    if (mountainMask <= 0.0f) {
+        return base;
+    }
 
     float mountain = _mountainNoise.fbm(worldX / MOUNTAIN_SCALE, worldZ / MOUNTAIN_SCALE, 4) * 2.0f;
 
@@ -133,11 +154,9 @@ float ChunkGenerator::terrainHeight(float worldX, float worldZ, const ClimateSam
     ridge = std::clamp(ridge, 0.0f, 1.0f);
     ridge *= ridge;
 
-    // 海平面附近的起伏會讓陸地反覆穿過 0，海岸碎成水窪；越接近海岸線起伏越小
-    float coastMask = smoothStep(0.0f, 0.35f, std::abs(land));
-    float detail = _detailNoise.fbm(worldX / DETAIL_SCALE, worldZ / DETAIL_SCALE, 6);
+    base += mountainMask * 25.0f * ridge;
 
-    return base + mountainMask * 25.0f * ridge + coastMask * 6.0f * detail;
+    return base;
 }
 
 }  // namespace robot::world::chunk
