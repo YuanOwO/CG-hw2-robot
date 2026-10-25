@@ -2,11 +2,9 @@
 
 #include "graphics/3d/primitives.hpp"
 #include "math/vec3.hpp"
+#include "view/terrain_palette.hpp"
 
 namespace robot::view {
-
-const ColorRGBA ChunkRenderer::GRASS_LIGHT{0.56f, 0.76f, 0.40f};
-const ColorRGBA ChunkRenderer::GRASS_DARK{0.48f, 0.68f, 0.34f};
 
 void ChunkRenderer::render(const world::chunk::Chunk& chunk) const {
     using world::chunk::CHUNK_SIZE;
@@ -21,10 +19,9 @@ void ChunkRenderer::render(const world::chunk::Chunk& chunk) const {
     // 每格一個四邊形，四個角依各自的高度擺放
     for (int z = 0; z < CHUNK_SIZE; z++) {
         for (int x = 0; x < CHUNK_SIZE; x++) {
-            // 兩色交錯，移動時才看得出走了多遠；以世界座標決定顏色，相鄰 chunk 的格子才接得上
-            const ColorRGBA& color = (originX + x + originZ + z) % 2 == 0 ? GRASS_LIGHT : GRASS_DARK;
             // 從上方看為逆時針，正面朝上
-            graphics::drawQuad(corner(x, z), corner(x, z + 1), corner(x + 1, z + 1), corner(x + 1, z), color);
+            graphics::drawQuad(corner(x, z), corner(x, z + 1), corner(x + 1, z + 1), corner(x + 1, z),
+                               terrainCellColor(chunk, x, z));
         }
     }
 }
