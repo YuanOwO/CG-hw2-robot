@@ -44,4 +44,14 @@ void ChunkManager::update(ChunkPos center) {
     }
 }
 
+float ChunkManager::heightAt(float worldX, float worldZ) const {
+    const ChunkPos pos = ChunkPos::containing(worldX, worldZ);
+    const Chunk* chunk = chunkAt(pos);
+    if (chunk) {
+        // 如果該 chunk 已載入，就直接用它的高度資料
+        return chunk->heightAt(worldX, worldZ);
+    }
+    return _generator.heightAt(worldX, worldZ);
+}
+
 }  // namespace robot::world::chunk

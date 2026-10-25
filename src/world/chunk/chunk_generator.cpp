@@ -62,6 +62,10 @@ ChunkGenerator::ClimateSample ChunkGenerator::sampleClimate(float worldX, float 
     return sample;
 }
 
+float ChunkGenerator::heightAt(float worldX, float worldZ) const {
+    return terrainHeight(worldX, worldZ);
+}
+
 float ChunkGenerator::terrainHeight(float worldX, float worldZ) const {
     ClimateSample climate = sampleClimate(worldX, worldZ);
 
@@ -84,7 +88,7 @@ float ChunkGenerator::terrainHeight(float worldX, float worldZ) const {
     ridge *= ridge;
 
     // 海平面附近的起伏會讓陸地反覆穿過 0，海岸碎成水窪；越接近海岸線起伏越小
-    float coastMask = smoothStep(0.0f, 0.2f, std::abs(land));
+    float coastMask = smoothStep(0.0f, 0.35f, std::abs(land));
     float detail = _detailNoise.fbm(worldX / 32.0f, worldZ / 32.0f, 6);
 
     return base + mountainMask * 25.0f * ridge + coastMask * 6.0f * detail;

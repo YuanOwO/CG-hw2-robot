@@ -17,11 +17,11 @@ class World {
     explicit World(Seed seed);
     void tick(float dt);
 
+    Vec3 spawnPosition() const;
+
     void setFocus(Vec3 position);
 
     bool blockedAt(float worldX, float worldZ, float radius) const { return false; }  // TODO
-    /// 地面高度；該處的 chunk 還沒載入時沒有值
-    std::optional<float> heightAt(float worldX, float worldZ) const;
 
     const chunk::ChunkManager& chunks() const { return _chunkManager; }
     entity::EntityManager& entities() { return _entityManager; }

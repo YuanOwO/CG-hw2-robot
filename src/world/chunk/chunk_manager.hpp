@@ -18,6 +18,8 @@ class ChunkManager {
 
     const Chunk* chunkAt(ChunkPos pos) const;  // 沒載入就回傳 nullptr
 
+    float heightAt(float worldX, float worldZ) const;
+
     template <typename F>
     void forEach(F&& visit) const {
         for (const auto& [pos, chunk] : _chunks) {

@@ -15,6 +15,8 @@ class ChunkGenerator {
 
     std::unique_ptr<Chunk> generate(ChunkPos pos) const;
 
+    float heightAt(float worldX, float worldZ) const;
+
    private:
     Seed _seed;
     Perlin2D _mainNoise;
