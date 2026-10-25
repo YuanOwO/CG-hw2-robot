@@ -16,8 +16,24 @@ class ChunkGenerator {
     std::unique_ptr<Chunk> generate(ChunkPos pos) const;
 
    private:
-    Perlin2D _perlin;
     Seed _seed;
+    Perlin2D _mainNoise;
+    Perlin2D _temperatureNoise;
+    Perlin2D _humidityNoise;
+    Perlin2D _roughnessNoise;
+    Perlin2D _mountainNoise;
+    Perlin2D _detailNoise;
+
+    struct ClimateSample {
+        float continent;
+        float temperature;
+        float humidity;
+        float roughness;
+    };
+
+    ClimateSample sampleClimate(float worldX, float worldZ) const;
+
+    float terrainHeight(float worldX, float worldZ) const;
 };
 
 }  // namespace robot::world::chunk
