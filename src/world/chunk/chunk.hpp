@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <functional>
 
+#include "world/chunk/surface.hpp"
+
 namespace robot::world::chunk {
 
 constexpr int CHUNK_SIZE = 16;                      // 邊長
@@ -29,16 +31,19 @@ struct ChunkPosHash {
 class Chunk {
    public:
     using Heights = std::array<float, CHUNK_VERTEX_COUNT * CHUNK_VERTEX_COUNT>;
+    using Surfaces = std::array<SurfaceType, CHUNK_SIZE * CHUNK_SIZE>;
 
-    Chunk(ChunkPos pos, Heights heights);
+    Chunk(ChunkPos pos, Heights heights, Surfaces surfaces);
 
     ChunkPos pos() const { return _pos; }
     float vertexHeight(int localX, int localZ) const;
     float heightAt(float worldX, float worldZ) const;
+    SurfaceType surfaceAt(int localX, int localZ) const;
 
    private:
     ChunkPos _pos;
     Heights _heights;
+    Surfaces _surfaces;
 };
 
 }  // namespace robot::world::chunk

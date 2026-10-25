@@ -27,15 +27,15 @@ class ChunkGenerator {
     Perlin2D _detailNoise;
 
     struct ClimateSample {
-        float continent;
-        float temperature;
-        float humidity;
-        float roughness;
+        float continent;    /// 0.0 以下是海洋，越大越陸地
+        float temperature;  /// [0.0, 1.0]，越大越熱
+        float humidity;     /// [0.0, 1.0]，越大越潮濕
+        float roughness;    /// [0.0, 1.0]，越大越粗糙
     };
 
     ClimateSample sampleClimate(float worldX, float worldZ) const;
 
-    float terrainHeight(float worldX, float worldZ) const;
+    float terrainHeight(float worldX, float worldZ, const ClimateSample& climate) const;
 };
 
 }  // namespace robot::world::chunk
