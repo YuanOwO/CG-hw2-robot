@@ -25,7 +25,7 @@ class Session {
     void renderHud(graphics::Canvas& canvas, double framesPerSecond, double ticksPerSecond) const;
 
    private:
-    world::Seed _seed = 24622192;  // 隨便挑的數字，讓每次遊戲都一樣
+    Seed _seed = 24622192;  // 隨便挑的數字，讓每次遊戲都一樣
     world::World _world;
 
     view::WorldRenderer _worldRenderer;

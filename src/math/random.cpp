@@ -3,6 +3,8 @@
 #include <cassert>
 #include <cmath>
 
+#include "math/utils.hpp"
+
 namespace robot {
 namespace {
 
@@ -10,21 +12,22 @@ namespace {
 // 這些值只需固定且彼此不同；修改任一值會改變既有世界的生成結果。
 // 取自 SHA-512 的初始雜湊值（前幾個質數平方根的小數部分），
 // 來源公開可查，表示這些數字沒有刻意挑選過
-constexpr std::uint64_t DOMAIN_0D = 0x9b05688c2b3e6c1fULL;
-constexpr std::uint64_t DOMAIN_1D = 0x6a09e667f3bcc908ULL;
-constexpr std::uint64_t DOMAIN_2D = 0xbb67ae8584caa73bULL;
-constexpr std::uint64_t DOMAIN_3D = 0x510e527fade682d1ULL;
-constexpr std::uint64_t STREAM_TAG = 0x3c6ef372fe94f82bULL;
-constexpr std::uint64_t INDEX_TAG = 0xa54ff53a5f1d36f1ULL;
+
+constexpr Random::Value DOMAIN_0D = 0x9b05688c2b3e6c1fULL;
+constexpr Random::Value DOMAIN_1D = 0x6a09e667f3bcc908ULL;
+constexpr Random::Value DOMAIN_2D = 0xbb67ae8584caa73bULL;
+constexpr Random::Value DOMAIN_3D = 0x510e527fade682d1ULL;
+constexpr Random::Value STREAM_TAG = 0x3c6ef372fe94f82bULL;
+constexpr Random::Value INDEX_TAG = 0xa54ff53a5f1d36f1ULL;
 
 // 重試時用來導出另一個候選值的固定奇數步長
-constexpr std::uint64_t RETRY_STEP = 0x9e3779b97f4a7c15ULL;
+constexpr Random::Value RETRY_STEP = 0x9e3779b97f4a7c15ULL;
 
 }  // namespace
 
-Random::Random(std::uint64_t seed) : _seed(seed) {}
+Random::Random(Seed seed) : _seed(seed) {}
 
-std::uint64_t Random::mix64(std::uint64_t value) {
+Random::Value Random::mix64(Value value) {
     // SplitMix64 的 finalizer。無號整數溢位具有 modulo 2^64 的定義，
     // 因此各平台會得到相同的位元結果
     value = (value ^ (value >> 30)) * 0xbf58476d1ce4e5b9ULL;
@@ -32,39 +35,38 @@ std::uint64_t Random::mix64(std::uint64_t value) {
     return value ^ (value >> 31);
 }
 
-std::uint64_t Random::valueAt(std::uint32_t stream, std::uint32_t index) const {
-    std::uint64_t value = mix64(_seed ^ DOMAIN_0D);
+Random::Value Random::valueAt(Stream stream, Index index) const {
+    auto value = mix64(_seed ^ DOMAIN_0D);
     value = mix64(value ^ STREAM_TAG ^ stream);
     return mix64(value ^ INDEX_TAG ^ index);
 }
 
-std::uint64_t Random::valueAt1D(std::int64_t x, std::uint32_t stream, std::uint32_t index) const {
+Random::Value Random::valueAt1D(std::int64_t x, Stream stream, Index index) const {
     // 負座標轉為 uint64_t 時依 modulo 2^64 規則處理，仍可穩定重現
-    std::uint64_t value = mix64(_seed ^ DOMAIN_1D);
-    value = mix64(value ^ static_cast<std::uint64_t>(x));
+    auto value = mix64(_seed ^ DOMAIN_1D);
+    value = mix64(value ^ static_cast<Value>(x));
     value = mix64(value ^ STREAM_TAG ^ stream);
     return mix64(value ^ INDEX_TAG ^ index);
 }
 
-std::uint64_t Random::valueAt2D(std::int64_t x, std::int64_t y, std::uint32_t stream, std::uint32_t index) const {
-    std::uint64_t value = mix64(_seed ^ DOMAIN_2D);
-    value = mix64(value ^ static_cast<std::uint64_t>(x));
-    value = mix64(value ^ static_cast<std::uint64_t>(y));
+Random::Value Random::valueAt2D(std::int64_t x, std::int64_t y, Stream stream, Index index) const {
+    auto value = mix64(_seed ^ DOMAIN_2D);
+    value = mix64(value ^ static_cast<Value>(x));
+    value = mix64(value ^ static_cast<Value>(y));
     value = mix64(value ^ STREAM_TAG ^ stream);
     return mix64(value ^ INDEX_TAG ^ index);
 }
 
-std::uint64_t Random::valueAt3D(std::int64_t x, std::int64_t y, std::int64_t z, std::uint32_t stream,
-                                std::uint32_t index) const {
-    std::uint64_t value = mix64(_seed ^ DOMAIN_3D);
-    value = mix64(value ^ static_cast<std::uint64_t>(x));
-    value = mix64(value ^ static_cast<std::uint64_t>(y));
-    value = mix64(value ^ static_cast<std::uint64_t>(z));
+Random::Value Random::valueAt3D(std::int64_t x, std::int64_t y, std::int64_t z, Stream stream, Index index) const {
+    auto value = mix64(_seed ^ DOMAIN_3D);
+    value = mix64(value ^ static_cast<Value>(x));
+    value = mix64(value ^ static_cast<Value>(y));
+    value = mix64(value ^ static_cast<Value>(z));
     value = mix64(value ^ STREAM_TAG ^ stream);
     return mix64(value ^ INDEX_TAG ^ index);
 }
 
-std::uint32_t Random::uniformInt(std::uint64_t value, std::uint32_t minimum, std::uint32_t maximum) {
+std::uint32_t Random::uniformInt(Value value, std::uint32_t minimum, std::uint32_t maximum) {
     assert(minimum <= maximum);
     const std::uint64_t range = static_cast<std::uint64_t>(maximum) - minimum + 1u;
 
@@ -82,7 +84,7 @@ std::uint32_t Random::uniformInt(std::uint64_t value, std::uint32_t minimum, std
     return minimum + static_cast<std::uint32_t>(candidate % range);
 }
 
-double Random::uniformFloat(std::uint64_t value, double minimum, double maximum) {
+double Random::uniformFloat(Value value, double minimum, double maximum) {
     assert(std::isfinite(minimum));
     assert(std::isfinite(maximum));
     assert(minimum <= maximum);

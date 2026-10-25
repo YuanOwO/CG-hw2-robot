@@ -93,4 +93,34 @@ inline float ceilDiv(float numerator, float denominator) {
 
 #pragma endregion  // Integer division
 
+#pragma region Hash
+
+inline constexpr std::uint64_t fnv1a64(const char* str) {
+    const std::uint64_t OFFSET_BASIS = 0xcbf29ce484222325ULL;
+    const std::uint64_t FNV_PRIME = 0x100000001b3ULL;
+
+    std::uint64_t hash = OFFSET_BASIS;
+    for (const char* p = str; *p != '\0'; p++) {
+        hash ^= static_cast<unsigned char>(*p);
+        hash *= FNV_PRIME;
+    }
+
+    return hash;
+}
+
+inline constexpr std::uint32_t fnv1a32(const char* str) {
+    const std::uint32_t OFFSET_BASIS = 2166136261u;
+    const std::uint32_t FNV_PRIME = 16777619u;
+
+    std::uint32_t hash = OFFSET_BASIS;
+    for (const char* p = str; *p != '\0'; p++) {
+        hash ^= static_cast<unsigned char>(*p);
+        hash *= FNV_PRIME;
+    }
+
+    return hash;
+}
+
+#pragma endregion  // Hash
+
 }  // namespace robot

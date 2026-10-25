@@ -2,8 +2,8 @@
 
 #include <memory>
 
+#include "math/random.hpp"
 #include "world/chunk/chunk.hpp"
-#include "world/types.hpp"
 
 namespace robot::world::chunk {
 
