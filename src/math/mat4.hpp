@@ -1,5 +1,7 @@
 #pragma once
 
+#include <initializer_list>
+
 #include "math/vec3.hpp"
 
 namespace robot {
@@ -8,7 +10,10 @@ namespace robot {
 struct Mat4 {
     float m[16];  ///< 與 OpenGL 相同的 column-major 排列，可直接交給 glMultMatrixf
 
-    Mat4();  ///< 單位矩陣
+    /// 單位矩陣
+    Mat4();
+    Mat4(std::initializer_list<float> values);
+    Mat4(std::initializer_list<std::initializer_list<float>> mat);
 
     /// 第 row 列、第 col 行的元素
     float& at(int row, int col) { return m[col * 4 + row]; }

@@ -5,7 +5,9 @@
 #include <cstdint>
 
 #include "math/constants.hpp"
+#include "math/mat4.hpp"
 #include "math/utils.hpp"
+#include "math/vec3.hpp"
 
 namespace robot {
 
@@ -16,8 +18,19 @@ namespace {
 // 表大小取 2 的冪，才能直接取雜湊值的高位元當索引；SplitMix64 的高位元混合得最充分
 constexpr int GRADIENT_BITS = 4;
 constexpr int GRADIENT_COUNT = 1 << GRADIENT_BITS;
+
 // 錯開各 octave 的取樣位置，否則各層在原點同為 0，格點也會互相對齊
 constexpr float OCTAVE_OFFSET = 17.31f;
+constexpr float ROTATION_2D_COS = 0.8f;
+constexpr float ROTATION_2D_SIN = 0.6f;
+
+const Mat4 ROTATION_3D = Mat4({
+    {0.8f,   -0.48f, 0.36f,  0.0f},
+    {0.48f,  0.872f, 0.096f, 0.0f},
+    {-0.36f, 0.096f, 0.928f, 0.0f},
+    {0.0f,   0.0f,   0.0f,   1.0f},
+});
+
 constexpr float SQRT_2 = 1.4142135623730950488f;
 
 // 只用 8 個方向時，單一 octave 就看得出 45° 紋路；16 個已幾乎看不出。
@@ -141,17 +154,19 @@ float Perlin2D::noise(float x, float y) const {
 
 float Perlin2D::fbm(float x, float y, int octaves, float lacunarity, float gain) const {
     float sum = 0.0f;
+    float offset = 0.0f;
     float amplitude = 1.0f;
     float totalAmplitude = 0.0f;
-    float frequency = 1.0f;
-    float offset = 0.0f;
 
     for (int i = 0; i < octaves; i++) {
-        sum += noise(x * frequency + offset, y * frequency + offset) * amplitude;
-        totalAmplitude += amplitude;
+        sum += noise(x + offset, y + offset) * amplitude;
         offset += OCTAVE_OFFSET;
-        frequency *= lacunarity;
+        totalAmplitude += amplitude;
         amplitude *= gain;
+        const float rx = ROTATION_2D_COS * x + ROTATION_2D_SIN * y;
+        const float ry = -ROTATION_2D_SIN * x + ROTATION_2D_COS * y;
+        x = rx * lacunarity;
+        y = ry * lacunarity;
     }
 
     return sum / totalAmplitude;
@@ -200,17 +215,21 @@ float Perlin3D::noise(float x, float y, float z) const {
 
 float Perlin3D::fbm(float x, float y, float z, int octaves, float lacunarity, float gain) const {
     float sum = 0.0f;
+    float offset = 0.0f;
     float amplitude = 1.0f;
     float totalAmplitude = 0.0f;
-    float frequency = 1.0f;
-    float offset = 0.0f;
+
+    const Mat4 trans = ROTATION_3D * scale(lacunarity);
 
     for (int i = 0; i < octaves; i++) {
-        sum += noise(x * frequency + offset, y * frequency + offset, z * frequency + offset) * amplitude;
-        totalAmplitude += amplitude;
+        sum += noise(x + offset, y + offset, z + offset) * amplitude;
         offset += OCTAVE_OFFSET;
-        frequency *= lacunarity;
+        totalAmplitude += amplitude;
         amplitude *= gain;
+        auto v = transformPoint(trans, Vec3(x, y, z));
+        x = v.x;
+        y = v.y;
+        z = v.z;
     }
 
     return sum / totalAmplitude;

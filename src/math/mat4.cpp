@@ -12,6 +12,24 @@ Mat4::Mat4() : m{} {
     }
 }
 
+Mat4::Mat4(std::initializer_list<float> values) : m{} {
+    std::copy_n(values.begin(), std::min(values.size(), 16ul), m);
+}
+
+Mat4::Mat4(std::initializer_list<std::initializer_list<float>> mat) : m{} {
+    int row = 0;
+    for (const auto& r : mat) {
+        int col = 0;
+        for (const auto& v : r) {
+            if (row < 4 && col < 4) {
+                at(row, col) = v;
+            }
+            col++;
+        }
+        row++;
+    }
+}
+
 Mat4 Mat4::operator*(const Mat4& rhs) const {
     Mat4 result;
     for (int row = 0; row < 4; ++row) {
