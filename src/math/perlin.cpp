@@ -16,6 +16,8 @@ namespace {
 // 表大小取 2 的冪，才能直接取雜湊值的高位元當索引；SplitMix64 的高位元混合得最充分
 constexpr int GRADIENT_BITS = 4;
 constexpr int GRADIENT_COUNT = 1 << GRADIENT_BITS;
+// 錯開各 octave 的取樣位置，否則各層在原點同為 0，格點也會互相對齊
+constexpr float OCTAVE_OFFSET = 17.31f;
 constexpr float SQRT_2 = 1.4142135623730950488f;
 
 // 只用 8 個方向時，單一 octave 就看得出 45° 紋路；16 個已幾乎看不出。
@@ -85,6 +87,24 @@ float Perlin1D::noise(float x) const {
     return raw * 2.0f;  // [-0.5, 0.5] -> [-1, 1]
 }
 
+float Perlin1D::fbm(float x, int octaves, float lacunarity, float gain) const {
+    float sum = 0.0f;
+    float amplitude = 1.0f;
+    float totalAmplitude = 0.0f;
+    float frequency = 1.0f;
+    float offset = 0.0f;
+
+    for (int i = 0; i < octaves; i++) {
+        sum += noise(x * frequency + offset) * amplitude;
+        totalAmplitude += amplitude;
+        offset += OCTAVE_OFFSET;
+        frequency *= lacunarity;
+        amplitude *= gain;
+    }
+
+    return sum / totalAmplitude;
+}
+
 #pragma endregion  // Perlin1D
 
 #pragma region Perlin2D
@@ -117,6 +137,24 @@ float Perlin2D::noise(float x, float y) const {
     float raw = lerp(edge[0], edge[1], u);
 
     return raw * SQRT_2;  // [-0.71, 0.71] -> [-1, 1]
+}
+
+float Perlin2D::fbm(float x, float y, int octaves, float lacunarity, float gain) const {
+    float sum = 0.0f;
+    float amplitude = 1.0f;
+    float totalAmplitude = 0.0f;
+    float frequency = 1.0f;
+    float offset = 0.0f;
+
+    for (int i = 0; i < octaves; i++) {
+        sum += noise(x * frequency + offset, y * frequency + offset) * amplitude;
+        totalAmplitude += amplitude;
+        offset += OCTAVE_OFFSET;
+        frequency *= lacunarity;
+        amplitude *= gain;
+    }
+
+    return sum / totalAmplitude;
 }
 
 #pragma endregion  // Perlin2D
@@ -158,6 +196,24 @@ float Perlin3D::noise(float x, float y, float z) const {
     float raw = lerp(face[0], face[1], u);
 
     return raw;  // [-1, 1]，不需再縮放
+}
+
+float Perlin3D::fbm(float x, float y, float z, int octaves, float lacunarity, float gain) const {
+    float sum = 0.0f;
+    float amplitude = 1.0f;
+    float totalAmplitude = 0.0f;
+    float frequency = 1.0f;
+    float offset = 0.0f;
+
+    for (int i = 0; i < octaves; i++) {
+        sum += noise(x * frequency + offset, y * frequency + offset, z * frequency + offset) * amplitude;
+        totalAmplitude += amplitude;
+        offset += OCTAVE_OFFSET;
+        frequency *= lacunarity;
+        amplitude *= gain;
+    }
+
+    return sum / totalAmplitude;
 }
 
 #pragma endregion  // Perlin3D

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 
@@ -49,6 +50,12 @@ inline float wrapSignedDegrees(float degree) {
 template <typename T>
 T lerp(const T& a, const T& b, float t) {
     return a + (b - a) * t;
+}
+
+/// 平滑內插
+inline float smoothStep(float a, float b, float t) {
+    t = std::clamp((t - a) / (b - a), 0.0f, 1.0f);
+    return t * t * (3.0f - 2.0f * t);
 }
 
 /// 每秒以 rate 的比例縮小與目標的差距時，這一步要走掉差距的多少。

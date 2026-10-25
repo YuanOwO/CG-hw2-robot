@@ -28,6 +28,7 @@ class Perlin1D {
     ~Perlin1D() = default;
 
     float noise(float x) const;
+    float fbm(float x, int octaves, float lacunarity = 2.0f, float gain = 0.5f) const;
 
    private:
     Random _random;
@@ -43,6 +44,7 @@ class Perlin2D {
     ~Perlin2D() = default;
 
     float noise(float x, float y) const;
+    float fbm(float x, float y, int octaves, float lacunarity = 2.0f, float gain = 0.5f) const;
 
    private:
     Random _random;
@@ -58,6 +60,7 @@ class Perlin3D {
     ~Perlin3D() = default;
 
     float noise(float x, float y, float z) const;
+    float fbm(float x, float y, float z, int octaves, float lacunarity = 2.0f, float gain = 0.5f) const;
 
    private:
     Random _random;
