@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "math/perlin.hpp"
 #include "math/random.hpp"
 #include "world/chunk/chunk.hpp"
 
@@ -15,6 +16,7 @@ class ChunkGenerator {
     std::unique_ptr<Chunk> generate(ChunkPos pos) const;
 
    private:
+    Perlin2D _perlin;
     Seed _seed;
 };
 

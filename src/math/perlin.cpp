@@ -13,17 +13,13 @@ namespace robot {
 
 namespace {
 
-// 與同一 seed 的其他隨機用途分開，雜訊才不會和它們相關
-constexpr std::uint32_t PERLIN_1D_STREAM = 0x50455231u;
-constexpr std::uint32_t PERLIN_2D_STREAM = 0x50455232u;
-constexpr std::uint32_t PERLIN_3D_STREAM = 0x50455233u;
-
 // 表大小取 2 的冪，才能直接取雜湊值的高位元當索引；SplitMix64 的高位元混合得最充分
 constexpr int GRADIENT_BITS = 4;
 constexpr int GRADIENT_COUNT = 1 << GRADIENT_BITS;
+constexpr float SQRT_2 = 1.4142135623730950488f;
 
 // 只用 8 個方向時，單一 octave 就看得出 45° 紋路；16 個已幾乎看不出。
-// 預先建表，取樣時就不必計算三角函數。單位向量使輸出範圍約為 [-0.71, 0.71]
+// 預先建表，取樣時就不必計算三角函數。單位向量使內插結果的範圍約為 [-0.71, 0.71]
 const auto GRADIENTS_2D = [] {
     std::array<Vec2, GRADIENT_COUNT> table;
     for (int i = 0; i < GRADIENT_COUNT; ++i) {
@@ -69,12 +65,12 @@ float fade(float t) {
 
 #pragma region Perlin1D
 
-Perlin1D::Perlin1D(std::uint64_t seed) : _random(seed) {}
+Perlin1D::Perlin1D(Seed seed, Stream stream) : _random(seed), _stream(stream) {}
 
 // 1D 不能像 2D、3D 一樣只用幾個固定梯度：斜率若只有 ±1，每一格的起伏都一樣高，
 // 會看出明顯的週期，所以連斜率大小也取隨機值
 float Perlin1D::gradientAt(std::int64_t x) const {
-    return static_cast<float>(Random::uniformFloat(_random.valueAt1D(x, PERLIN_1D_STREAM), -1.0, 1.0));
+    return static_cast<float>(Random::uniformFloat(_random.valueAt1D(x, _stream), -1.0, 1.0));
 }
 
 float Perlin1D::noise(float x) const {
@@ -84,17 +80,19 @@ float Perlin1D::noise(float x) const {
     const float n0 = gradientAt(x0) * t;
     const float n1 = gradientAt(x0 + 1) * (t - 1.0f);
 
-    return lerp(n0, n1, fade(t));
+    float raw = lerp(n0, n1, fade(t));
+
+    return raw * 2.0f;  // [-0.5, 0.5] -> [-1, 1]
 }
 
 #pragma endregion  // Perlin1D
 
 #pragma region Perlin2D
 
-Perlin2D::Perlin2D(std::uint64_t seed) : _random(seed) {}
+Perlin2D::Perlin2D(Seed seed, Stream stream) : _random(seed), _stream(stream) {}
 
 Vec2 Perlin2D::gradientAt(std::int64_t x, std::int64_t y) const {
-    return GRADIENTS_2D[gradientIndex(_random.valueAt2D(x, y, PERLIN_2D_STREAM))];
+    return GRADIENTS_2D[gradientIndex(_random.valueAt2D(x, y, _stream))];
 }
 
 float Perlin2D::noise(float x, float y) const {
@@ -116,17 +114,19 @@ float Perlin2D::noise(float x, float y) const {
         edge[i] = lerp(corner[0], corner[1], v);
     }
 
-    return lerp(edge[0], edge[1], u);
+    float raw = lerp(edge[0], edge[1], u);
+
+    return raw * SQRT_2;  // [-0.71, 0.71] -> [-1, 1]
 }
 
 #pragma endregion  // Perlin2D
 
 #pragma region Perlin3D
 
-Perlin3D::Perlin3D(std::uint64_t seed) : _random(seed) {}
+Perlin3D::Perlin3D(Seed seed, Stream stream) : _random(seed), _stream(stream) {}
 
 Vec3 Perlin3D::gradientAt(std::int64_t x, std::int64_t y, std::int64_t z) const {
-    return GRADIENTS_3D[gradientIndex(_random.valueAt3D(x, y, z, PERLIN_3D_STREAM))];
+    return GRADIENTS_3D[gradientIndex(_random.valueAt3D(x, y, z, _stream))];
 }
 
 float Perlin3D::noise(float x, float y, float z) const {
@@ -155,7 +155,9 @@ float Perlin3D::noise(float x, float y, float z) const {
         face[i] = lerp(edge[0], edge[1], v);
     }
 
-    return lerp(face[0], face[1], u);
+    float raw = lerp(face[0], face[1], u);
+
+    return raw;  // [-1, 1]，不需再縮放
 }
 
 #pragma endregion  // Perlin3D
