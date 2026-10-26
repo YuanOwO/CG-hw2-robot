@@ -4,24 +4,108 @@
 
 #include "graphics/3d/primitives.hpp"
 #include "math/vec3.hpp"
+#include "world/chunk/core/biome.hpp"
 #include "world/chunk/core/surface.hpp"
 
 namespace robot::view {
 
+using world::chunk::Biome;
 using world::chunk::Chunk;
 using world::chunk::CHUNK_SIZE;
 using world::chunk::Surface;
 
 namespace {
-const ColorRGBA SURFACE_COLORS[static_cast<std::size_t>(Surface::Count)][2] = {
-    {{0.56f, 0.76f, 0.40f}, {0.48f, 0.68f, 0.34f}}, // Grass
-    {{0.55f, 0.53f, 0.50f}, {0.49f, 0.47f, 0.44f}}, // Stone
-    {{0.94f, 0.86f, 0.62f}, {0.86f, 0.78f, 0.54f}}, // Sand
-    {{0.95f, 0.96f, 0.98f}, {0.88f, 0.90f, 0.93f}}, // Snow
-    {{0.20f, 0.40f, 0.80f}, {0.10f, 0.20f, 0.60f}}, // Water
-    {{0.80f, 0.90f, 0.95f}, {0.70f, 0.80f, 0.90f}}, // Ice
+
+const ColorRGBA SURFACE_COLORS[static_cast<std::size_t>(Surface::Count)] = {
+    {0.56f, 0.76f, 0.40f}, // Grass
+    {0.55f, 0.53f, 0.50f}, // Stone
+    {0.94f, 0.86f, 0.62f}, // Sand
+    {0.95f, 0.96f, 0.98f}, // Snow
+    {0.20f, 0.40f, 0.80f}, // Water
+    {0.80f, 0.90f, 0.95f}, // Ice
 };
+
+ColorRGBA grassColor(Biome biome) {
+    switch (biome) {
+    case Biome::Plains:
+        return {0.60f, 0.78f, 0.38f};  // 亮黃綠
+    case Biome::Forest:
+        return {0.38f, 0.62f, 0.30f};  // 中綠
+    case Biome::Taiga:
+        return {0.32f, 0.50f, 0.40f};  // 暗藍綠
+    case Biome::Jungle:
+        return {0.22f, 0.58f, 0.20f};  // 飽和深綠
+    case Biome::Savanna:
+        return {0.72f, 0.70f, 0.38f};  // 乾草黃
+    case Biome::AlpineMeadow:
+        return {0.54f, 0.74f, 0.48f};  // 淺綠
+    case Biome::Swamp:
+        return {0.38f, 0.45f, 0.26f};  // 暗橄欖綠
+    default:
+        return {0.56f, 0.76f, 0.40f};
+    }
 }
+
+ColorRGBA stoneColor(Biome biome) {
+    switch (biome) {
+    case Biome::StonyPeaks:
+        return {0.60f, 0.58f, 0.56f};
+    case Biome::StoneShore:
+        return {0.46f, 0.46f, 0.47f};
+    case Biome::Desert:
+    case Biome::Savanna:
+        return {0.68f, 0.52f, 0.40f};
+    case Biome::SnowyPlains:
+    case Biome::SnowyTaiga:
+    case Biome::SnowyPeaks:
+        return {0.50f, 0.52f, 0.56f};
+    default:
+        return SURFACE_COLORS[static_cast<std::size_t>(Surface::Stone)];
+    }
+}
+
+ColorRGBA sandColor(Biome biome) {
+    switch (biome) {
+    case Biome::Beach:
+        return {0.94f, 0.88f, 0.68f};
+    case Biome::Desert:
+        return {0.90f, 0.75f, 0.50f};
+    default:
+        return SURFACE_COLORS[static_cast<std::size_t>(Surface::Sand)];
+    }
+}
+
+ColorRGBA snowColor(Biome biome) {
+    switch (biome) {
+    case Biome::SnowyTaiga:
+        return {0.88f, 0.92f, 0.96f};
+    case Biome::SnowyPeaks:
+        return {0.97f, 0.98f, 1.00f};
+    default:
+        return SURFACE_COLORS[static_cast<std::size_t>(Surface::Snow)];
+    }
+}
+
+ColorRGBA surfaceColor(Surface surface, Biome biome) {
+    switch (surface) {
+    case Surface::Grass:
+        return grassColor(biome);
+    case Surface::Stone:
+        return stoneColor(biome);
+    case Surface::Sand:
+        return sandColor(biome);
+    case Surface::Snow:
+        return snowColor(biome);
+    default:
+        return SURFACE_COLORS[static_cast<std::size_t>(surface)];
+    }
+}
+
+ColorRGBA darker(ColorRGBA color, float factor) {
+    return {color.r * factor, color.g * factor, color.b * factor, color.a};
+}
+
+}  // namespace
 
 void ChunkRenderer::render(const Chunk& chunk) const {
     const int originX = chunk.pos().x * CHUNK_SIZE;
@@ -44,10 +128,10 @@ void ChunkRenderer::render(const Chunk& chunk) const {
 ColorRGBA ChunkRenderer::cellColor(const Chunk& chunk, int localX, int localZ) const {
     const int worldX = chunk.pos().x * CHUNK_SIZE + localX;
     const int worldZ = chunk.pos().z * CHUNK_SIZE + localZ;
-    const int colorIndex = (worldX + worldZ) & 1;  // checkerboard pattern
+    const float dark = (worldX + worldZ) % 2 == 0 ? 1.0f : 0.88f;  // checkerboard pattern
 
-    const auto surface = static_cast<std::size_t>(chunk.surfaceAt(localX, localZ));
-    return SURFACE_COLORS[surface][colorIndex];
+    const auto surface = chunk.surfaceAt(localX, localZ);
+    return darker(surfaceColor(surface, chunk.biomeAt(localX, localZ)), dark);
 }
 
 }  // namespace robot::view
