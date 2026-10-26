@@ -10,13 +10,13 @@ namespace robot::view {
 
 using world::chunk::Chunk;
 using world::chunk::CHUNK_SIZE;
-using world::chunk::SurfaceType;
+using world::chunk::Surface;
 
 namespace {
-const ColorRGBA SURFACE_COLORS[static_cast<std::size_t>(SurfaceType::Count)][2] = {
+const ColorRGBA SURFACE_COLORS[static_cast<std::size_t>(Surface::Count)][2] = {
     {{0.56f, 0.76f, 0.40f}, {0.48f, 0.68f, 0.34f}}, // Grass
+    {{0.55f, 0.53f, 0.50f}, {0.49f, 0.47f, 0.44f}}, // Stone
     {{0.94f, 0.86f, 0.62f}, {0.86f, 0.78f, 0.54f}}, // Sand
-    {{0.55f, 0.53f, 0.50f}, {0.49f, 0.47f, 0.44f}}, // Rock
     {{0.95f, 0.96f, 0.98f}, {0.88f, 0.90f, 0.93f}}, // Snow
     {{0.20f, 0.40f, 0.80f}, {0.10f, 0.20f, 0.60f}}, // Water
     {{0.80f, 0.90f, 0.95f}, {0.70f, 0.80f, 0.90f}}, // Ice

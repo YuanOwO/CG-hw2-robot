@@ -69,7 +69,7 @@ Biome Chunk::biomeAt(int localX, int localZ) const {
     return _biomes[index];
 }
 
-SurfaceType Chunk::surfaceAt(int localX, int localZ) const {
+Surface Chunk::surfaceAt(int localX, int localZ) const {
     assert(localX >= 0 && localX < CHUNK_SIZE && localZ >= 0 && localZ < CHUNK_SIZE);
     std::size_t index = static_cast<std::size_t>(localZ * CHUNK_SIZE + localX);
     return _surfaces[index];

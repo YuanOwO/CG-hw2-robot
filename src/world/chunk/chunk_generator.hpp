@@ -23,6 +23,7 @@ class ChunkGenerator {
    private:
     BiomeClassifier _biomeClassifier;
     ClimateSampler _climateSampler;
+    SurfaceResolver _surfaceResolver;
     TerrainSampler _terrainSampler;
 };
 

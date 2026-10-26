@@ -86,16 +86,12 @@ std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
             biomes[z * CHUNK_SIZE + x] = _biomeClassifier.classify(biomeInput);
 
             SurfaceInput surfaceInput;
-            surfaceInput.x = biomeInput.worldX;
-            surfaceInput.z = biomeInput.worldZ;
+            surfaceInput.biome = biomes[z * CHUNK_SIZE + x];
             surfaceInput.height = biomeInput.height;
-            surfaceInput.slope = biomeInput.slope;
             surfaceInput.waterLevel = biomeInput.waterLevel;
-            surfaceInput.landness = biomeInput.continent;
-            surfaceInput.temperature = biomeInput.temperature;
-            surfaceInput.humidity = biomeInput.humidity;
+            surfaceInput.slope = biomeInput.slope;
 
-            surfaces[z * CHUNK_SIZE + x] = classifySurface(surfaceInput);
+            surfaces[z * CHUNK_SIZE + x] = _surfaceResolver.resolve(surfaceInput);
         }
     }
 

@@ -33,7 +33,7 @@ class Chunk {
    public:
     using Heights = std::array<float, CHUNK_VERTEX_COUNT * CHUNK_VERTEX_COUNT>;
     using Biomes = std::array<Biome, CHUNK_SIZE * CHUNK_SIZE>;
-    using Surfaces = std::array<SurfaceType, CHUNK_SIZE * CHUNK_SIZE>;
+    using Surfaces = std::array<Surface, CHUNK_SIZE * CHUNK_SIZE>;
 
     Chunk(ChunkPos pos, Heights heights, Heights waterLevels, Biomes biomes, Surfaces surfaces);
 
@@ -41,7 +41,7 @@ class Chunk {
     float heightAt(float worldX, float worldZ) const;
     float vertexHeight(int localX, int localZ) const;
     Biome biomeAt(int localX, int localZ) const;
-    SurfaceType surfaceAt(int localX, int localZ) const;
+    Surface surfaceAt(int localX, int localZ) const;
 
    private:
     ChunkPos _pos;

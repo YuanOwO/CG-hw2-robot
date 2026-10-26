@@ -1,11 +1,13 @@
 #pragma once
 
+#include "world/chunk/core/biome.hpp"
+
 namespace robot::world::chunk {
 
-enum class SurfaceType {
+enum class Surface {
     Grass,
+    Stone,
     Sand,
-    Rock,
     Snow,
     Water,
     Ice,
@@ -14,16 +16,20 @@ enum class SurfaceType {
 };
 
 struct SurfaceInput {
-    float x;            ///< 世界座標
-    float z;            ///< 世界座標
-    float height;       ///< 四個角落的平均高度
-    float slope;        ///< 四個角落的最大坡度
-    float waterLevel;   ///< 水位高度
-    float landness;     ///< 大於 0 表示陸地，越接近 0 越靠近海岸
-    float temperature;  ///< [0.0, 1.0]，越大越熱
-    float humidity;     ///< [0.0, 1.0]，越大越潮濕
+    Biome biome;
+    float height;
+    float waterLevel;
+    float slope;
 };
 
-SurfaceType classifySurface(SurfaceInput input);
+class SurfaceResolver {
+   public:
+    Surface resolve(const SurfaceInput& input) const;
+
+   private:
+    bool isFrozen(const Biome& biome) const;
+
+    Surface defaultSurface(const Biome& biome) const;
+};
 
 }  // namespace robot::world::chunk
