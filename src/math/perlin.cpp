@@ -103,19 +103,20 @@ float Perlin1D::noise(float x) const {
 float Perlin1D::fbm(float x, int octaves, float lacunarity, float gain) const {
     float sum = 0.0f;
     float amplitude = 1.0f;
-    float totalAmplitude = 0.0f;
+    float amplitudeSquaredSum = 0.0f;
     float frequency = 1.0f;
     float offset = 0.0f;
 
     for (int i = 0; i < octaves; i++) {
         sum += noise(x * frequency + offset) * amplitude;
-        totalAmplitude += amplitude;
+        amplitudeSquaredSum += amplitude * amplitude;
         offset += OCTAVE_OFFSET;
         frequency *= lacunarity;
         amplitude *= gain;
     }
 
-    return sum / totalAmplitude;
+    // 各層互不相關，變異數按振幅平方相加；除以其平方根，分布寬度才不隨層數改變
+    return sum / std::sqrt(amplitudeSquaredSum);
 }
 
 #pragma endregion  // Perlin1D
@@ -156,12 +157,12 @@ float Perlin2D::fbm(float x, float y, int octaves, float lacunarity, float gain)
     float sum = 0.0f;
     float offset = 0.0f;
     float amplitude = 1.0f;
-    float totalAmplitude = 0.0f;
+    float amplitudeSquaredSum = 0.0f;
 
     for (int i = 0; i < octaves; i++) {
         sum += noise(x + offset, y + offset) * amplitude;
         offset += OCTAVE_OFFSET;
-        totalAmplitude += amplitude;
+        amplitudeSquaredSum += amplitude * amplitude;
         amplitude *= gain;
         const float rx = ROTATION_2D_COS * x + ROTATION_2D_SIN * y;
         const float ry = -ROTATION_2D_SIN * x + ROTATION_2D_COS * y;
@@ -169,7 +170,8 @@ float Perlin2D::fbm(float x, float y, int octaves, float lacunarity, float gain)
         y = ry * lacunarity;
     }
 
-    return sum / totalAmplitude;
+    // 各層互不相關，變異數按振幅平方相加；除以其平方根，分布寬度才不隨層數改變
+    return sum / std::sqrt(amplitudeSquaredSum);
 }
 
 #pragma endregion  // Perlin2D
@@ -217,14 +219,14 @@ float Perlin3D::fbm(float x, float y, float z, int octaves, float lacunarity, fl
     float sum = 0.0f;
     float offset = 0.0f;
     float amplitude = 1.0f;
-    float totalAmplitude = 0.0f;
+    float amplitudeSquaredSum = 0.0f;
 
     const Mat4 trans = ROTATION_3D * scale(lacunarity);
 
     for (int i = 0; i < octaves; i++) {
         sum += noise(x + offset, y + offset, z + offset) * amplitude;
         offset += OCTAVE_OFFSET;
-        totalAmplitude += amplitude;
+        amplitudeSquaredSum += amplitude * amplitude;
         amplitude *= gain;
         auto v = transformPoint(trans, Vec3(x, y, z));
         x = v.x;
@@ -232,7 +234,8 @@ float Perlin3D::fbm(float x, float y, float z, int octaves, float lacunarity, fl
         z = v.z;
     }
 
-    return sum / totalAmplitude;
+    // 各層互不相關，變異數按振幅平方相加；除以其平方根，分布寬度才不隨層數改變
+    return sum / std::sqrt(amplitudeSquaredSum);
 }
 
 #pragma endregion  // Perlin3D

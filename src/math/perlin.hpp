@@ -19,7 +19,8 @@ constexpr Stream DEFAULT_PERLIN_3D_STREAM = fnv1a32("PERLIN_3D");
 }  // namespace detail
 
 // Perlin 梯度雜訊。輸出只由 seed 與座標決定，與取樣順序無關，
-// 因此分開生成的相鄰區塊在共用邊界上會得到相同的值
+// 因此分開生成的相鄰區塊在共用邊界上會得到相同的值。
+// fbm() 的分布寬度與 noise() 相同、不隨層數改變，但偶爾會略超出 [-1, 1]
 
 /// 1D Perlin 梯度雜訊，輸出範圍 [-1, 1]；整數格點上為 0
 class Perlin1D {
