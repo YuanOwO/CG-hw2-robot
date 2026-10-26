@@ -11,19 +11,27 @@ namespace robot::world::chunk {
 
 namespace {
 
-constexpr Stream TERRAIN_MAIN_NOISE_STREAM = fnv1a32("TERRAIN_MAIN_NOISE");
-constexpr Stream TERRAIN_TEMPERATURE_NOISE_STREAM = fnv1a32("TERRAIN_TEMPERATURE_NOISE");
-constexpr Stream TERRAIN_HUMIDITY_NOISE_STREAM = fnv1a32("TERRAIN_HUMIDITY_NOISE");
-constexpr Stream TERRAIN_ROUGHNESS_NOISE_STREAM = fnv1a32("TERRAIN_ROUGHNESS_NOISE");
-constexpr Stream TERRAIN_MOUNTAIN_NOISE_STREAM = fnv1a32("TERRAIN_MOUNTAIN_NOISE");
-constexpr Stream TERRAIN_DETAIL_NOISE_STREAM = fnv1a32("TERRAIN_DETAIL_NOISE");
+constexpr float WARP_NOISE_SCALE = 256.0f;
+constexpr float WARP_NOISE_STRENGTH = 144.0f;
 
-constexpr float CONTINENT_SCALE = 512.0f;
+constexpr float CONTINENT_SCALE = 1024.0f;
 constexpr float TEMPERATURE_SCALE = 384.0f;
-constexpr float HUMIDITY_SCALE = 128.0f;
+constexpr float HUMIDITY_SCALE = 384.0f;
+
+constexpr float CLIFF_FOOT = 0.003f;
+constexpr float CLIFF_WIDTH = 0.009f;
+constexpr float CLIFF_HEIGHT = 10.0f;
+
 constexpr float ROUGHNESS_SCALE = 512.0f;
-constexpr float MOUNTAIN_SCALE = 128.0f;
-constexpr float DETAIL_SCALE = 36.0f;
+constexpr float MOUNTAIN_SCALE = 188.0f;
+constexpr float MOUNTAIN_WARP_SCALE = 448.0f;
+constexpr float MOUNTAIN_WARP_STRENGTH = 72.0f;
+constexpr float MOUNTAIN_HEIGHT = 50.0f;
+constexpr float HILL_SCALE = 64.0f;
+constexpr float HILL_HEIGHT = 8.0f;
+
+constexpr float DETAIL_SCALE = 48.0f;
+constexpr float DETAIL_HEIGHT = 6.0f;
 
 constexpr float SEA_LEVEL_BIAS = 0.3010299956639812f;
 
@@ -31,12 +39,15 @@ constexpr float SEA_LEVEL_BIAS = 0.3010299956639812f;
 
 ChunkGenerator::ChunkGenerator(Seed seed)
     : _seed(seed),
-      _mainNoise(seed, TERRAIN_MAIN_NOISE_STREAM),
-      _temperatureNoise(seed, TERRAIN_TEMPERATURE_NOISE_STREAM),
-      _humidityNoise(seed, TERRAIN_HUMIDITY_NOISE_STREAM),
-      _roughnessNoise(seed, TERRAIN_ROUGHNESS_NOISE_STREAM),
-      _mountainNoise(seed, TERRAIN_MOUNTAIN_NOISE_STREAM),
-      _detailNoise(seed, TERRAIN_DETAIL_NOISE_STREAM) {}
+      _mainNoise(seed, fnv1a32("MAIN")),
+      _warpXNoise(seed, fnv1a32("WARP_X")),
+      _warpZNoise(seed, fnv1a32("WARP_Z")),
+      _temperatureNoise(seed, fnv1a32("TEMPERATURE")),
+      _humidityNoise(seed, fnv1a32("HUMIDITY")),
+      _roughnessNoise(seed, fnv1a32("ROUGHNESS")),
+      _mountainNoise(seed, fnv1a32("MOUNTAIN")),
+      _hillNoise(seed, fnv1a32("HILL")),
+      _detailNoise(seed, fnv1a32("DETAIL")) {}
 
 std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
     int originX = pos.x * CHUNK_SIZE;
@@ -102,8 +113,10 @@ float ChunkGenerator::heightAt(float worldX, float worldZ) const {
 
 ChunkGenerator::ClimateSample ChunkGenerator::sampleContinent(float worldX, float worldZ) const {
     ClimateSample sample;
+    float warpX, warpZ;
+    warpNoise(worldX, worldZ, warpX, warpZ, WARP_NOISE_SCALE, WARP_NOISE_STRENGTH, 0.0f);
 
-    sample.continent = _mainNoise.fbm(worldX / CONTINENT_SCALE, worldZ / CONTINENT_SCALE, 4) * 2.0f;
+    sample.continent = _mainNoise.fbm(warpX / CONTINENT_SCALE, warpZ / CONTINENT_SCALE, 4) * 2.0f;
 
     // 大陸性的修正值
     sample.continent = sample.continent + SEA_LEVEL_BIAS;
@@ -120,41 +133,66 @@ ChunkGenerator::ClimateSample ChunkGenerator::sampleClimate(float worldX, float 
     return sample;
 }
 
+void ChunkGenerator::warpNoise(float worldX, float worldZ, float& outX, float& outZ, float scale, float strength,
+                               float offset) const {
+    float noiseX = _warpXNoise.fbm(worldX / scale + offset, worldZ / scale, 3);
+    float noiseZ = _warpZNoise.fbm(worldX / scale + offset, worldZ / scale, 3);
+
+    outX = worldX + noiseX * strength;
+    outZ = worldZ + noiseZ * strength;
+}
+
 float ChunkGenerator::terrainHeight(float worldX, float worldZ, const ClimateSample& climate) const {
     // 大於 0 是陸地
-    float land = climate.continent;
+    const float land = climate.continent;
 
-    // 海底往下比陸地往上陡，海岸附近才會是平緩的平原
+    // 海底往下比陸地往上陡
     float base = land < 0.0f ? land * 25.0f : land * 10.0f;
 
     // 海平面附近的起伏會讓陸地反覆穿過 0，海岸碎成水窪；越接近海岸線起伏越小
-    float coastMask = smoothStep(0.0f, 0.35f, std::abs(land));
+    const float coastMask = smoothStep(0.0f, 0.35f, std::abs(land));
     float detail = _detailNoise.fbm(worldX / DETAIL_SCALE, worldZ / DETAIL_SCALE, 5);
 
-    base += coastMask * 6.0f * detail;
+    base += coastMask * DETAIL_HEIGHT * detail;
 
-    // 同時位於內陸且崎嶇才長山：沿海保持平原，內陸不崎嶇的地方也是平地
-    float inlandMask = smoothStep(0.2f, 0.7f, land);
-
-    if (inlandMask <= 0.0f) {
+    // 海底地形已經結束
+    if (land <= CLIFF_FOOT) {
         return base;
     }
 
-    float roughness = _roughnessNoise.fbm(worldX / ROUGHNESS_SCALE, worldZ / ROUGHNESS_SCALE, 2) + 0.5f;
-    float mountainMask = inlandMask * smoothStep(0.4f, 0.78f, roughness);
+    const float roughness = _roughnessNoise.fbm(worldX / ROUGHNESS_SCALE, worldZ / ROUGHNESS_SCALE, 2) + 0.5f;
+    const float inlandMask = smoothStep(0.1f, 0.7f, land);
 
-    if (mountainMask <= 0.0f) {
-        return base;
+    // 海岸斷崖
+    const float cliffMask = smoothStep(0.65f, 0.8f, roughness);
+    const float cliffRise = smoothStep(CLIFF_FOOT, CLIFF_FOOT + CLIFF_WIDTH, land);
+    base += cliffMask * CLIFF_HEIGHT * cliffRise * std::max(1.0f - inlandMask, 0.0f);  // 越接近海岸越陡峭
+
+    // 丘陵
+    const float hillMask = inlandMask * smoothStep(0.3f, 0.7f, roughness);
+    if (hillMask > 0.0f) {
+        float hill = _hillNoise.fbm(worldX / HILL_SCALE, worldZ / HILL_SCALE, 3) * 2.0f;
+
+        base += hillMask * HILL_HEIGHT * std::max(hill * 0.5f + 0.5f, 0.0f);  // [0, 1]，丘陵不會太高
     }
 
-    float mountain = _mountainNoise.fbm(worldX / MOUNTAIN_SCALE, worldZ / MOUNTAIN_SCALE, 4) * 2.0f;
+    // 山脈
+    const float mountainMask = inlandMask * smoothStep(0.6f, 0.8f, roughness);
+    if (mountainMask > 0.0f) {
+        float warpX, warpZ;
+        warpNoise(worldX, worldZ, warpX, warpZ, MOUNTAIN_WARP_SCALE, MOUNTAIN_WARP_STRENGTH, 66.07f);
+        const float mountain = _mountainNoise.fbm(warpX / MOUNTAIN_SCALE, warpZ / MOUNTAIN_SCALE, 2) * 2.0f;
 
-    // (1 - |n|)^2 在零交叉處形成尖脊
-    float ridge = 1.0f - std::abs(mountain);
-    ridge = std::clamp(ridge, 0.0f, 1.0f);
-    ridge *= ridge;
+        // (1 - |n|)^2 在零交叉處形成尖脊
+        float ridge = 1.0f - std::abs(mountain);
+        ridge = std::clamp(ridge, 0.0f, 1.0f);
+        ridge *= ridge;
 
-    base += mountainMask * 25.0f * ridge;
+        const float detailScale = MOUNTAIN_SCALE / 4.0f;
+        float mountainDetail = _mountainNoise.fbm(warpX / detailScale, warpZ / detailScale, 5);
+
+        base += mountainMask * MOUNTAIN_HEIGHT * ridge * (1.0f + 0.5f * mountainDetail);
+    }
 
     return base;
 }

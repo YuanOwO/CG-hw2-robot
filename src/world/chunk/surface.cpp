@@ -22,7 +22,7 @@ constexpr float BEACH_MAX_LANDNESS = 0.1f;  // 沙灘的邊界，越接近 0 越
 constexpr float BEACH_MAX_HEIGHT = 0.87f;   // 沙灘的高度不能太高
 constexpr float BEACH_MAX_SLOPE = 0.4f;     // 沙灘的坡度不能太陡，否則會變成岩石
 
-constexpr float DESERT_MAX_HUMIDITY = 0.15f;    // 沙漠的濕度上限
+constexpr float DESERT_MAX_HUMIDITY = 0.25f;    // 沙漠的濕度上限
 constexpr float DESERT_MAX_SLOPE = 0.6f;        // 沙漠的坡度上限
 constexpr float DESERT_MIN_TEMPERATURE = 0.5f;  // 沙漠的溫度下限，太冷就不會是沙漠
 
