@@ -62,13 +62,13 @@ Biome BiomeClassifier::classify(const BiomeInput& input) const {
     }
 
     // 沙灘與石岸
-    if (adjInput.continent <= BEACH_MAX_CONTINENT) {
+    if (!isFreezing && adjInput.continent <= BEACH_MAX_CONTINENT) {
         // 斷崖或陡坡是石岸，結凍的海岸也是石岸
         if (adjInput.cliffMask >= 0.5f) {
             return Biome::StoneShore;
         }
         if (adjInput.height <= BEACH_MAX_HEIGHT) {
-            if (adjInput.slope > BEACH_MAX_SLOPE || isFreezing) {
+            if (adjInput.slope > BEACH_MAX_SLOPE) {
                 return Biome::StoneShore;
             }
             return Biome::Beach;
