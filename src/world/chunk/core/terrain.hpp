@@ -8,6 +8,10 @@ namespace robot::world::chunk {
 struct TerrainSample {
     float height = 0.0f;      ///< 地表高度
     float waterLevel = 0.0f;  ///< 水位高度
+    float cliffMask = 0.0f;
+    float hillMask = 0.0f;
+    float mountainMask = 0.0f;
+    float ridge = 0.0f;  ///< 山脊遮罩，越接近 1 越靠近山脊
 };
 
 class TerrainSampler {

@@ -2,15 +2,24 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 
 #include "math/utils.hpp"
 #include "world/chunk/core/surface.hpp"
 #include "world/utils.hpp"
 
 namespace robot::world::chunk {
+namespace {
+
+struct VertexSample {
+    ClimateSample climate;
+    TerrainSample terrain;
+};
+
+}  // namespace
 
 ChunkGenerator::ChunkGenerator(Seed seed)
-    : _seed(seed),
+    : _biomeClassifier(deriveSeed(seed, fnv1a32("BIOME"))),
       _climateSampler(deriveSeed(seed, fnv1a32("CLIMATE"))),
       _terrainSampler(deriveSeed(seed, fnv1a32("TERRAIN"))) {}
 
@@ -20,63 +29,77 @@ std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
 
     Chunk::Heights heights;
     Chunk::Heights waterLevels;
+    Chunk::Biomes biomes;
     Chunk::Surfaces surfaces;
-    using Array = std::array<float, CHUNK_VERTEX_COUNT * CHUNK_VERTEX_COUNT>;
-    Array landness;
-    Array temperature;
-    Array humidity;
+    std::array<VertexSample, CHUNK_VERTEX_COUNT * CHUNK_VERTEX_COUNT> vertices;
 
     auto indexOf = [&](int localX, int localZ) { return localZ * CHUNK_VERTEX_COUNT + localX; };
+
+    auto cellAverage = [&](int x, int z, auto field) {
+        float a = field(vertices[indexOf(x, z)]);
+        float b = field(vertices[indexOf(x, z + 1)]);
+        float c = field(vertices[indexOf(x + 1, z + 1)]);
+        float d = field(vertices[indexOf(x + 1, z)]);
+        return (a + b + c + d) / 4.0f;
+    };
+
+    auto cellSlope = [&](int x, int z) {
+        float h00 = vertices[indexOf(x, z)].terrain.height;
+        float h01 = vertices[indexOf(x, z + 1)].terrain.height;
+        float h11 = vertices[indexOf(x + 1, z + 1)].terrain.height;
+        float h10 = vertices[indexOf(x + 1, z)].terrain.height;
+        const float abc = std::hypot(h11 - h01, h01 - h00);
+        const float acd = std::hypot(h10 - h00, h11 - h10);
+        return std::max(abc, acd);
+    };
 
     for (int x = 0; x < CHUNK_VERTEX_COUNT; x++) {
         for (int z = 0; z < CHUNK_VERTEX_COUNT; z++) {
             float worldX = static_cast<float>(originX + x);
             float worldZ = static_cast<float>(originZ + z);
-            ClimateSample climate = _climateSampler.sample(worldX, worldZ);
-            TerrainSample terrain = _terrainSampler.sample(worldX, worldZ, climate.continent);
 
+            auto climate = _climateSampler.sample(worldX, worldZ);
+            auto terrain = _terrainSampler.sample(worldX, worldZ, climate.continent);
+
+            vertices[indexOf(x, z)] = {climate, terrain};
             heights[indexOf(x, z)] = terrain.height;
             waterLevels[indexOf(x, z)] = terrain.waterLevel;
-            landness[indexOf(x, z)] = climate.continent;
-            temperature[indexOf(x, z)] = climate.temperature;
-            humidity[indexOf(x, z)] = climate.humidity;
         }
     }
-
-    auto cellAverage = [&](Array& arr, int x, int z) {
-        float a = arr[indexOf(x, z)];
-        float b = arr[indexOf(x, z + 1)];
-        float c = arr[indexOf(x + 1, z + 1)];
-        float d = arr[indexOf(x + 1, z)];
-        return (a + b + c + d) / 4.0f;
-    };
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
         for (int z = 0; z < CHUNK_SIZE; z++) {
-            float h00 = heights[indexOf(x, z)];
-            float h01 = heights[indexOf(x, z + 1)];
-            float h11 = heights[indexOf(x + 1, z + 1)];
-            float h10 = heights[indexOf(x + 1, z)];
-            float w00 = waterLevels[indexOf(x, z)];
-            float w01 = waterLevels[indexOf(x, z + 1)];
-            float w11 = waterLevels[indexOf(x + 1, z + 1)];
-            float w10 = waterLevels[indexOf(x + 1, z)];
+            BiomeInput biomeInput;
+            biomeInput.worldX = static_cast<float>(originX + x) + 0.5f;
+            biomeInput.worldZ = static_cast<float>(originZ + z) + 0.5f;
+            biomeInput.height = cellAverage(x, z, [](const VertexSample& v) { return v.terrain.height; });
+            biomeInput.waterLevel = cellAverage(x, z, [](const VertexSample& v) { return v.terrain.waterLevel; });
+            biomeInput.slope = cellSlope(x, z);
+            biomeInput.continent = cellAverage(x, z, [](const VertexSample& v) { return v.climate.continent; });
+            biomeInput.temperature = cellAverage(x, z, [](const VertexSample& v) { return v.climate.temperature; });
+            biomeInput.humidity = cellAverage(x, z, [](const VertexSample& v) { return v.climate.humidity; });
+            biomeInput.cliffMask = cellAverage(x, z, [](const VertexSample& v) { return v.terrain.cliffMask; });
+            biomeInput.hillMask = cellAverage(x, z, [](const VertexSample& v) { return v.terrain.hillMask; });
+            biomeInput.mountainMask = cellAverage(x, z, [](const VertexSample& v) { return v.terrain.mountainMask; });
+            biomeInput.ridge = cellAverage(x, z, [](const VertexSample& v) { return v.terrain.ridge; });
 
-            SurfaceInput input;
-            input.x = static_cast<float>(originX + x) + 0.5f;
-            input.z = static_cast<float>(originZ + z) + 0.5f;
-            input.height = cellHeight(h00, h01, h11, h10);
-            input.slope = cellSlope(h00, h01, h11, h10);
-            input.waterLevel = cellHeight(w00, w01, w11, w10);
-            input.landness = cellAverage(landness, x, z);
-            input.temperature = cellAverage(temperature, x, z);
-            input.humidity = cellAverage(humidity, x, z);
+            biomes[z * CHUNK_SIZE + x] = _biomeClassifier.classify(biomeInput);
 
-            surfaces[z * CHUNK_SIZE + x] = classifySurface(input);
+            SurfaceInput surfaceInput;
+            surfaceInput.x = biomeInput.worldX;
+            surfaceInput.z = biomeInput.worldZ;
+            surfaceInput.height = biomeInput.height;
+            surfaceInput.slope = biomeInput.slope;
+            surfaceInput.waterLevel = biomeInput.waterLevel;
+            surfaceInput.landness = biomeInput.continent;
+            surfaceInput.temperature = biomeInput.temperature;
+            surfaceInput.humidity = biomeInput.humidity;
+
+            surfaces[z * CHUNK_SIZE + x] = classifySurface(surfaceInput);
         }
     }
 
-    auto chunk = std::make_unique<Chunk>(pos, heights, waterLevels, surfaces);
+    auto chunk = std::make_unique<Chunk>(pos, heights, waterLevels, biomes, surfaces);
     return chunk;
 }
 

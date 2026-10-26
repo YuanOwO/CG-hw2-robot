@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <functional>
 
+#include "world/chunk/core/biome.hpp"
 #include "world/chunk/core/surface.hpp"
 
 namespace robot::world::chunk {
@@ -31,19 +32,22 @@ struct ChunkPosHash {
 class Chunk {
    public:
     using Heights = std::array<float, CHUNK_VERTEX_COUNT * CHUNK_VERTEX_COUNT>;
+    using Biomes = std::array<Biome, CHUNK_SIZE * CHUNK_SIZE>;
     using Surfaces = std::array<SurfaceType, CHUNK_SIZE * CHUNK_SIZE>;
 
-    Chunk(ChunkPos pos, Heights heights, Heights waterLevels, Surfaces surfaces);
+    Chunk(ChunkPos pos, Heights heights, Heights waterLevels, Biomes biomes, Surfaces surfaces);
 
     ChunkPos pos() const { return _pos; }
-    float vertexHeight(int localX, int localZ) const;
     float heightAt(float worldX, float worldZ) const;
+    float vertexHeight(int localX, int localZ) const;
+    Biome biomeAt(int localX, int localZ) const;
     SurfaceType surfaceAt(int localX, int localZ) const;
 
    private:
     ChunkPos _pos;
     Heights _heights;
     Heights _waterLevels;
+    Biomes _biomes;
     Surfaces _surfaces;
 };
 

@@ -30,16 +30,6 @@ constexpr float ROCK_MIN_SLOPE = 0.85f;
 
 }  // namespace
 
-float cellHeight(float h00, float h01, float h11, float h10) {
-    return (h00 + h01 + h11 + h10) / 4.0f;
-}
-
-float cellSlope(float h00, float h01, float h11, float h10) {
-    const float abc = std::hypot(h11 - h01, h01 - h00);
-    const float acd = std::hypot(h10 - h00, h11 - h10);
-    return std::max(abc, acd);
-}
-
 SurfaceType classifySurface(SurfaceInput input) {
     const float height = input.height;
     const float slope = input.slope;

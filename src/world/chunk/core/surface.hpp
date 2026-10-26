@@ -24,9 +24,6 @@ struct SurfaceInput {
     float humidity;     ///< [0.0, 1.0]，越大越潮濕
 };
 
-float cellHeight(float h00, float h01, float h11, float h10);
-float cellSlope(float h00, float h01, float h11, float h10);
-
 SurfaceType classifySurface(SurfaceInput input);
 
 }  // namespace robot::world::chunk

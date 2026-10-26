@@ -23,14 +23,12 @@ std::size_t ChunkPosHash::operator()(const ChunkPos& pos) const {
     return std::hash<std::uint64_t>{}(key);
 }
 
-Chunk::Chunk(ChunkPos pos, Heights heights, Heights waterLevels, Surfaces surfaces)
-    : _pos(pos), _heights(std::move(heights)), _waterLevels(std::move(waterLevels)), _surfaces(std::move(surfaces)) {}
-
-float Chunk::vertexHeight(int localX, int localZ) const {
-    assert(localX >= 0 && localX < CHUNK_VERTEX_COUNT && localZ >= 0 && localZ < CHUNK_VERTEX_COUNT);
-    std::size_t index = static_cast<std::size_t>(localZ * CHUNK_VERTEX_COUNT + localX);
-    return _heights[index];
-}
+Chunk::Chunk(ChunkPos pos, Heights heights, Heights waterLevels, Biomes biomes, Surfaces surfaces)
+    : _pos(pos),
+      _heights(std::move(heights)),
+      _waterLevels(std::move(waterLevels)),
+      _biomes(std::move(biomes)),
+      _surfaces(std::move(surfaces)) {}
 
 float Chunk::heightAt(float worldX, float worldZ) const {
     float localX = worldX - _pos.x * CHUNK_SIZE;
@@ -57,6 +55,18 @@ float Chunk::heightAt(float worldX, float worldZ) const {
         // 在 h00, h11, h10 的平面上
         return h00 + (h10 - h00) * fracX + (h11 - h10) * fracZ;
     }
+}
+
+float Chunk::vertexHeight(int localX, int localZ) const {
+    assert(localX >= 0 && localX < CHUNK_VERTEX_COUNT && localZ >= 0 && localZ < CHUNK_VERTEX_COUNT);
+    std::size_t index = static_cast<std::size_t>(localZ * CHUNK_VERTEX_COUNT + localX);
+    return _heights[index];
+}
+
+Biome Chunk::biomeAt(int localX, int localZ) const {
+    assert(localX >= 0 && localX < CHUNK_SIZE && localZ >= 0 && localZ < CHUNK_SIZE);
+    std::size_t index = static_cast<std::size_t>(localZ * CHUNK_SIZE + localX);
+    return _biomes[index];
 }
 
 SurfaceType Chunk::surfaceAt(int localX, int localZ) const {

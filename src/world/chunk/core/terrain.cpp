@@ -77,6 +77,8 @@ void TerrainSampler::addCoast(TerrainSample& sample, const Context& ctx) const {
     const float landMask = std::max(1.0f - ctx.inlandMask, 0.0f);
     const float cliffRise = smoothStep(CLIFF_START_THRESHOLD, CLIFF_END_THRESHOLD, ctx.continent);
     sample.height += cliffMask * CLIFF_HEIGHT_SCALE * cliffRise * landMask;
+
+    sample.cliffMask = cliffMask * landMask;
 }
 
 void TerrainSampler::addHills(TerrainSample& sample, const Context& ctx) const {
@@ -88,6 +90,7 @@ void TerrainSampler::addHills(TerrainSample& sample, const Context& ctx) const {
     static constexpr float HILL_ROUGHNESS_MAX = 0.7f;
 
     const float hillMask = ctx.inlandMask * smoothStep(HILL_ROUGHNESS_MIN, HILL_ROUGHNESS_MAX, ctx.roughness);
+    sample.hillMask = hillMask;
     if (hillMask <= 0.0f) {
         return;
     }
@@ -110,7 +113,7 @@ void TerrainSampler::addMountain(TerrainSample& sample, const Context& ctx) cons
     static constexpr float MNTN_ROUGHNESS_MAX = 0.8f;
 
     const float mountainMask = ctx.inlandMask * smoothStep(MNTN_ROUGHNESS_MIN, MNTN_ROUGHNESS_MAX, ctx.roughness);
-
+    sample.mountainMask = mountainMask;
     if (mountainMask <= 0.0f) {
         return;
     }
@@ -124,6 +127,7 @@ void TerrainSampler::addMountain(TerrainSample& sample, const Context& ctx) cons
     float ridge = 1.0f - std::abs(mountain * 1.46f);
     ridge = std::clamp(ridge, 0.0f, 1.0f);
     ridge *= ridge;
+    sample.ridge = ridge;
 
     float detail = _mountainNoise.fbm(warpX / MNTN_DETAIL_SCALE, warpZ / MNTN_DETAIL_SCALE, MNTN_DETAIL_OCTAVES);
 
@@ -141,7 +145,6 @@ void TerrainSampler::addDetail(TerrainSample& sample, const Context& ctx) const 
 
     // 海平面附近的起伏會讓陸地反覆穿過 0，海岸碎成水窪；越接近海岸線起伏越小
     float coastMask = smoothStep(0.0f, COAST_FADE_THRESHOLD, std::abs(sample.height));
-
     if (sample.height < 0.0f) {
         coastMask = -coastMask;
     }

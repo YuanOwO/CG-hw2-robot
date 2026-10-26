@@ -5,6 +5,7 @@
 #include "math/perlin.hpp"
 #include "math/random.hpp"
 #include "world/chunk/chunk.hpp"
+#include "world/chunk/core/biome.hpp"
 #include "world/chunk/core/climate.hpp"
 #include "world/chunk/core/terrain.hpp"
 
@@ -20,7 +21,7 @@ class ChunkGenerator {
     float heightAt(float worldX, float worldZ) const;
 
    private:
-    Seed _seed;
+    BiomeClassifier _biomeClassifier;
     ClimateSampler _climateSampler;
     TerrainSampler _terrainSampler;
 };
