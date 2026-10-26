@@ -15,7 +15,7 @@ void WorldRenderer::render(const world::World& world, const graphics::Camera& ca
                            const graphics::OrthoProjection& projection, int width, int height) const {
     graphics::begin3D(width, height, camera, projection);
 
-    world.chunks().forEach([this](const world::chunk::Chunk& c) { _chunkRenderer.render(c); });
+    _chunkRenderer.render(world.chunks());
 
     world.entities().forEach([this](const world::entity::Entity& e) { _entityRenderer.render(e); });
 

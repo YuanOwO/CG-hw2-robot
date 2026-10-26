@@ -63,6 +63,9 @@ class MeshBuilder {
     /// 起點或終點落在 y 軸上時，該端自然封口，否則留下開口
     MeshBuilder& lathe(const Path2D& profile);
 
+    /// 以三個頂點組成的三角形，順序決定法向量方向
+    MeshBuilder& triangle(const Vec3& a, const Vec3& b, const Vec3& c);
+
    private:
     Mesh _mesh;
     Mat4 _transform = Mat4();

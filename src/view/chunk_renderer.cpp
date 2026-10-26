@@ -1,7 +1,9 @@
 #include "view/chunk_renderer.hpp"
 
 #include <cstddef>
+#include <iterator>
 
+#include "geometry/mesh/mesh_builder.hpp"
 #include "graphics/3d/primitives.hpp"
 #include "math/vec3.hpp"
 #include "world/chunk/core/biome.hpp"
@@ -12,6 +14,7 @@ namespace robot::view {
 using world::chunk::Biome;
 using world::chunk::Chunk;
 using world::chunk::CHUNK_SIZE;
+using world::chunk::ChunkManager;
 using world::chunk::Surface;
 
 namespace {
@@ -107,7 +110,22 @@ ColorRGBA darker(ColorRGBA color, float factor) {
 
 }  // namespace
 
-void ChunkRenderer::render(const Chunk& chunk) const {
+void ChunkRenderer::render(const ChunkManager& chunks) const {
+    // 已卸載的 chunk 不會再畫到，網格留著只會一直累積
+    for (auto it = _meshes.begin(); it != _meshes.end();) {
+        it = chunks.chunkAt(it->first) == nullptr ? _meshes.erase(it) : std::next(it);
+    }
+
+    chunks.forEach([this](const Chunk& chunk) {
+        auto it = _meshes.find(chunk.pos());
+        if (it == _meshes.end()) {
+            it = _meshes.emplace(chunk.pos(), buildMesh(chunk)).first;
+        }
+        graphics::drawMesh(it->second);
+    });
+}
+
+geometry::Mesh ChunkRenderer::buildMesh(const Chunk& chunk) const {
     const int originX = chunk.pos().x * CHUNK_SIZE;
     const int originZ = chunk.pos().z * CHUNK_SIZE;
     auto corner = [&](int localX, int localZ) {
@@ -116,13 +134,21 @@ void ChunkRenderer::render(const Chunk& chunk) const {
     };
 
     // 每格一個四邊形，四個角依各自的高度擺放
+    geometry::MeshBuilder builder;
+
     for (int z = 0; z < CHUNK_SIZE; z++) {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             // 從上方看為逆時針，正面朝上
-            graphics::drawQuad(corner(x, z), corner(x, z + 1), corner(x + 1, z + 1), corner(x + 1, z),
-                               cellColor(chunk, x, z));
+            auto a = corner(x, z);
+            auto b = corner(x, z + 1);
+            auto c = corner(x + 1, z + 1);
+            auto d = corner(x + 1, z);
+            builder.setColor(cellColor(chunk, x, z));
+            builder.triangle(a, b, c).triangle(a, c, d);
         }
     }
+
+    return builder.build();
 }
 
 ColorRGBA ChunkRenderer::cellColor(const Chunk& chunk, int localX, int localZ) const {

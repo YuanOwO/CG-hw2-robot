@@ -165,6 +165,20 @@ MeshBuilder& MeshBuilder::lathe(const Path2D& profile) {
     return *this;
 }
 
+MeshBuilder& MeshBuilder::triangle(const Vec3& a, const Vec3& b, const Vec3& c) {
+    const Vec3 ta = transformPoint(_transform, a);
+    const Vec3 tb = transformPoint(_transform, b);
+    const Vec3 tc = transformPoint(_transform, c);
+
+    // 法向量由變換後的頂點算出，所以不必另外變換
+    const Vec3 normal = cross(tb - ta, tc - ta);
+    std::uint32_t ia = _mesh.addVertex(ta, normal, _currentColor);
+    std::uint32_t ib = _mesh.addVertex(tb, normal, _currentColor);
+    std::uint32_t ic = _mesh.addVertex(tc, normal, _currentColor);
+    _mesh.addTriangle(ia, ib, ic);
+    return *this;
+}
+
 #pragma region Lathe Implementation
 
 void MeshBuilder::addLathe(const Path2D& profile, int segments, bool smooth) {
