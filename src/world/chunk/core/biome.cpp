@@ -32,6 +32,45 @@ Biome thawedBiome(Biome biome) {
 
 }  // namespace
 
+std::string toString(Biome biome) {
+    switch (biome) {
+    case Biome::Ocean:
+        return "Ocean";
+    case Biome::FrozenOcean:
+        return "FrozenOcean";
+    case Biome::Beach:
+        return "Beach";
+    case Biome::StoneShore:
+        return "StoneShore";
+    case Biome::Swamp:
+        return "Swamp";
+    case Biome::AlpineMeadow:
+        return "AlpineMeadow";
+    case Biome::StonyPeaks:
+        return "StonyPeaks";
+    case Biome::SnowyPeaks:
+        return "SnowyPeaks";
+    case Biome::Plains:
+        return "Plains";
+    case Biome::SnowyPlains:
+        return "SnowyPlains";
+    case Biome::Savanna:
+        return "Savanna";
+    case Biome::Desert:
+        return "Desert";
+    case Biome::Forest:
+        return "Forest";
+    case Biome::Taiga:
+        return "Taiga";
+    case Biome::SnowyTaiga:
+        return "SnowyTaiga";
+    case Biome::Jungle:
+        return "Jungle";
+    default:
+        return "UnknownBiome";
+    }
+}
+
 BiomeClassifier::BiomeClassifier(Seed seed)
     : _temperatureJitter(seed, fnv1a32("TEMPERATURE_JITTER")),
       _humidityJitter(seed, fnv1a32("HUMIDITY_JITTER")),

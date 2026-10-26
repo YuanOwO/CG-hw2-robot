@@ -54,4 +54,18 @@ float ChunkManager::heightAt(float worldX, float worldZ) const {
     return _generator.heightAt(worldX, worldZ);
 }
 
+const Biome ChunkManager::biomeAt(float worldX, float worldZ) const {
+    const ChunkPos pos = ChunkPos::containing(worldX, worldZ);
+    const Chunk* chunk = chunkAt(pos);
+    if (chunk) {
+        // 如果該 chunk 已載入，就直接用它的生態系資料
+        int localX = static_cast<int>(std::floor(worldX)) - pos.x * CHUNK_SIZE;
+        int localZ = static_cast<int>(std::floor(worldZ)) - pos.z * CHUNK_SIZE;
+
+        return chunk->biomeAt(localX, localZ);
+    }
+    // 否則回傳不知道
+    return Biome::Count;  // 這裡使用 Biome::Count 作為未知生態系的標記
+}
+
 }  // namespace robot::world::chunk

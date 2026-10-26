@@ -5,7 +5,7 @@
 
 #include "world/chunk/chunk.hpp"
 #include "world/chunk/chunk_generator.hpp"
-#include "world/types.hpp"
+#include "world/chunk/core/biome.hpp"
 
 namespace robot::world::chunk {
 
@@ -19,6 +19,7 @@ class ChunkManager {
     const Chunk* chunkAt(ChunkPos pos) const;  // 沒載入就回傳 nullptr
 
     float heightAt(float worldX, float worldZ) const;
+    const Biome biomeAt(float worldX, float worldZ) const;
 
     template <typename F>
     void forEach(F&& visit) const {

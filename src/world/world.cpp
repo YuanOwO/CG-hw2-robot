@@ -25,6 +25,10 @@ void World::tick(float dt) {
     _entityManager.tick(dt, *this);
 }
 
+const chunk::Biome World::biomeAt(float worldX, float worldZ) const {
+    return _chunkManager.biomeAt(worldX, worldZ);
+}
+
 Vec3 World::spawnPosition() const {
     Random random(deriveSeed(_seed, SPAWN_POSITION_SEED_STREAM));
     int count = 0;

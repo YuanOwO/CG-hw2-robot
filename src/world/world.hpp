@@ -1,8 +1,7 @@
 #pragma once
 
-#include <optional>
-
 #include "world/chunk/chunk_manager.hpp"
+#include "world/chunk/core/biome.hpp"
 #include "world/collision/collision.hpp"
 #include "world/entity/brain/player_brain.hpp"
 #include "world/entity/entity_manager.hpp"
@@ -16,6 +15,8 @@ class World {
    public:
     explicit World(Seed seed);
     void tick(float dt);
+
+    const chunk::Biome biomeAt(float worldX, float worldZ) const;
 
     Vec3 spawnPosition() const;
 

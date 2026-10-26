@@ -1,7 +1,7 @@
 #pragma once
 
 #include <array>
-#include <limits>
+#include <string>
 
 #include "math/perlin.hpp"
 #include "math/random.hpp"
@@ -35,6 +35,8 @@ enum class Biome {
 
     Count
 };
+
+std::string toString(Biome biome);
 
 struct BiomeInput {
     float worldX;
