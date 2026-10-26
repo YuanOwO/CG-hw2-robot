@@ -4,7 +4,7 @@ namespace robot::world::chunk {
 
 namespace {
 
-constexpr int CHUNK_LOAD_RADIUS = 5;
+constexpr int CHUNK_LOAD_RADIUS = 12;
 
 // 以 chunk 為單位的圓形範圍；比較平方，不必開根號。載入與卸載都用這個判斷，範圍才會一致
 bool withinLoadRadius(ChunkPos pos, ChunkPos center) {

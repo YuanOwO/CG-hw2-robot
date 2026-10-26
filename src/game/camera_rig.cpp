@@ -69,7 +69,7 @@ graphics::OrthoProjection CameraRig::projection() const {
 
     // 平行投影時眼睛的位置只決定裁切範圍：nearPlane 取負值，眼睛背後的高地才不會被切掉；
     // 眼睛在目標點後方 _distance 處，farPlane 要涵蓋目標點之後整個載入範圍的地形
-    projection.nearPlane = -200.0f;
+    projection.nearPlane = -400.0f;
     projection.farPlane = 400.0f;
     return projection;
 }
