@@ -18,6 +18,7 @@ struct SurfaceInput {
     float z;            ///< 世界座標
     float height;       ///< 四個角落的平均高度
     float slope;        ///< 四個角落的最大坡度
+    float waterLevel;   ///< 水位高度
     float landness;     ///< 大於 0 表示陸地，越接近 0 越靠近海岸
     float temperature;  ///< [0.0, 1.0]，越大越熱
     float humidity;     ///< [0.0, 1.0]，越大越潮濕

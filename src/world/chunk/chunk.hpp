@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <functional>
 
-#include "world/chunk/surface.hpp"
+#include "world/chunk/core/surface.hpp"
 
 namespace robot::world::chunk {
 
@@ -33,7 +33,7 @@ class Chunk {
     using Heights = std::array<float, CHUNK_VERTEX_COUNT * CHUNK_VERTEX_COUNT>;
     using Surfaces = std::array<SurfaceType, CHUNK_SIZE * CHUNK_SIZE>;
 
-    Chunk(ChunkPos pos, Heights heights, Surfaces surfaces);
+    Chunk(ChunkPos pos, Heights heights, Heights waterLevels, Surfaces surfaces);
 
     ChunkPos pos() const { return _pos; }
     float vertexHeight(int localX, int localZ) const;
@@ -43,6 +43,7 @@ class Chunk {
    private:
     ChunkPos _pos;
     Heights _heights;
+    Heights _waterLevels;
     Surfaces _surfaces;
 };
 

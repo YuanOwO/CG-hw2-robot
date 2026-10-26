@@ -23,8 +23,8 @@ std::size_t ChunkPosHash::operator()(const ChunkPos& pos) const {
     return std::hash<std::uint64_t>{}(key);
 }
 
-Chunk::Chunk(ChunkPos pos, Heights heights, Surfaces surfaces)
-    : _pos(pos), _heights(std::move(heights)), _surfaces(std::move(surfaces)) {}
+Chunk::Chunk(ChunkPos pos, Heights heights, Heights waterLevels, Surfaces surfaces)
+    : _pos(pos), _heights(std::move(heights)), _waterLevels(std::move(waterLevels)), _surfaces(std::move(surfaces)) {}
 
 float Chunk::vertexHeight(int localX, int localZ) const {
     assert(localX >= 0 && localX < CHUNK_VERTEX_COUNT && localZ >= 0 && localZ < CHUNK_VERTEX_COUNT);

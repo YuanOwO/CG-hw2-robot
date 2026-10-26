@@ -1,4 +1,4 @@
-#include "world/chunk/surface.hpp"
+#include "world/chunk/core/surface.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -52,9 +52,13 @@ SurfaceType classifySurface(SurfaceInput input) {
     const bool isFreezing = temperature <= FREEZING_TEMPERATURE;
     const bool isSnowy = isFreezing && humidity >= SNOW_MIN_HUMIDITY;
 
-    // 先判斷海洋
-    if (height <= SEA_LEVEL) {
-        if (temperature <= ICED_SEA_TEMPERATURE) {
+    // 海洋、湖泊、河流、冰面
+    if (height <= input.waterLevel) {
+        if (height > SEA_LEVEL && isFreezing) {
+            // 海平面以上的水體是淡水
+            return SurfaceType::Ice;
+        } else if (temperature <= ICED_SEA_TEMPERATURE) {
+            // 海洋是鹹水，冰點比淡水低一點
             return SurfaceType::Ice;
         }
         return SurfaceType::Water;

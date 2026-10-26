@@ -4,7 +4,7 @@
 
 #include "graphics/3d/primitives.hpp"
 #include "math/vec3.hpp"
-#include "world/chunk/surface.hpp"
+#include "world/chunk/core/surface.hpp"
 
 namespace robot::view {
 
