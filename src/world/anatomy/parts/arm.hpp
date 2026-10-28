@@ -69,7 +69,7 @@ class Arm final : public Part {
    protected:
     void onAttach(RigBuilder& builder, Socket socket) override {
         Vec3 shoulderOffset(_armSpec.upperArmSize.x * 0.5f * sideSign(_side), 0.0f, 0.0f);
-        collision::Box upperArmBox(Vec3(0.0f, -_armSpec.upperArmSize.y * 0.5f, 0.0f), _armSpec.upperArmSize * 0.5f);
+        collision::UprightBox upperArmBox(Vec3(0.0f, -_armSpec.upperArmSize.y, 0.0f), _armSpec.upperArmSize, 0.0f);
         BoneSpec upperArmSpec{Joint(_armSpec.shoulderYaw, _armSpec.shoulderPitch, _armSpec.shoulderRoll), upperArmBox,
                               _armSpec.upperArmMesh};
 
@@ -81,8 +81,8 @@ class Arm final : public Part {
         }
 
         Vec3 elbowOffset(0.0f, -_armSpec.upperArmSize.y, 0.0f);
-        collision::Box forearmBox(Vec3(0.0f, -_armSpec.forearmSize->y * 0.5f, 0.0f),
-                                  _armSpec.forearmSize.value() * 0.5f);
+        collision::UprightBox forearmBox(Vec3(0.0f, -_armSpec.forearmSize->y, 0.0f), _armSpec.forearmSize.value(),
+                                         0.0f);
         BoneSpec forearmSpec{Joint(JointLimits(), _armSpec.elbowPitch.value(), JointLimits()), forearmBox,
                              _armSpec.forearmMesh};
 

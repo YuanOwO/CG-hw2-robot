@@ -70,7 +70,7 @@ class Leg final : public Part {
 
    protected:
     void onAttach(RigBuilder& builder, Socket socket) override {
-        collision::Box thighBox(Vec3(0.0f, -_legSpec.thighSize.y * 0.5f, 0.0f), _legSpec.thighSize * 0.5f);
+        collision::UprightBox thighBox(Vec3(0.0f, -_legSpec.thighSize.y, 0.0f), _legSpec.thighSize, 0.0f);
         BoneSpec thighSpec{Joint(_legSpec.hipYaw, _legSpec.hipPitch, _legSpec.hipRoll), thighBox, _legSpec.thighMesh};
 
         _thigh = builder.addBone(Bone(name() + "_thigh", socket.bone, socket.offset, thighSpec));
@@ -80,7 +80,7 @@ class Leg final : public Part {
         }
 
         Vec3 kneeOffset(0.0f, -_legSpec.thighSize.y, 0.0f);
-        collision::Box shinBox(Vec3(0.0f, -_legSpec.shinSize->y * 0.5f, 0.0f), _legSpec.shinSize.value() * 0.5f);
+        collision::UprightBox shinBox(Vec3(0.0f, -_legSpec.shinSize->y, 0.0f), _legSpec.shinSize.value(), 0.0f);
         BoneSpec shinSpec{Joint(JointLimits(), _legSpec.kneePitch.value(), JointLimits()), shinBox, _legSpec.shinMesh};
 
         _shin = builder.addBone(Bone(name() + "_shin", _thigh, kneeOffset, shinSpec));

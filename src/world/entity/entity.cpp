@@ -44,6 +44,7 @@ collision::UprightCylinder Entity::collider() const {
     const collision::UprightCylinder& to = localCollider(_stance.to);
     const float t = _stance.progress;
 
+    // localCollider 的 baseCenter 是以腳底為原點的，所以要加上腳底位置
     collision::UprightCylinder local(lerp(from.baseCenter(), to.baseCenter(), t), lerp(from.radius(), to.radius(), t),
                                      lerp(from.height(), to.height(), t));
     return local.translated(_position);

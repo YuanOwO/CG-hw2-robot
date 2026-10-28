@@ -42,7 +42,7 @@ class Wing final : public Part {
    protected:
     void onAttach(RigBuilder& builder, Socket socket) override {
         Vec3 shoulderOffset(_wingSpec.size.x * 0.5f * sideSign(_side), 0.0f, 0.0f);
-        collision::Box wingBox(Vec3(0.0f, -_wingSpec.size.y * 0.5f, 0.0f), _wingSpec.size * 0.5f);
+        collision::UprightBox wingBox(Vec3(0.0f, -_wingSpec.size.y, 0.0f), _wingSpec.size, 0.0f);
         BoneSpec wingSpec{Joint(JointLimits(), JointLimits(), _wingSpec.shoulderRoll), wingBox, _wingSpec.wingMesh};
 
         _wing = builder.addBone(Bone(name(), socket.bone, socket.offset + shoulderOffset, wingSpec));

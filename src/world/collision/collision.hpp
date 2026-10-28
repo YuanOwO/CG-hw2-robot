@@ -1,28 +1,30 @@
 #pragma once
 
-#include <array>
+#include <variant>
 
-#include "math/mat4.hpp"
 #include "math/vec3.hpp"
 
 namespace robot::world::collision {
 
-class Box {
+class UprightBox {
    public:
-    Box(const Vec3& center, const Vec3& halfExtents);
-    ~Box() = default;
+    UprightBox(const Vec3& baseCenter, const Vec3& size, float yaw);
+    ~UprightBox() = default;
 
-    const Vec3& center() const { return _center; }  ///< 取得碰撞箱的中心點座標
+    const Vec3& baseCenter() const { return _baseCenter; }
 
-    const Vec3& halfExtents() const { return _halfExtents; }  ///< 取得碰撞箱的半尺寸
+    float bottomY() const { return _baseCenter.y; }
+    float topY() const { return _baseCenter.y + _size.y; }
 
-    std::array<Vec3, 8> corners() const;
+    const Vec3& size() const { return _size; }
+    float yaw() const { return _yaw; }
 
-    std::array<Vec3, 8> transformedCorners(const Mat4& transform) const;
+    UprightBox translated(const Vec3& translation) const;
 
    private:
-    Vec3 _center;
-    Vec3 _halfExtents;
+    Vec3 _baseCenter;
+    Vec3 _size;
+    float _yaw;
 };
 
 class UprightCylinder {
@@ -32,22 +34,40 @@ class UprightCylinder {
 
     const Vec3& baseCenter() const { return _baseCenter; }
 
-    float radius() const { return _radius; }
-
-    float height() const { return _height; }
-
     float bottomY() const { return _baseCenter.y; }
-
     float topY() const { return _baseCenter.y + _height; }
 
-    UprightCylinder translated(const Vec3& offset) const;
+    float radius() const { return _radius; }
+    float height() const { return _height; }
 
-    bool overlaps(const UprightCylinder& other) const;
+    UprightCylinder translated(const Vec3& translation) const;
 
    private:
     Vec3 _baseCenter;
     float _radius;
     float _height;
 };
+
+class Sphere {
+   public:
+    Sphere(const Vec3& center, float radius);
+    ~Sphere() = default;
+
+    const Vec3& center() const { return _center; }
+    float radius() const { return _radius; }
+
+    float bottomY() const { return _center.y - _radius; }
+    float topY() const { return _center.y + _radius; }
+
+    Sphere translated(const Vec3& translation) const;
+
+   private:
+    Vec3 _center;
+    float _radius;
+};
+
+using Collider = std::variant<UprightBox, UprightCylinder, Sphere>;
+
+Collider translated(const Collider& collider, const Vec3& translation);
 
 }  // namespace robot::world::collision

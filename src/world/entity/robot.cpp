@@ -22,7 +22,7 @@ const std::array<collision::UprightCylinder, anatomy::STANCE_COUNT> COLLIDERS = 
 Robot::Robot(EntityId id, Seed seed, Vec3 position, std::unique_ptr<brain::Brain> brain)
     : Entity(id, seed, position, std::move(brain)) {}
 
-const collision::UprightCylinder& Robot::localCollider(anatomy::Stance stance) const {
+collision::UprightCylinder Robot::localCollider(anatomy::Stance stance) const {
     return COLLIDERS.at(static_cast<std::size_t>(stance));
 }
 

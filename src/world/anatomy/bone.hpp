@@ -14,7 +14,7 @@ namespace robot::world::anatomy {
 struct BoneSpec {
     Joint joint;
 
-    std::optional<collision::Box> collider;
+    std::optional<collision::UprightBox> collider;
     std::optional<geometry::Mesh> mesh;
 };
 
@@ -29,7 +29,7 @@ class Bone {
     const Vec3& pivot() const { return _pivot; }
     const Joint& joint() const { return _joint; }
 
-    const std::optional<collision::Box>& collider() const { return _collider; }
+    const std::optional<collision::UprightBox>& collider() const { return _collider; }
     const std::optional<geometry::Mesh>& mesh() const { return _mesh; }
 
    private:
@@ -38,7 +38,7 @@ class Bone {
     Vec3 _pivot;
     Joint _joint;
 
-    std::optional<collision::Box> _collider;
+    std::optional<collision::UprightBox> _collider;
     std::optional<geometry::Mesh> _mesh;
 };
 

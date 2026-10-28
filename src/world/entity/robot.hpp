@@ -17,7 +17,7 @@ class Robot final : public Entity {
     float walkSpeed() const override { return 1.2f; }
     float runSpeed() const override { return 10.0f; }
 
-    const collision::UprightCylinder& localCollider(anatomy::Stance stance) const override;
+    collision::UprightCylinder localCollider(anatomy::Stance stance) const override;
     bool supportsStance(anatomy::Stance stance) const override;
 };
 

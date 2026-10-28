@@ -41,7 +41,7 @@ class Neck final : public Part {
 
    protected:
     void onAttach(RigBuilder& builder, Socket socket) override {
-        collision::Box neckBox(Vec3(0.0f, _neckSpec.size.y * 0.5f, 0.0f), _neckSpec.size * 0.5f);
+        collision::UprightBox neckBox(Vec3(), _neckSpec.size, 0.0f);
         BoneSpec neckBoneSpec{Joint(_neckSpec.yaw, _neckSpec.pitch, _neckSpec.roll), neckBox, _neckSpec.neckMesh};
 
         _neck = builder.addBone(Bone(name(), socket.bone, socket.offset, neckBoneSpec));

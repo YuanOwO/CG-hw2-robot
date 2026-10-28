@@ -68,7 +68,7 @@ class BipedTorso final : public Part {
 
    protected:
     void onAttach(RigBuilder& builder, Socket socket) override {
-        collision::Box torsoBox(Vec3(0.0f, _torsoSpec.size.y * 0.5f, 0.0f), _torsoSpec.size * 0.5f);
+        collision::UprightBox torsoBox(Vec3(), _torsoSpec.size, 0.0f);
         BoneSpec torsoBoneSpec{Joint(), torsoBox, _torsoSpec.torsoMesh};
 
         _torso = builder.addBone(Bone(name(), socket.bone, socket.offset, torsoBoneSpec));
@@ -146,7 +146,7 @@ class QuadrupedTorso final : public Part {
 
    protected:
     void onAttach(RigBuilder& builder, Socket socket) override {
-        collision::Box torsoBox(Vec3(0.0f, _torsoSpec.size.y * 0.5f, 0.0f), _torsoSpec.size * 0.5f);
+        collision::UprightBox torsoBox(Vec3(), _torsoSpec.size, 0.0f);
         BoneSpec torsoBoneSpec{Joint(), torsoBox, _torsoSpec.torsoMesh};
 
         _torso = builder.addBone(Bone(name(), socket.bone, socket.offset, torsoBoneSpec));

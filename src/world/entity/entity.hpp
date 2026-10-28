@@ -30,7 +30,7 @@ class Entity {
     bool onGround() const { return _onGround; }
     const anatomy::StanceTransition& stance() const { return _stance; }
 
-    /// 世界座標的碰撞體；stance 過渡中依進度內插
+    /// 世界座標的碰撞箱；stance 過渡中依進度內插
     collision::UprightCylinder collider() const;
 
    protected:
@@ -42,8 +42,8 @@ class Entity {
     virtual float runSpeed() const = 0;    /// 跑步速度，單位 m/s
     float jumpSpeed() const;               /// 起跳速度，單位 m/s
 
-    /// 以腳底為原點的碰撞體
-    virtual const collision::UprightCylinder& localCollider(anatomy::Stance stance) const = 0;
+    /// 以腳底為原點的碰撞箱
+    virtual collision::UprightCylinder localCollider(anatomy::Stance stance) const = 0;
     virtual bool supportsStance(anatomy::Stance stance) const = 0;
 
    private:
