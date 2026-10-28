@@ -3,9 +3,12 @@
 #include <array>
 #include <cstddef>
 #include <functional>
+#include <memory>
+#include <vector>
 
 #include "world/chunk/core/biome.hpp"
 #include "world/chunk/core/surface.hpp"
+#include "world/obstacle/obstacle.hpp"
 
 namespace robot::world::chunk {
 
@@ -34,6 +37,7 @@ class Chunk {
     using Heights = std::array<float, CHUNK_VERTEX_COUNT * CHUNK_VERTEX_COUNT>;
     using Biomes = std::array<Biome, CHUNK_SIZE * CHUNK_SIZE>;
     using Surfaces = std::array<Surface, CHUNK_SIZE * CHUNK_SIZE>;
+    using Obstacles = std::vector<std::unique_ptr<obstacle::Obstacle>>;
 
     Chunk(ChunkPos pos, Heights heights, Heights waterLevels, Biomes biomes, Surfaces surfaces);
 
@@ -43,12 +47,17 @@ class Chunk {
     Biome biomeAt(int localX, int localZ) const;
     Surface surfaceAt(int localX, int localZ) const;
 
+    void addObstacle(std::unique_ptr<obstacle::Obstacle> obstacle);
+    const Obstacles& obstacles() const { return _obstacles; }
+
    private:
     ChunkPos _pos;
     Heights _heights;
     Heights _waterLevels;
     Biomes _biomes;
     Surfaces _surfaces;
+
+    Obstacles _obstacles;
 };
 
 }  // namespace robot::world::chunk

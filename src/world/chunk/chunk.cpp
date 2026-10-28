@@ -75,4 +75,11 @@ Surface Chunk::surfaceAt(int localX, int localZ) const {
     return _surfaces[index];
 }
 
+void Chunk::addObstacle(std::unique_ptr<obstacle::Obstacle> obstacle) {
+    assert(obstacle != nullptr);
+    assert(obstacle->position().x >= _pos.x * CHUNK_SIZE && obstacle->position().x < (_pos.x + 1) * CHUNK_SIZE);
+    assert(obstacle->position().z >= _pos.z * CHUNK_SIZE && obstacle->position().z < (_pos.z + 1) * CHUNK_SIZE);
+    _obstacles.push_back(std::move(obstacle));
+}
+
 }  // namespace robot::world::chunk
