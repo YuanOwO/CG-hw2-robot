@@ -21,6 +21,8 @@ class ChunkGenerator {
     float heightAt(float worldX, float worldZ) const;
 
    private:
+    Random _random;
+
     BiomeClassifier _biomeClassifier;
     ClimateSampler _climateSampler;
     SurfaceResolver _surfaceResolver;

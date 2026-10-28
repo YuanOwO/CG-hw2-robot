@@ -6,6 +6,7 @@
 #include "geometry/mesh/mesh_builder.hpp"
 #include "graphics/3d/primitives.hpp"
 #include "math/vec3.hpp"
+#include "view/collider_renderer.hpp"
 #include "world/chunk/core/biome.hpp"
 #include "world/chunk/core/surface.hpp"
 
@@ -122,6 +123,11 @@ void ChunkRenderer::render(const ChunkManager& chunks) const {
             it = _meshes.emplace(chunk.pos(), buildMesh(chunk)).first;
         }
         graphics::drawMesh(it->second);
+
+        // 畫出障礙物的碰撞箱
+        for (const auto& obstacle : chunk.obstacles()) {
+            drawCollider(obstacle->collider());
+        }
     });
 }
 
