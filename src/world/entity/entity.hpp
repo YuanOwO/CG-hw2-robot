@@ -6,7 +6,7 @@
 #include "math/random.hpp"
 #include "math/vec3.hpp"
 #include "world/anatomy/stance.hpp"
-#include "world/collision/collision.hpp"
+#include "world/collision/collider.hpp"
 #include "world/entity/brain/brain.hpp"
 #include "world/types.hpp"
 

@@ -2,7 +2,7 @@
 
 #include "math/random.hpp"
 #include "math/vec3.hpp"
-#include "world/collision/collision.hpp"
+#include "world/collision/collider.hpp"
 
 namespace robot::world::obstacle {
 

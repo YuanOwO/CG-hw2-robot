@@ -2,7 +2,7 @@
 
 #include "world/chunk/chunk_manager.hpp"
 #include "world/chunk/core/biome.hpp"
-#include "world/collision/collision.hpp"
+#include "world/collision/collider.hpp"
 #include "world/entity/brain/player_brain.hpp"
 #include "world/entity/entity_manager.hpp"
 #include "world/entity/robot.hpp"

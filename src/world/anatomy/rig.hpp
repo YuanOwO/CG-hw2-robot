@@ -9,7 +9,7 @@
 #include "world/anatomy/bone.hpp"
 #include "world/anatomy/pose.hpp"
 #include "world/anatomy/stance.hpp"
-#include "world/collision/collision.hpp"
+#include "world/collision/collider.hpp"
 
 namespace robot::world::anatomy {
 

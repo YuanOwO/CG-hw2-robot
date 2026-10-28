@@ -1,6 +1,6 @@
 #pragma once
 
-#include "world/collision/collision.hpp"
+#include "world/collision/collider.hpp"
 
 namespace robot::view {
 

@@ -7,7 +7,7 @@
 #include "math/vec3.hpp"
 #include "world/anatomy/joint.hpp"
 #include "world/anatomy/types.hpp"
-#include "world/collision/collision.hpp"
+#include "world/collision/collider.hpp"
 
 namespace robot::world::anatomy {
 

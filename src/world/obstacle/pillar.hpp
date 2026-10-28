@@ -1,7 +1,7 @@
 #pragma once
 
 #include "math/vec3.hpp"
-#include "world/collision/collision.hpp"
+#include "world/collision/collider.hpp"
 #include "world/obstacle/obstacle.hpp"
 
 namespace robot::world::obstacle {
