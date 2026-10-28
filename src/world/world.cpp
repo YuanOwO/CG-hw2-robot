@@ -41,7 +41,7 @@ Vec3 World::spawnPosition() const {
         }
 
         int direction = ++count % 4;
-        float step = random.uniformFloat(random.valueAt1D(count), 1.0f, 5.0f) * static_cast<float>(count);
+        float step = Random::uniformFloat(random.valueAt1D(count), 1.0f, 5.0f) * static_cast<float>(count);
         if (direction == 0) {
             z += step;
         } else if (direction == 1) {
