@@ -1,5 +1,6 @@
 #include "math/mat4.hpp"
 
+#include <algorithm>
 #include <cmath>
 
 #include "math/utils.hpp"
@@ -78,10 +79,6 @@ Mat4 scale(float sx, float sy, float sz) {
     result.at(1, 1) = sy;
     result.at(2, 2) = sz;
     return result;
-}
-
-Mat4 scale(float s) {
-    return scale(s, s, s);
 }
 
 Vec3 transformPoint(const Mat4& mat, const Vec3& point) {

@@ -221,7 +221,7 @@ float Perlin3D::fbm(float x, float y, float z, int octaves, float lacunarity, fl
     float amplitude = 1.0f;
     float amplitudeSquaredSum = 0.0f;
 
-    const Mat4 trans = ROTATION_3D * scale(lacunarity);
+    const Mat4 trans = ROTATION_3D * scale(lacunarity, lacunarity, lacunarity);
 
     for (int i = 0; i < octaves; i++) {
         sum += noise(x + offset, y + offset, z + offset) * amplitude;
