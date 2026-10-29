@@ -7,7 +7,7 @@
 #include <utility>
 
 #include "math/utils.hpp"
-#include "world/constants.hpp"
+#include "world/physics/constants.hpp"
 #include "world/world.hpp"
 
 namespace robot::world::entity {
@@ -27,13 +27,13 @@ void Entity::tick(float dt, const World& world) {
         _yaw = _look.yaw;  // 身體朝向與視線一致
     }
 
-    Motion motion;
+    physics::Motion motion;
     motion.velocity = _velocity;  // 初速度為目前速度
     motion = drift(motion, world, dt);
     motion = steer(motion, intent, dt);
 
     motion.displacement = motion.velocity * dt;  // 位移 = 速度 * 時間
-    auto result = world.resolveMotion(collider(), motion, _onGround);
+    auto result = world.physics().resolve(collider(), motion, _onGround);
     applyMotion(result, dt);
 
     _age++;
@@ -51,19 +51,19 @@ collision::UprightCylinder Entity::collider() const {
 }
 
 float Entity::jumpSpeed() const {
-    return std::sqrt(2.0f * GRAVITY * jumpHeight());
+    return std::sqrt(2.0f * physics::GRAVITY * jumpHeight());
 }
 
-Motion Entity::drift(Motion motion, const World& world, float dt) {
+physics::Motion Entity::drift(physics::Motion motion, const World& world, float dt) {
     // 受重力影響
     if (!_onGround) {
-        motion.velocity.y -= GRAVITY * dt;
+        motion.velocity.y -= physics::GRAVITY * dt;
     }
 
     return motion;
 }
 
-Motion Entity::steer(Motion motion, const brain::Intent& intent, float dt) {
+physics::Motion Entity::steer(physics::Motion motion, const brain::Intent& intent, float dt) {
     if (_stance.changing()) {
         // 轉換姿勢時不允許移動
         return motion;
@@ -105,7 +105,7 @@ Motion Entity::steer(Motion motion, const brain::Intent& intent, float dt) {
     return motion;
 }
 
-void Entity::applyMotion(const MotionResult& motionResult, float dt) {
+void Entity::applyMotion(const physics::MotionResult& motionResult, float dt) {
     _position += motionResult.motion.displacement;
     _velocity = motionResult.motion.velocity;
     _onGround = motionResult.onGround;

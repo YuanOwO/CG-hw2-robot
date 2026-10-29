@@ -8,6 +8,7 @@
 #include "world/anatomy/stance.hpp"
 #include "world/collision/collider.hpp"
 #include "world/entity/brain/brain.hpp"
+#include "world/physics/motion.hpp"
 #include "world/types.hpp"
 
 namespace robot::world::entity {
@@ -61,9 +62,9 @@ class Entity {
 
     std::unique_ptr<brain::Brain> _brain;
 
-    Motion drift(Motion motion, const World& world, float dt);           /// 受外力影響的速度與位移
-    Motion steer(Motion motion, const brain::Intent& intent, float dt);  /// 依 intent 產生速度與位移
-    void applyMotion(const MotionResult& motionResult, float dt);
+    physics::Motion drift(physics::Motion motion, const World& world, float dt);           /// 受外力影響的速度與位移
+    physics::Motion steer(physics::Motion motion, const brain::Intent& intent, float dt);  /// 依 intent 產生速度與位移
+    void applyMotion(const physics::MotionResult& motionResult, float dt);
 };
 
 }  // namespace robot::world::entity
