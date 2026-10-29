@@ -31,8 +31,6 @@ const Mat4 ROTATION_3D = Mat4({
     {0.0f,   0.0f,   0.0f,   1.0f},
 });
 
-constexpr float SQRT_2 = 1.4142135623730950488f;
-
 // 只用 8 個方向時，單一 octave 就看得出 45° 紋路；16 個已幾乎看不出。
 // 預先建表，取樣時就不必計算三角函數。單位向量使內插結果的範圍約為 [-0.71, 0.71]
 const auto GRADIENTS_2D = [] {
