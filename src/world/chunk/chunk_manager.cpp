@@ -54,6 +54,16 @@ float ChunkManager::heightAt(float worldX, float worldZ) const {
     return _generator.heightAt(worldX, worldZ);
 }
 
+Vec3 ChunkManager::normalAt(float worldX, float worldZ) const {
+    const ChunkPos pos = ChunkPos::containing(worldX, worldZ);
+    const Chunk* chunk = chunkAt(pos);
+    if (chunk) {
+        // 如果該 chunk 已載入，就直接用它的法線資料
+        return chunk->normalAt(worldX, worldZ);
+    }
+    return Vec3(0.0f, 1.0f, 0.0f);  // 預設法線向上
+}
+
 const Biome ChunkManager::biomeAt(float worldX, float worldZ) const {
     const ChunkPos pos = ChunkPos::containing(worldX, worldZ);
     const Chunk* chunk = chunkAt(pos);

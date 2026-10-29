@@ -24,6 +24,7 @@ class ChunkManager {
     const Chunk* chunkAt(ChunkPos pos) const;  // 沒載入就回傳 nullptr
 
     float heightAt(float worldX, float worldZ) const;
+    Vec3 normalAt(float worldX, float worldZ) const;
     const Biome biomeAt(float worldX, float worldZ) const;
 
     void forEach(ChunkHandler&& visit) const {

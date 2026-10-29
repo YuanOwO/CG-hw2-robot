@@ -57,6 +57,35 @@ float Chunk::heightAt(float worldX, float worldZ) const {
     }
 }
 
+Vec3 Chunk::normalAt(float worldX, float worldZ) const {
+    float localX = worldX - _pos.x * CHUNK_SIZE;
+    float localZ = worldZ - _pos.z * CHUNK_SIZE;
+
+    // 計算所在的格子
+    int cellX = std::clamp(static_cast<int>(std::floor(localX)), 0, CHUNK_SIZE - 1);
+    int cellZ = std::clamp(static_cast<int>(std::floor(localZ)), 0, CHUNK_SIZE - 1);
+
+    float fracX = localX - cellX;  // [0, 1]
+    float fracZ = localZ - cellZ;  // [0, 1]
+
+    // 取得四個頂點的高度
+    Vec3 v00(0.0f, vertexHeight(cellX, cellZ), 0.0f);
+    Vec3 v01(0.0f, vertexHeight(cellX, cellZ + 1), 1.0f);
+    Vec3 v11(1.0f, vertexHeight(cellX + 1, cellZ + 1), 1.0f);
+    Vec3 v10(1.0f, vertexHeight(cellX + 1, cellZ), 0.0f);
+
+    Vec3 normal;
+    if (fracX <= fracZ) {
+        // 在 v00, v01, v11 的平面上
+        normal = cross(v01 - v00, v11 - v01);
+    } else {
+        // 在 v00, v11, v10 的平面上
+        normal = cross(v11 - v10, v10 - v00);
+    }
+
+    return normalize(normal);
+}
+
 float Chunk::vertexHeight(int localX, int localZ) const {
     assert(localX >= 0 && localX < CHUNK_VERTEX_COUNT && localZ >= 0 && localZ < CHUNK_VERTEX_COUNT);
     std::size_t index = static_cast<std::size_t>(localZ * CHUNK_VERTEX_COUNT + localX);

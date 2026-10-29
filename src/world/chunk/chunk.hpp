@@ -43,6 +43,7 @@ class Chunk {
 
     ChunkPos pos() const { return _pos; }
     float heightAt(float worldX, float worldZ) const;
+    Vec3 normalAt(float worldX, float worldZ) const;
     float vertexHeight(int localX, int localZ) const;
     Biome biomeAt(int localX, int localZ) const;
     Surface surfaceAt(int localX, int localZ) const;
