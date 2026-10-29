@@ -10,7 +10,7 @@ namespace robot::world::collision {
 
 std::optional<Contact> detect(const UprightCylinder& player, const UprightBox& obstacle) {
     // 先檢查垂直方向上是否有重疊
-    if (player.topY() <= obstacle.bottomY() || player.bottomY() >= obstacle.topY()) {
+    if (player.topY() < obstacle.bottomY() || player.bottomY() > obstacle.topY()) {
         return std::nullopt;  // 沒有垂直重疊，沒有碰撞
     }
 
@@ -25,7 +25,7 @@ std::optional<Contact> detect(const UprightCylinder& player, const UprightBox& o
     float dz = closestZ - d.z;
     float distance = std::hypot(dx, dz);
 
-    if (distance >= player.radius()) {
+    if (distance > player.radius()) {
         return std::nullopt;  // 沒有水平重疊，沒有碰撞
     }
 
@@ -77,7 +77,7 @@ std::optional<Contact> detect(const UprightCylinder& player, const UprightCylind
     const float top = std::min(player.topY(), obstacle.topY());
     const float verticalDepth = top - bottom;
 
-    if (verticalDepth <= 0.0f) {
+    if (verticalDepth < 0.0f) {
         return std::nullopt;  // 沒有垂直重疊，沒有碰撞
     }
 
@@ -85,7 +85,7 @@ std::optional<Contact> detect(const UprightCylinder& player, const UprightCylind
     const float rho = std::hypot(d.x, d.z);
     const float horizontalDepth = player.radius() + obstacle.radius() - rho;
 
-    if (horizontalDepth <= 0.0f) {
+    if (horizontalDepth < 0.0f) {
         return std::nullopt;  // 沒有水平重疊，沒有碰撞
     }
 
@@ -113,8 +113,8 @@ std::optional<Contact> detect(const UprightCylinder& player, const UprightCylind
 
 std::optional<Contact> detect(const UprightCylinder& player, const Sphere& obstacle) {
     // 先檢查垂直方向上是否有重疊
-    if (player.topY() <= obstacle.center().y - obstacle.radius() ||
-        player.bottomY() >= obstacle.center().y + obstacle.radius()) {
+    if (player.topY() < obstacle.center().y - obstacle.radius() ||
+        player.bottomY() > obstacle.center().y + obstacle.radius()) {
         return std::nullopt;  // 沒有垂直重疊，沒有碰撞
     }
 
@@ -133,7 +133,7 @@ std::optional<Contact> detect(const UprightCylinder& player, const Sphere& obsta
     const Vec3 delta = obstacle.center() - closestPoint;
     const float distance = length(delta);
 
-    if (distance >= obstacle.radius()) {
+    if (distance > obstacle.radius()) {
         return std::nullopt;  // 沒有碰撞
     }
 
