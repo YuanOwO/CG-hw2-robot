@@ -39,6 +39,7 @@ class Entity {
 
     virtual float mass() const = 0;        /// 質量，單位 kg
     virtual float jumpHeight() const = 0;  /// 起跳高度，單位 m
+    virtual float sneakSpeed() const = 0;  /// 潛行速度，單位 m/s
     virtual float walkSpeed() const = 0;   /// 走路速度，單位 m/s
     virtual float runSpeed() const = 0;    /// 跑步速度，單位 m/s
     float jumpSpeed() const;               /// 起跳速度，單位 m/s

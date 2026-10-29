@@ -14,6 +14,7 @@ class Robot final : public Entity {
    protected:
     float mass() const override { return 70.0f; }
     float jumpHeight() const override { return 0.5f; }
+    float sneakSpeed() const override { return 0.6f; }
     float walkSpeed() const override { return 1.2f; }
     float runSpeed() const override { return 10.0f; }
 

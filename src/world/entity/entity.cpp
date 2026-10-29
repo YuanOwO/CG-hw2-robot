@@ -27,6 +27,10 @@ void Entity::tick(float dt, const World& world) {
         _yaw = _look.yaw;  // 身體朝向與視線一致
     }
 
+    if (intent.stance.has_value() && supportsStance(intent.stance.value())) {
+        _stance.to = intent.stance.value();
+    }
+
     physics::Motion motion;
     motion.velocity = _velocity;  // 初速度為目前速度
     motion = drift(motion, world, dt);
@@ -69,14 +73,23 @@ physics::Motion Entity::steer(physics::Motion motion, const brain::Intent& inten
         return motion;
     }
 
-    if (_stance.to != anatomy::Stance::Standing) {
-        // 非站立姿勢不允許移動
+    float speed = 0.0f;  // 依 stance 與 intent 計算目標速度
+
+    if (_stance.to == anatomy::Stance::Standing) {
+        // 站立姿勢才允許走路或跑步
+        speed = intent.run ? runSpeed() : walkSpeed();
+    } else if (_stance.to == anatomy::Stance::Sneaking) {
+        // 潛行姿勢才允許潛行
+        speed = sneakSpeed();
+    }
+
+    if (speed <= 0.0f) {
+        // 沒有速度就不需要計算方向
         return motion;
     }
 
-    float radYaw = radians(_look.yaw);
-    Vec3 ahead(std::sin(radYaw), 0.0f, std::cos(radYaw));
-    Vec3 right(-std::cos(radYaw), 0.0f, std::sin(radYaw));
+    Vec3 ahead = rotateAroundY(Vec3(0.0f, 0.0f, 1.0f), _look.yaw);
+    Vec3 right = rotateAroundY(Vec3(-1.0f, 0.0f, 0.0f), _look.yaw);
 
     float surge = std::clamp(intent.surge, -1.0f, 1.0f);
     float sway = std::clamp(intent.sway, -1.0f, 1.0f);
@@ -87,8 +100,6 @@ physics::Motion Entity::steer(physics::Motion motion, const brain::Intent& inten
     if (amount > 1.0f) {
         direction /= amount;
     }
-
-    float speed = intent.sprint ? runSpeed() : walkSpeed();
 
     Vec3 targetVelocity = direction * speed;
 

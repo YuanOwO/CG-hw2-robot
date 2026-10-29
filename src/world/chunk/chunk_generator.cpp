@@ -102,7 +102,7 @@ std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
 
     auto chunk = std::make_unique<Chunk>(pos, heights, waterLevels, biomes, surfaces);
 
-    if (chunk->surfaceAt(3, 3) != Surface::Water) {
+    if (chunk->surfaceAt(3, 3) != Surface::Water && chunk->surfaceAt(3, 3) != Surface::Ice) {
         float blockX = static_cast<float>(originX) + 3.0f;
         float blockZ = static_cast<float>(originZ) + 3.0f;
         Vec3 blockPosition(blockX, chunk->heightAt(blockX, blockZ), blockZ);
@@ -111,25 +111,25 @@ std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
         Random blockRandom(blockSeed);
         float blockYaw = Random::uniformFloat(blockRandom.valueAt(fnv1a32("BLOCK_YAW")), 0.0f, 360.0f);
         Vec3 blockSize(Random::uniformFloat(blockRandom.valueAt(fnv1a32("BLOCK_SIZE_X")), 0.5f, 2.0f),
-                       Random::uniformFloat(blockRandom.valueAt(fnv1a32("BLOCK_SIZE_Y")), 0.5f, 2.0f),
+                       Random::uniformFloat(blockRandom.valueAt(fnv1a32("BLOCK_SIZE_Y")), 0.1f, 1.0f),
                        Random::uniformFloat(blockRandom.valueAt(fnv1a32("BLOCK_SIZE_Z")), 0.5f, 2.0f));
 
         chunk->addObstacle(std::make_unique<obstacle::Block>(blockSeed, blockPosition, blockYaw, blockSize));
     }
 
-    if (chunk->surfaceAt(8, 8) != Surface::Water) {
+    if (chunk->surfaceAt(8, 8) != Surface::Water && chunk->surfaceAt(8, 8) != Surface::Ice) {
         float ballX = static_cast<float>(originX) + 8.0f;
         float ballZ = static_cast<float>(originZ) + 8.0f;
         Vec3 ballPosition(ballX, chunk->heightAt(ballX, ballZ), ballZ);
 
         auto ballSeed = _random.valueAt2D(ballX, ballZ, fnv1a32("OBSTACLE_BALL"));
         Random ballRandom(ballSeed);
-        float ballRadius = Random::uniformFloat(ballRandom.valueAt(fnv1a32("SPHERE_RADIUS")), 0.5f, 2.0f);
+        float ballRadius = Random::uniformFloat(ballRandom.valueAt(fnv1a32("SPHERE_RADIUS")), 0.1f, 1.0f);
 
         chunk->addObstacle(std::make_unique<obstacle::Ball>(ballSeed, ballPosition, ballRadius));
     }
 
-    if (chunk->surfaceAt(13, 13) != Surface::Water) {
+    if (chunk->surfaceAt(13, 13) != Surface::Water && chunk->surfaceAt(13, 13) != Surface::Ice) {
         float pillarX = static_cast<float>(originX) + 13.0f;
         float pillarZ = static_cast<float>(originZ) + 13.0f;
         Vec3 pillarPosition(pillarX, chunk->heightAt(pillarX, pillarZ), pillarZ);
@@ -137,7 +137,7 @@ std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
         auto pillarSeed = _random.valueAt2D(pillarX, pillarZ, fnv1a32("OBSTACLE_PILLAR"));
         Random pillarRandom(pillarSeed);
         float pillarRadius = Random::uniformFloat(pillarRandom.valueAt(fnv1a32("PILLAR_RADIUS")), 0.5f, 1.5f);
-        float pillarHeight = Random::uniformFloat(pillarRandom.valueAt(fnv1a32("PILLAR_HEIGHT")), 2.0f, 5.0f);
+        float pillarHeight = Random::uniformFloat(pillarRandom.valueAt(fnv1a32("PILLAR_HEIGHT")), 0.1f, 1.0f);
 
         chunk->addObstacle(std::make_unique<obstacle::Pillar>(pillarSeed, pillarPosition, pillarRadius, pillarHeight));
     }

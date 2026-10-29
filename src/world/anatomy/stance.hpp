@@ -6,7 +6,7 @@ namespace robot::world::anatomy {
 
 enum class Stance {
     Standing,
-    Kneeling,
+    Sneaking,
     Sitting,
 
     Count
