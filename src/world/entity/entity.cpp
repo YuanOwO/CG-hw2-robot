@@ -1,19 +1,17 @@
 #include "world/entity/entity.hpp"
 
 #include <algorithm>
-#include <cmath>
 #include <optional>
 #include <stdexcept>
 #include <utility>
 
 #include "math/utils.hpp"
-#include "world/physics/constants.hpp"
 #include "world/world.hpp"
 
 namespace robot::world::entity {
 
-Entity::Entity(EntityId id, Seed seed, Vec3 position, std::unique_ptr<brain::Brain> brain)
-    : _id(id), _seed(seed), _random(seed), _position(position), _brain(std::move(brain)) {
+Entity::Entity(EntityId id, Seed seed, float mass, Vec3 position, std::unique_ptr<brain::Brain> brain)
+    : _id(id), _seed(seed), _random(seed), _rigidBody(mass, position), _brain(std::move(brain)) {
     if (_brain == nullptr) {
         throw std::invalid_argument("Entity requires a brain");
     }
@@ -31,14 +29,8 @@ void Entity::tick(float dt, const World& world) {
         _stance.to = intent.stance.value();
     }
 
-    physics::Motion motion;
-    motion.velocity = _velocity;  // 初速度為目前速度
-    motion = drift(motion, world, dt);
-    motion = steer(motion, intent, dt);
-
-    motion.displacement = motion.velocity * dt;  // 位移 = 速度 * 時間
-    auto result = world.physics().resolve(collider(), motion, _onGround);
-    applyMotion(result, dt);
+    auto driveInput = steer(intent);
+    world.physics().simulate(_rigidBody, collider(), driveInput, dt);
 
     _age++;
 }
@@ -51,26 +43,13 @@ collision::UprightCylinder Entity::collider() const {
     // localCollider 的 baseCenter 是以腳底為原點的，所以要加上腳底位置
     collision::UprightCylinder local(lerp(from.baseCenter(), to.baseCenter(), t), lerp(from.radius(), to.radius(), t),
                                      lerp(from.height(), to.height(), t));
-    return local.translated(_position);
+    return local.translated(_rigidBody.position());  // 轉換到世界座標
 }
 
-float Entity::jumpSpeed() const {
-    return std::sqrt(2.0f * physics::GRAVITY * jumpHeight());
-}
-
-physics::Motion Entity::drift(physics::Motion motion, const World& world, float dt) {
-    // 受重力影響
-    if (!_onGround) {
-        motion.velocity.y -= physics::GRAVITY * dt;
-    }
-
-    return motion;
-}
-
-physics::Motion Entity::steer(physics::Motion motion, const brain::Intent& intent, float dt) {
+physics::DriveInput Entity::steer(const brain::Intent& intent) {
     if (_stance.changing()) {
         // 轉換姿勢時不允許移動
-        return motion;
+        return {};
     }
 
     float speed = 0.0f;  // 依 stance 與 intent 計算目標速度
@@ -85,7 +64,7 @@ physics::Motion Entity::steer(physics::Motion motion, const brain::Intent& inten
 
     if (speed <= 0.0f) {
         // 沒有速度就不需要計算方向
-        return motion;
+        return {};
     }
 
     Vec3 ahead = rotateAroundY(Vec3(0.0f, 0.0f, 1.0f), _look.yaw);
@@ -103,23 +82,14 @@ physics::Motion Entity::steer(physics::Motion motion, const brain::Intent& inten
 
     Vec3 targetVelocity = direction * speed;
 
-    if (_onGround) {
-        // 先假設地面摩擦力足夠大，能立即將速度調整到目標速度
-        motion.velocity.x = targetVelocity.x;
-        motion.velocity.z = targetVelocity.z;
+    physics::DriveInput driveInput;
+    driveInput.targetVelocity = targetVelocity;
 
-        if (intent.jump) {
-            motion.velocity.y = jumpSpeed();
-        }
+    if (intent.jump) {
+        driveInput.jumpHeight = jumpHeight();
     }
 
-    return motion;
-}
-
-void Entity::applyMotion(const physics::MotionResult& motionResult, float dt) {
-    _position += motionResult.motion.displacement;
-    _velocity = motionResult.motion.velocity;
-    _onGround = motionResult.onGround;
+    return driveInput;
 }
 
 }  // namespace robot::world::entity

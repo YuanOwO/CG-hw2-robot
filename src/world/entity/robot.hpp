@@ -12,11 +12,10 @@ class Robot final : public Entity {
     Robot(EntityId id, Seed seed, Vec3 position, std::unique_ptr<brain::Brain> brain);
 
    protected:
-    float mass() const override { return 70.0f; }
-    float jumpHeight() const override { return 0.5f; }
-    float sneakSpeed() const override { return 0.6f; }
-    float walkSpeed() const override { return 1.2f; }
-    float runSpeed() const override { return 10.0f; }
+    float jumpHeight() const override;
+    float sneakSpeed() const override;
+    float walkSpeed() const override;
+    float runSpeed() const override;
 
     collision::UprightCylinder localCollider(anatomy::Stance stance) const override;
     bool supportsStance(anatomy::Stance stance) const override;

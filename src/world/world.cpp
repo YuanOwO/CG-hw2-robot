@@ -19,7 +19,7 @@ World::World(Seed seed)
     : _seed(seed),
       _chunkManager(deriveSeed(seed, CHUNK_SEED_STREAM)),
       _entityManager(deriveSeed(seed, ENTITY_SEED_STREAM)),
-      _motionSolver(_chunkManager) {}
+      _simulator(_chunkManager) {}
 
 void World::tick(float dt) {
     _entityManager.tick(dt, *this);

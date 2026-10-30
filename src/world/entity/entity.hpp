@@ -9,6 +9,7 @@
 #include "world/collision/collider.hpp"
 #include "world/entity/brain/brain.hpp"
 #include "world/physics/motion.hpp"
+#include "world/physics/rigid_body.hpp"
 #include "world/types.hpp"
 
 namespace robot::world::entity {
@@ -24,25 +25,25 @@ class Entity {
     const Random& random() const { return _random; }
     std::uint32_t age() const { return _age; }  ///< 已經走過幾個 tick
 
-    const Vec3& position() const { return _position; }  ///< 腳底
-    float yaw() const { return _yaw; }                  ///< 身體朝向，方向定義與 Look::yaw 相同
-    const Vec3& velocity() const { return _velocity; }
+    float yaw() const { return _yaw; }  ///< 身體朝向，方向定義與 Look::yaw 相同
     const Look& look() const { return _look; }
-    bool onGround() const { return _onGround; }
+
+    const Vec3& position() const { return _rigidBody.position(); }
+    const Vec3& velocity() const { return _rigidBody.velocity(); }
+    bool onGround() const { return _rigidBody.onGround(); }
+
     const anatomy::StanceTransition& stance() const { return _stance; }
 
     /// 世界座標的碰撞箱；stance 過渡中依進度內插
     collision::UprightCylinder collider() const;
 
    protected:
-    Entity(EntityId id, Seed seed, Vec3 position, std::unique_ptr<brain::Brain> brain);
+    Entity(EntityId id, Seed seed, float mass, Vec3 position, std::unique_ptr<brain::Brain> brain);
 
-    virtual float mass() const = 0;        /// 質量，單位 kg
     virtual float jumpHeight() const = 0;  /// 起跳高度，單位 m
     virtual float sneakSpeed() const = 0;  /// 潛行速度，單位 m/s
     virtual float walkSpeed() const = 0;   /// 走路速度，單位 m/s
     virtual float runSpeed() const = 0;    /// 跑步速度，單位 m/s
-    float jumpSpeed() const;               /// 起跳速度，單位 m/s
 
     /// 以腳底為原點的碰撞箱
     virtual collision::UprightCylinder localCollider(anatomy::Stance stance) const = 0;
@@ -54,18 +55,15 @@ class Entity {
     Random _random;
     std::uint32_t _age = 0;
 
-    Vec3 _position;
     float _yaw = 0.0f;
-    Vec3 _velocity;
     Look _look;
-    bool _onGround = false;
     anatomy::StanceTransition _stance;
+    physics::RigidBody _rigidBody;
 
     std::unique_ptr<brain::Brain> _brain;
 
-    physics::Motion drift(physics::Motion motion, const World& world, float dt);           /// 受外力影響的速度與位移
-    physics::Motion steer(physics::Motion motion, const brain::Intent& intent, float dt);  /// 依 intent 產生速度與位移
-    void applyMotion(const physics::MotionResult& motionResult, float dt);
+    /// 依 intent 計算目標速度
+    physics::DriveInput steer(const brain::Intent& intent);
 };
 
 }  // namespace robot::world::entity

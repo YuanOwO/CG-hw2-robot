@@ -5,7 +5,7 @@
 #include "world/entity/brain/player_brain.hpp"
 #include "world/entity/entity_manager.hpp"
 #include "world/entity/robot.hpp"
-#include "world/physics/motion_solver.hpp"
+#include "world/physics/simulator.hpp"
 #include "world/types.hpp"
 
 namespace robot::world {
@@ -25,13 +25,13 @@ class World {
     const chunk::ChunkManager& chunks() const { return _chunkManager; }
     entity::EntityManager& entities() { return _entityManager; }
     const entity::EntityManager& entities() const { return _entityManager; }
-    const physics::MotionSolver& physics() const { return _motionSolver; }
+    const physics::Simulator& physics() const { return _simulator; }
 
    private:
     Seed _seed;
     chunk::ChunkManager _chunkManager;
     entity::EntityManager _entityManager;
-    physics::MotionSolver _motionSolver;
+    physics::Simulator _simulator;
 };
 
 }  // namespace robot::world
