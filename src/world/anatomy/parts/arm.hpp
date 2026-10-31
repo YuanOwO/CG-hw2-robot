@@ -67,7 +67,7 @@ class Arm final : public Part {
     }
 
    protected:
-    void onAttach(RigBuilder& builder, Socket socket) override {
+    void onAttach(SkeletonBuilder& builder, Socket socket) override {
         Vec3 shoulderOffset(_armSpec.upperArmSize.x * 0.5f * sideSign(_side), 0.0f, 0.0f);
         collision::UprightBox upperArmBox(Vec3(0.0f, -_armSpec.upperArmSize.y, 0.0f), _armSpec.upperArmSize, 0.0f);
         BoneSpec upperArmSpec{Joint(_armSpec.shoulderYaw, _armSpec.shoulderPitch, _armSpec.shoulderRoll), upperArmBox,

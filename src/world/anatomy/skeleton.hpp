@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <cstddef>
 #include <string_view>
 #include <vector>
@@ -8,19 +7,17 @@
 #include "math/mat4.hpp"
 #include "world/anatomy/bone.hpp"
 #include "world/anatomy/pose.hpp"
-#include "world/anatomy/stance.hpp"
-#include "world/collision/collider.hpp"
 
 namespace robot::world::anatomy {
 
-class Rig {
-    friend class RigBuilder;
+class Skeleton {
+    friend class SkeletonBuilder;
 
    public:
-    Rig(const Rig&) = delete;
-    Rig& operator=(const Rig&) = delete;
-    Rig(Rig&&) = default;
-    Rig& operator=(Rig&&) = default;
+    Skeleton(const Skeleton&) = delete;
+    Skeleton& operator=(const Skeleton&) = delete;
+    Skeleton(Skeleton&&) = default;
+    Skeleton& operator=(Skeleton&&) = default;
 
     std::size_t boneCount() const { return _bones.size(); }
     const Bone& bone(BoneIndex index) const { return _bones.at(index); }
@@ -30,22 +27,16 @@ class Rig {
     std::size_t markerCount() const { return _markers.size(); }
     const Marker& marker(std::size_t index) const { return _markers.at(index); }
 
-    // const Pose& stancePose(Stance stance) const;
-    // const collision::UprightCylinder& stanceCollider(Stance stance) const;
-
     void clampPose(Pose& pose) const;
 
     std::vector<Mat4> transforms(Pose pose) const;
 
    private:
-    Rig() = default;
+    Skeleton() = default;
 
     std::vector<Bone> _bones;
     std::vector<std::vector<BoneIndex>> _children;
     std::vector<Marker> _markers;
-
-    // std::array<Pose, STANCE_COUNT> _stanceAngles;
-    // std::array<collision::UprightCylinder, STANCE_COUNT> _stanceColliders;
 };
 
 }  // namespace robot::world::anatomy

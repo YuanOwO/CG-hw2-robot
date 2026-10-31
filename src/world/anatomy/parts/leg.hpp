@@ -69,7 +69,7 @@ class Leg final : public Part {
     }
 
    protected:
-    void onAttach(RigBuilder& builder, Socket socket) override {
+    void onAttach(SkeletonBuilder& builder, Socket socket) override {
         collision::UprightBox thighBox(Vec3(0.0f, -_legSpec.thighSize.y, 0.0f), _legSpec.thighSize, 0.0f);
         BoneSpec thighSpec{Joint(_legSpec.hipYaw, _legSpec.hipPitch, _legSpec.hipRoll), thighBox, _legSpec.thighMesh};
 

@@ -1,4 +1,4 @@
-#include "world/anatomy/rig.hpp"
+#include "world/anatomy/skeleton.hpp"
 
 #include <stdexcept>
 
@@ -6,7 +6,7 @@
 
 namespace robot::world::anatomy {
 
-BoneIndex Rig::findBone(std::string_view name) const {
+BoneIndex Skeleton::findBone(std::string_view name) const {
     for (BoneIndex i = 0; i < boneCount(); i++) {
         if (_bones[i].name() == name) {
             return i;
@@ -15,17 +15,9 @@ BoneIndex Rig::findBone(std::string_view name) const {
     return NO_BONE;
 }
 
-// const Pose& Rig::stancePose(Stance stance) const {
-//     return _stanceAngles.at(static_cast<std::size_t>(stance));
-// }
-
-// const collision::UprightCylinder& Rig::stanceCollider(Stance stance) const {
-//     return _stanceColliders.at(static_cast<std::size_t>(stance));
-// }
-
-void Rig::clampPose(Pose& pose) const {
+void Skeleton::clampPose(Pose& pose) const {
     if (pose.boneCount() != boneCount()) {
-        throw std::invalid_argument("Pose bone count does not match rig bone count");
+        throw std::invalid_argument("Pose bone count does not match skeleton bone count");
     }
 
     for (BoneIndex i = 0; i < boneCount(); i++) {
@@ -38,14 +30,16 @@ void Rig::clampPose(Pose& pose) const {
     }
 }
 
-std::vector<Mat4> Rig::transforms(Pose pose) const {
+std::vector<Mat4> Skeleton::transforms(Pose pose) const {
     if (pose.boneCount() != boneCount()) {
-        throw std::invalid_argument("Pose bone count does not match rig bone count");
+        throw std::invalid_argument("Pose bone count does not match skeleton bone count");
     }
 
     clampPose(pose);
 
     std::vector<Mat4> ret(boneCount());
+
+    ret[0] = translation(pose.rootOffset());
 
     for (BoneIndex i = 1; i < boneCount(); i++) {
         const Bone& bone = _bones[i];

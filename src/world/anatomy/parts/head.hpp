@@ -35,7 +35,7 @@ class Head final : public Part {
     }
 
    protected:
-    void onAttach(RigBuilder& builder, Socket socket) override {
+    void onAttach(SkeletonBuilder& builder, Socket socket) override {
         collision::UprightBox headBox(Vec3(), _headSpec.size, 0.0f);
         BoneSpec headBoneSpec{Joint(_headSpec.yaw, _headSpec.pitch, JointLimits()), headBox, _headSpec.headMesh};
         _head = builder.addBone(Bone(name(), socket.bone, socket.offset, headBoneSpec));

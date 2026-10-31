@@ -6,7 +6,7 @@
 
 namespace robot::world::anatomy {
 
-class RigBuilder;
+class SkeletonBuilder;
 
 class Part {
    public:
@@ -21,13 +21,13 @@ class Part {
 
     AttachState state() const { return _state; }
 
-    void attachTo(RigBuilder& builder, Socket socket);
+    void attachTo(SkeletonBuilder& builder, Socket socket);
     const std::string& name() const { return _name; }
 
    protected:
     Part(const std::string& name) : _name(name), _state(AttachState::Detached) {}
 
-    virtual void onAttach(RigBuilder& builder, Socket socket) = 0;
+    virtual void onAttach(SkeletonBuilder& builder, Socket socket) = 0;
 
     void requireAttached() const;
 

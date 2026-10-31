@@ -6,7 +6,7 @@
 
 namespace robot::world::anatomy {
 
-void Part::attachTo(RigBuilder& builder, Socket socket) {
+void Part::attachTo(SkeletonBuilder& builder, Socket socket) {
     if (_state != AttachState::Detached) {
         throw std::logic_error("Part cannot be attached again");
     }

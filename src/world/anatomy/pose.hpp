@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <vector>
 
+#include "math/utils.hpp"
 #include "world/anatomy/joint.hpp"
 #include "world/anatomy/types.hpp"
 
@@ -16,6 +17,9 @@ class Pose {
 
     std::size_t boneCount() const { return _joints.size(); }
 
+    Vec3& rootOffset() { return _rootOffset; }
+    const Vec3& rootOffset() const { return _rootOffset; }
+
     JointAngles& operator[](const BoneIndex index) { return _joints.at(index); }
     const JointAngles& operator[](const BoneIndex index) const { return _joints.at(index); }
 
@@ -26,6 +30,7 @@ class Pose {
         }
 
         Pose result(a.boneCount());
+        result.rootOffset() = lerp(a.rootOffset(), b.rootOffset(), t);
         for (std::size_t i = 0; i < a.boneCount(); ++i) {
             result[i] = JointAngles::blend(a[i], b[i], t);
         }
@@ -33,6 +38,7 @@ class Pose {
     }
 
    private:
+    Vec3 _rootOffset;
     std::vector<JointAngles> _joints;
 };
 

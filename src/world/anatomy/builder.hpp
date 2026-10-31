@@ -2,17 +2,17 @@
 
 #include "math/vec3.hpp"
 #include "world/anatomy/bone.hpp"
-#include "world/anatomy/rig.hpp"
+#include "world/anatomy/skeleton.hpp"
 #include "world/anatomy/types.hpp"
 
 namespace robot::world::anatomy {
 
 class Part;
 
-class RigBuilder {
+class SkeletonBuilder {
    public:
-    RigBuilder(const Vec3& rootOffset = Vec3(0.0f, 0.0f, 0.0f));
-    ~RigBuilder() = default;
+    SkeletonBuilder(const Vec3& rootOffset = Vec3(0.0f, 0.0f, 0.0f));
+    ~SkeletonBuilder() = default;
 
     Socket root() const { return Socket{0, _rootOffset}; }
 
@@ -21,10 +21,10 @@ class RigBuilder {
     BoneIndex addBone(Bone bone);
     void addMarker(Marker marker);
 
-    Rig build() &&;
+    Skeleton build() &&;
 
    private:
-    Rig _rig;
+    Skeleton _skeleton;
     Vec3 _rootOffset;
 };
 

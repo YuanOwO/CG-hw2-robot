@@ -35,12 +35,12 @@ class BipedTorso final : public Part {
             throw std::invalid_argument("BipedTorsoSpec neckOffset must be within torso bounds and above torso base");
         }
 
-        if (spec.shoulderHeight <= 0.0f || spec.shoulderHeight >= spec.size.y) {
-            throw std::invalid_argument("BipedTorsoSpec shoulderHeight must be positive and less than torso height");
+        if (spec.shoulderHeight < 0.0f || spec.shoulderHeight > spec.size.y) {
+            throw std::invalid_argument("BipedTorsoSpec shoulderHeight must be within torso height");
         }
 
-        if (spec.hipSpacing <= 0.0f || spec.hipSpacing >= spec.size.x) {
-            throw std::invalid_argument("BipedTorsoSpec hipSpacing must be positive and less than torso width");
+        if (spec.hipSpacing < 0.0f || spec.hipSpacing > spec.size.x) {
+            throw std::invalid_argument("BipedTorsoSpec hipSpacing must be within torso width");
         }
     }
 
@@ -67,7 +67,7 @@ class BipedTorso final : public Part {
     }
 
    protected:
-    void onAttach(RigBuilder& builder, Socket socket) override {
+    void onAttach(SkeletonBuilder& builder, Socket socket) override {
         collision::UprightBox torsoBox(Vec3(), _torsoSpec.size, 0.0f);
         BoneSpec torsoBoneSpec{Joint(), torsoBox, _torsoSpec.torsoMesh};
 
@@ -145,7 +145,7 @@ class QuadrupedTorso final : public Part {
     }
 
    protected:
-    void onAttach(RigBuilder& builder, Socket socket) override {
+    void onAttach(SkeletonBuilder& builder, Socket socket) override {
         collision::UprightBox torsoBox(Vec3(), _torsoSpec.size, 0.0f);
         BoneSpec torsoBoneSpec{Joint(), torsoBox, _torsoSpec.torsoMesh};
 
