@@ -33,9 +33,10 @@ void Entity::tick(float dt, const World& world) {
     }
 
     if (intent.stance.has_value() && supportsStance(intent.stance.value())) {
-        _stance.to = intent.stance.value();
+        _stance.request(intent.stance.value());
     }
 
+    _stance.advance(dt, 0.5f);  // 轉換姿勢的時間固定為 0.5 秒
     updatePose(_pose);
 
     auto driveInput = steer(intent);
