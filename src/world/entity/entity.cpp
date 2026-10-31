@@ -10,8 +10,15 @@
 
 namespace robot::world::entity {
 
-Entity::Entity(EntityId id, Seed seed, float mass, Vec3 position, std::unique_ptr<brain::Brain> brain)
-    : _id(id), _seed(seed), _random(seed), _rigidBody(mass, position), _brain(std::move(brain)) {
+Entity::Entity(EntityId id, Seed seed, float mass, Vec3 position, const anatomy::Skeleton* skeleton,
+               std::unique_ptr<brain::Brain> brain)
+    : _id(id),
+      _seed(seed),
+      _random(seed),
+      _rigidBody(mass, position),
+      _skeleton(skeleton),
+      _pose(_skeleton->boneCount()),
+      _brain(std::move(brain)) {
     if (_brain == nullptr) {
         throw std::invalid_argument("Entity requires a brain");
     }
@@ -28,6 +35,8 @@ void Entity::tick(float dt, const World& world) {
     if (intent.stance.has_value() && supportsStance(intent.stance.value())) {
         _stance.to = intent.stance.value();
     }
+
+    updatePose(_pose);
 
     auto driveInput = steer(intent);
     world.physics().simulate(_rigidBody, collider(), driveInput, dt);

@@ -16,6 +16,7 @@ namespace robot::world::anatomy {
 
 struct BipedTorsoSpec {
     Vec3 size;  ///< 寬、高、厚
+    JointLimits pitch, roll;
     std::optional<geometry::Mesh> torsoMesh;
     Vec3 neckOffset;
     float shoulderHeight;
@@ -69,7 +70,7 @@ class BipedTorso final : public Part {
    protected:
     void onAttach(SkeletonBuilder& builder, Socket socket) override {
         collision::UprightBox torsoBox(Vec3(), _torsoSpec.size, 0.0f);
-        BoneSpec torsoBoneSpec{Joint(), torsoBox, _torsoSpec.torsoMesh};
+        BoneSpec torsoBoneSpec{Joint(JointLimits(), _torsoSpec.pitch, _torsoSpec.roll), torsoBox, _torsoSpec.torsoMesh};
 
         _torso = builder.addBone(Bone(name(), socket.bone, socket.offset, torsoBoneSpec));
     }

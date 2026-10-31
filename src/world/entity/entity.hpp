@@ -5,6 +5,8 @@
 
 #include "math/random.hpp"
 #include "math/vec3.hpp"
+#include "world/anatomy/pose.hpp"
+#include "world/anatomy/skeleton.hpp"
 #include "world/anatomy/stance.hpp"
 #include "world/collision/collider.hpp"
 #include "world/entity/brain/brain.hpp"
@@ -37,8 +39,12 @@ class Entity {
     /// 世界座標的碰撞箱；stance 過渡中依進度內插
     collision::UprightCylinder collider() const;
 
+    const anatomy::Skeleton& skeleton() const { return *_skeleton; }
+    const anatomy::Pose& pose() const { return _pose; }
+
    protected:
-    Entity(EntityId id, Seed seed, float mass, Vec3 position, std::unique_ptr<brain::Brain> brain);
+    Entity(EntityId id, Seed seed, float mass, Vec3 position, const anatomy::Skeleton* skeleton,
+           std::unique_ptr<brain::Brain> brain);
 
     virtual float jumpHeight() const = 0;  /// 起跳高度，單位 m
     virtual float sneakSpeed() const = 0;  /// 潛行速度，單位 m/s
@@ -48,6 +54,9 @@ class Entity {
     /// 以腳底為原點的碰撞箱
     virtual collision::UprightCylinder localCollider(anatomy::Stance stance) const = 0;
     virtual bool supportsStance(anatomy::Stance stance) const = 0;
+
+    /// 更新姿勢
+    virtual void updatePose(anatomy::Pose& pose) const = 0;
 
    private:
     EntityId _id;
@@ -59,6 +68,9 @@ class Entity {
     Look _look;
     anatomy::StanceTransition _stance;
     physics::RigidBody _rigidBody;
+
+    const anatomy::Skeleton* _skeleton;
+    anatomy::Pose _pose;
 
     std::unique_ptr<brain::Brain> _brain;
 

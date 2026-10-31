@@ -17,6 +17,23 @@ void EntityRenderer::render(const world::entity::Entity& entity) const {
 
     graphics::drawAxes(0.5f);
 
+    auto transforms = entity.skeleton().transforms(entity.pose());
+
+    for (size_t i = 1; i < entity.skeleton().boneCount(); i++) {
+        const auto& bone = entity.skeleton().bone(i);
+
+        glPushMatrix();
+        glMultMatrixf(transforms[i].data());
+
+        if (bone.mesh().has_value()) {
+            graphics::drawMesh(bone.mesh().value());
+        } else if (bone.collider().has_value()) {
+            drawCollider(bone.collider().value());
+        }
+
+        glPopMatrix();
+    }
+
     glPopMatrix();
 }
 

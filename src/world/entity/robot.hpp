@@ -1,11 +1,45 @@
 #pragma once
 
+#include <array>
 #include <memory>
 
+#include "world/anatomy/parts/arm.hpp"
+#include "world/anatomy/parts/head.hpp"
+#include "world/anatomy/parts/leg.hpp"
+#include "world/anatomy/parts/neck.hpp"
+#include "world/anatomy/parts/torso.hpp"
 #include "world/entity/entity.hpp"
 #include "world/types.hpp"
 
 namespace robot::world::entity {
+
+struct RobotBody {
+    anatomy::BipedTorsoSpec _torsoSpec;
+    anatomy::NeckSpec _neckSpec;
+    anatomy::HeadSpec _headSpec;
+    anatomy::ArmSpec _armSpec;
+    anatomy::LegSpec _legSpec;
+
+    anatomy::BipedTorso torso;
+    anatomy::Neck neck;
+    anatomy::Head head;
+    anatomy::Arm leftArm;
+    anatomy::Arm rightArm;
+    anatomy::Leg leftLeg;
+    anatomy::Leg rightLeg;
+    anatomy::Skeleton skeleton;
+    std::array<anatomy::Pose, static_cast<std::size_t>(anatomy::Stance::Count)> defaultPoses;
+
+    RobotBody(const anatomy::BipedTorsoSpec& torsoSpec, const anatomy::NeckSpec& neckSpec,
+              const anatomy::HeadSpec& headSpec, const anatomy::ArmSpec& armSpec, const anatomy::LegSpec& legSpec);
+
+   private:
+    anatomy::Skeleton assemble();
+
+    anatomy::Pose standingPose() const;
+    anatomy::Pose sneakingPose() const;
+    anatomy::Pose sittingPose() const;
+};
 
 class Robot final : public Entity {
    public:
@@ -19,6 +53,8 @@ class Robot final : public Entity {
 
     collision::UprightCylinder localCollider(anatomy::Stance stance) const override;
     bool supportsStance(anatomy::Stance stance) const override;
+
+    void updatePose(anatomy::Pose& pose) const override;
 };
 
 }  // namespace robot::world::entity
