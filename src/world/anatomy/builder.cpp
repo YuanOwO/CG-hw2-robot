@@ -43,11 +43,12 @@ BoneIndex SkeletonBuilder::addBone(Bone bone) {
     return index;
 }
 
-void SkeletonBuilder::addMarker(Marker marker) {
+MarkerIndex SkeletonBuilder::addMarker(Marker marker) {
     if (marker.bone >= _skeleton._bones.size()) {
         throw std::invalid_argument("Marker bone index is out of range");
     }
     _skeleton._markers.push_back(std::move(marker));
+    return _skeleton._markers.size() - 1;
 }
 
 Skeleton SkeletonBuilder::build() && {

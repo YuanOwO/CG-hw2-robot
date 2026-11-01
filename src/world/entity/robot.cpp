@@ -104,6 +104,10 @@ anatomy::Pose RobotBody::sittingPose() const {
 Robot::Robot(EntityId id, Seed seed, Vec3 position, std::unique_ptr<brain::Brain> brain)
     : Entity(id, seed, ROBOT_MASS, position, &ROBOT_BODY.skeleton, std::move(brain)) {}
 
+const RobotBody& Robot::body() {
+    return ROBOT_BODY;
+}
+
 collision::UprightCylinder Robot::localCollider(anatomy::Stance stance) const {
     return COLLIDERS.at(static_cast<std::size_t>(stance));
 }
@@ -122,6 +126,10 @@ float Robot::walkSpeed() const {
 
 float Robot::runSpeed() const {
     return ROBOT_RUN_SPEED;
+}
+
+anatomy::MarkerIndex Robot::eyeMarker() const {
+    return ROBOT_BODY.head.eye();
 }
 
 bool Robot::supportsStance(anatomy::Stance stance) const {

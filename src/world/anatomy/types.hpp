@@ -8,8 +8,10 @@
 namespace robot::world::anatomy {
 
 using BoneIndex = std::size_t;
+using MarkerIndex = std::size_t;
 
 constexpr BoneIndex NO_BONE = static_cast<BoneIndex>(-1);
+constexpr MarkerIndex NO_MARKER = static_cast<MarkerIndex>(-1);
 
 struct Socket {
     Socket(BoneIndex bone, const Vec3& offset) : bone(bone), offset(offset) {}

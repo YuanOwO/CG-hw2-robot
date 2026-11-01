@@ -50,7 +50,7 @@ void Player::update(float dt, const engine::Input& input) {
 }
 
 void Player::follow() {
-    _cameraRig.setTarget(_entity->position());
+    _cameraRig.setTarget(_entity->eyePosition());
 }
 
 void Player::resetCamera() {
@@ -58,7 +58,7 @@ void Player::resetCamera() {
 }
 
 void Player::syncCamera() {
-    _cameraRig.setTarget(_entity->position());
+    _cameraRig.setTarget(_entity->eyePosition());
     switch (_cameraMode) {
     case CameraMode::FollowFace:
         _cameraRig.setYaw(_yaw);

@@ -45,11 +45,15 @@ class Robot final : public Entity {
    public:
     Robot(EntityId id, Seed seed, Vec3 position, std::unique_ptr<brain::Brain> brain);
 
+    static const RobotBody& body();
+
    protected:
     float jumpHeight() const override;
     float sneakSpeed() const override;
     float walkSpeed() const override;
     float runSpeed() const override;
+
+    anatomy::MarkerIndex eyeMarker() const override;
 
     collision::UprightCylinder localCollider(anatomy::Stance stance) const override;
     bool supportsStance(anatomy::Stance stance) const override;

@@ -34,17 +34,24 @@ class Head final : public Part {
         return _head;
     }
 
+    MarkerIndex eye() const {
+        requireAttached();
+        return _eye;
+    }
+
    protected:
     void onAttach(SkeletonBuilder& builder, Socket socket) override {
         collision::UprightBox headBox(Vec3(), _headSpec.size, 0.0f);
         BoneSpec headBoneSpec{Joint(_headSpec.yaw, _headSpec.pitch, JointLimits()), headBox, _headSpec.headMesh};
         _head = builder.addBone(Bone(name(), socket.bone, socket.offset, headBoneSpec));
+        _eye = builder.addMarker(Marker{name() + "_eye", _head, Vec3(0.0f, _headSpec.size.y * 0.5f, 0.0f)});
     }
 
    private:
     HeadSpec _headSpec;
 
     BoneIndex _head = NO_BONE;
+    MarkerIndex _eye = NO_MARKER;
 };
 
 }  // namespace robot::world::anatomy

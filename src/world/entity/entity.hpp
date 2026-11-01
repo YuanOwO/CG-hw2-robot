@@ -42,6 +42,8 @@ class Entity {
     const anatomy::Skeleton& skeleton() const { return *_skeleton; }
     const anatomy::Pose& pose() const { return _pose; }
 
+    Vec3 eyePosition() const;  ///< 眼睛位置，世界座標
+
    protected:
     Entity(EntityId id, Seed seed, float mass, Vec3 position, const anatomy::Skeleton* skeleton,
            std::unique_ptr<brain::Brain> brain);
@@ -50,6 +52,8 @@ class Entity {
     virtual float sneakSpeed() const = 0;  /// 潛行速度，單位 m/s
     virtual float walkSpeed() const = 0;   /// 走路速度，單位 m/s
     virtual float runSpeed() const = 0;    /// 跑步速度，單位 m/s
+
+    virtual anatomy::MarkerIndex eyeMarker() const = 0;  /// 眼睛位置的 marker index
 
     /// 以腳底為原點的碰撞箱
     virtual collision::UprightCylinder localCollider(anatomy::Stance stance) const = 0;

@@ -60,6 +60,13 @@ collision::UprightCylinder Entity::collider() const {
     return local.translated(_rigidBody.position());  // 轉換到世界座標
 }
 
+Vec3 Entity::eyePosition() const {
+    const auto& eye = _skeleton->marker(eyeMarker());
+    const auto transforms = _skeleton->transforms(_pose);
+    const Vec3 local = transformPoint(transforms.at(eye.bone), eye.offset);
+    return rotateAroundY(local, _yaw) + _rigidBody.position();
+}
+
 physics::DriveInput Entity::steer(const brain::Intent& intent) {
     if (_stance.changing()) {
         // 轉換姿勢時不允許移動

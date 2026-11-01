@@ -19,7 +19,7 @@ class SkeletonBuilder {
     void addPart(Socket socket, Part& part);
 
     BoneIndex addBone(Bone bone);
-    void addMarker(Marker marker);
+    MarkerIndex addMarker(Marker marker);
 
     Skeleton build() &&;
 
