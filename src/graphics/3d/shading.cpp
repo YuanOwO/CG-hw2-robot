@@ -35,9 +35,9 @@ float shadeOf(const Vec3& normal) {
     static const float MIN_SHADE = 0.32f;
     // 平地只用到 MIN_SHADE 以上範圍的 90%，留下空間讓朝太陽的坡比平地亮
     static const float FLAT_HEADROOM = 0.9f;
-    float light =
-        std::min(1.0f, MIN_SHADE + (1.0f - MIN_SHADE) * halfLambert(normal) / FLAT_LAMBERT * FLAT_HEADROOM);
-    return light;
+
+    float light = MIN_SHADE + (1.0f - MIN_SHADE) * halfLambert(normal) / FLAT_LAMBERT * FLAT_HEADROOM;
+    return std::min(1.0f, light);
 }
 
 }  // namespace robot::graphics
