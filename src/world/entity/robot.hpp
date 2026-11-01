@@ -14,11 +14,11 @@
 namespace robot::world::entity {
 
 struct RobotBody {
-    anatomy::BipedTorsoSpec _torsoSpec;
-    anatomy::NeckSpec _neckSpec;
-    anatomy::HeadSpec _headSpec;
-    anatomy::ArmSpec _armSpec;
-    anatomy::LegSpec _legSpec;
+    anatomy::BipedTorsoSpec torsoSpec;
+    anatomy::NeckSpec neckSpec;
+    anatomy::HeadSpec headSpec;
+    anatomy::ArmSpec armSpec;
+    anatomy::LegSpec legSpec;
 
     anatomy::BipedTorso torso;
     anatomy::Neck neck;

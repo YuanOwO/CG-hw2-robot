@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <utility>
 
-#include "common/units.hpp"
 #include "world/entity/robot_spec.hpp"
 
 namespace robot::world::entity {
@@ -36,11 +35,11 @@ const std::array<collision::UprightCylinder, anatomy::STANCE_COUNT> COLLIDERS = 
 RobotBody::RobotBody(const anatomy::BipedTorsoSpec& torsoSpec, const anatomy::NeckSpec& neckSpec,
                      const anatomy::HeadSpec& headSpec, const anatomy::ArmSpec& armSpec,
                      const anatomy::LegSpec& legSpec)
-    : _torsoSpec(torsoSpec),
-      _neckSpec(neckSpec),
-      _headSpec(headSpec),
-      _armSpec(armSpec),
-      _legSpec(legSpec),
+    : torsoSpec(torsoSpec),
+      neckSpec(neckSpec),
+      headSpec(headSpec),
+      armSpec(armSpec),
+      legSpec(legSpec),
       torso("torso", torsoSpec),
       neck("neck", neckSpec),
       head("head", headSpec),
@@ -67,14 +66,14 @@ anatomy::Skeleton RobotBody::assemble() {
 
 anatomy::Pose RobotBody::standingPose() const {
     anatomy::Pose pose(skeleton.boneCount());
-    pose.rootOffset().y = _legSpec.length();
+    pose.rootOffset().y = legSpec.length();
 
     return pose;
 }
 
 anatomy::Pose RobotBody::sneakingPose() const {
     anatomy::Pose pose(skeleton.boneCount());
-    pose.rootOffset().y = _legSpec.length() * SQRT_3 / 2.0f;
+    pose.rootOffset().y = legSpec.length() * SQRT_3 / 2.0f;
 
     pose[torso.torso()] = anatomy::JointAngles(0.0f, -30.0f, 0.0f);
     pose[neck.neck()] = anatomy::JointAngles(0.0f, 30.0f, 0.0f);
@@ -89,7 +88,7 @@ anatomy::Pose RobotBody::sneakingPose() const {
 
 anatomy::Pose RobotBody::sittingPose() const {
     anatomy::Pose pose(skeleton.boneCount());
-    pose.rootOffset().y = _legSpec.thighSize.z * 0.5f;
+    pose.rootOffset().y = legSpec.thighSize.z * 0.5f;
 
     pose[leftLeg.thigh()] = anatomy::JointAngles(15.0f, 90.0f, 0.0f);
     pose[rightLeg.thigh()] = anatomy::JointAngles(-15.0f, 90.0f, 0.0f);

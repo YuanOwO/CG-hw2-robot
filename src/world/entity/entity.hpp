@@ -5,6 +5,7 @@
 
 #include "math/random.hpp"
 #include "math/vec3.hpp"
+#include "world/anatomy/gait.hpp"
 #include "world/anatomy/pose.hpp"
 #include "world/anatomy/skeleton.hpp"
 #include "world/anatomy/stance.hpp"
@@ -35,6 +36,7 @@ class Entity {
     bool onGround() const { return _rigidBody.onGround(); }
 
     const anatomy::StanceTransition& stance() const { return _stance; }
+    const anatomy::Gait& gait() const { return _gait; }
 
     /// 世界座標的碰撞箱；stance 過渡中依進度內插
     collision::UprightCylinder collider() const;
@@ -71,6 +73,7 @@ class Entity {
     float _yaw = 0.0f;
     Look _look;
     anatomy::StanceTransition _stance;
+    anatomy::Gait _gait;
     physics::RigidBody _rigidBody;
 
     const anatomy::Skeleton* _skeleton;

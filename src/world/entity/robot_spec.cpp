@@ -156,7 +156,7 @@ anatomy::ArmSpec robotArmSpec() {
     return anatomy::ArmSpec{
         Vec3(3.0f, 5.0f, 3.0f) * PX,                  // upperArmSize
         anatomy::JointLimits(),                       // shoulderYaw
-        anatomy::JointLimits(-60.0f, 170.0f, 90.0f),  // shoulderPitch
+        anatomy::JointLimits(-60.0f, 200.0f, 90.0f),  // shoulderPitch
         anatomy::JointLimits(0.0f, 170.0f, 90.0f),    // shoulderRoll
         robotUpperArmMesh(),                          // upperArmMesh
         Vec3(3.0f, 6.0f, 3.0f) * PX,                  // forearmSize

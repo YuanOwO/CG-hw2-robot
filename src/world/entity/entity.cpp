@@ -40,7 +40,14 @@ void Entity::tick(float dt, const World& world) {
     updatePose(_pose);
 
     auto driveInput = steer(intent);
+    const Vec3 before = _rigidBody.position();
     world.physics().simulate(_rigidBody, collider(), driveInput, dt);
+
+    Vec3 displacement = _rigidBody.position() - before;
+    displacement.y = 0.0f;
+    const Vec3 forward = rotateAroundY(Vec3(0.0f, 0.0f, 1.0f), _yaw);
+    const float moved = dot(displacement, forward) < 0.0f ? -length(displacement) : length(displacement);
+    _gait.advance(moved, walkSpeed(), dt);
 
     _age++;
 }
