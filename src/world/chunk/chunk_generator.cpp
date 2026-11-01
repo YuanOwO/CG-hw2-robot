@@ -111,7 +111,7 @@ std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
         Random blockRandom(blockSeed);
         float blockYaw = Random::uniformFloat(blockRandom.valueAt(fnv1a32("BLOCK_YAW")), 0.0f, 360.0f);
         Vec3 blockSize(Random::uniformFloat(blockRandom.valueAt(fnv1a32("BLOCK_SIZE_X")), 0.5f, 2.0f),
-                       Random::uniformFloat(blockRandom.valueAt(fnv1a32("BLOCK_SIZE_Y")), 0.1f, 1.0f),
+                       Random::uniformFloat(blockRandom.valueAt(fnv1a32("BLOCK_SIZE_Y")), 0.1f, 2.0f),
                        Random::uniformFloat(blockRandom.valueAt(fnv1a32("BLOCK_SIZE_Z")), 0.5f, 2.0f));
 
         chunk->addObstacle(std::make_unique<obstacle::Block>(blockSeed, blockPosition, blockYaw, blockSize));
@@ -124,7 +124,7 @@ std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
 
         auto ballSeed = _random.valueAt2D(ballX, ballZ, fnv1a32("OBSTACLE_BALL"));
         Random ballRandom(ballSeed);
-        float ballRadius = Random::uniformFloat(ballRandom.valueAt(fnv1a32("SPHERE_RADIUS")), 0.1f, 1.0f);
+        float ballRadius = Random::uniformFloat(ballRandom.valueAt(fnv1a32("SPHERE_RADIUS")), 0.1f, 2.0f);
 
         chunk->addObstacle(std::make_unique<obstacle::Ball>(ballSeed, ballPosition, ballRadius));
     }
@@ -137,7 +137,7 @@ std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
         auto pillarSeed = _random.valueAt2D(pillarX, pillarZ, fnv1a32("OBSTACLE_PILLAR"));
         Random pillarRandom(pillarSeed);
         float pillarRadius = Random::uniformFloat(pillarRandom.valueAt(fnv1a32("PILLAR_RADIUS")), 0.5f, 1.5f);
-        float pillarHeight = Random::uniformFloat(pillarRandom.valueAt(fnv1a32("PILLAR_HEIGHT")), 0.1f, 1.0f);
+        float pillarHeight = Random::uniformFloat(pillarRandom.valueAt(fnv1a32("PILLAR_HEIGHT")), 0.1f, 2.0f);
 
         chunk->addObstacle(std::make_unique<obstacle::Pillar>(pillarSeed, pillarPosition, pillarRadius, pillarHeight));
     }
