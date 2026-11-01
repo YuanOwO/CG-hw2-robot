@@ -12,8 +12,9 @@ struct Mat4 {
 
     /// 單位矩陣
     Mat4();
-    Mat4(std::initializer_list<float> values);
-    Mat4(std::initializer_list<std::initializer_list<float>> mat);
+    explicit Mat4(const float* values);
+    explicit Mat4(std::initializer_list<float> values);
+    explicit Mat4(std::initializer_list<std::initializer_list<float>> mat);
 
     /// 第 row 列、第 col 行的元素
     float& at(int row, int col) { return m[col * 4 + row]; }

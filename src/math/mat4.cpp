@@ -13,6 +13,10 @@ Mat4::Mat4() : m{} {
     }
 }
 
+Mat4::Mat4(const float* values) : m{} {
+    std::copy_n(values, 16, m);
+}
+
 Mat4::Mat4(std::initializer_list<float> values) : m{} {
     std::copy_n(values.begin(), std::min(values.size(), 16ul), m);
 }
