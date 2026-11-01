@@ -10,7 +10,7 @@ namespace robot::screen {
 
 namespace {
 
-const std::string TITLE = "一個移動的羅伯特";
+const std::string TITLE = "A Moving Robot";
 const std::string SUBTITLE = "電腦圖學 Homework #2";
 
 }  // namespace
