@@ -24,9 +24,9 @@ constexpr float ROBOT_WALK_SPEED = 1.2f;   // m/s
 constexpr float ROBOT_RUN_SPEED = 10.0f;   // m/s
 
 const std::array<collision::UprightCylinder, anatomy::STANCE_COUNT> COLLIDERS = {
-    collision::UprightCylinder(Vec3(), 0.44743190822739f, 1.75f),             // Standing
-    collision::UprightCylinder(Vec3(), 0.57622152858081f, 1.5657849302036f),  // Sneaking
-    collision::UprightCylinder(Vec3(), 0.87766592186389f, 1.0625f),           // Sitting
+    collision::UprightCylinder(Vec3(0.0f, 0.0f, 0.0f), 0.44743190822739f, 1.75f),                  // Standing
+    collision::UprightCylinder(Vec3(0.0f, 0.0f, 0.109375f), 0.50541872175618f, 1.5657849302036f),  // Sneaking
+    collision::UprightCylinder(Vec3(0.0f, 0.0f, 0.33685525608937f), 0.61386247366311f, 1.0625f),   // Sitting
 };
 
 }  // namespace
