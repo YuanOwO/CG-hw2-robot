@@ -5,62 +5,14 @@
 #include <utility>
 
 #include "common/units.hpp"
-#include "math/constants.hpp"
-#include "world/anatomy/builder.hpp"
-#include "world/anatomy/joint.hpp"
+#include "world/entity/robot_spec.hpp"
 
 namespace robot::world::entity {
 
 namespace {
 
-const anatomy::BipedTorsoSpec ROBOT_TORSO_SPEC = {
-    Vec3(8.0f, 9.0f, 4.0f) * PX,                 // size
-    anatomy::JointLimits(-45.0f, 45.0f, 90.0f),  // pitch
-    anatomy::JointLimits(),                      // roll
-    std::nullopt,                                // torsoMesh
-    Vec3(0.0f, 9.0f, 0.0f) * PX,                 // neckOffset
-    9.0f * PX,                                   // shoulderHeight
-    4.0f * PX,                                   // hipSpacing
-};
-
-const anatomy::NeckSpec ROBOT_NECK_SPEC = {
-    Vec3(2.0f, 1.0f, 2.0f) * PX,                 // size
-    anatomy::JointLimits(),                      // yaw
-    anatomy::JointLimits(-45.0f, 45.0f, 90.0f),  // pitch
-    anatomy::JointLimits(),                      // roll
-    std::nullopt,                                // neckMesh
-};
-
-const anatomy::HeadSpec ROBOT_HEAD_SPEC = {
-    Vec3(5.0f, 5.0f, 5.0f) * PX,                 // size
-    anatomy::JointLimits(-70.0f, 70.0f, 90.0f),  // yaw
-    anatomy::JointLimits(-60.0f, 50.0f, 90.0f),  // pitch
-    std::nullopt,                                // headMesh
-};
-
-const anatomy::ArmSpec ROBOT_ARM_SPEC = {
-    Vec3(3.0f, 5.0f, 3.0f) * PX,                  // upperArmSize
-    anatomy::JointLimits(),                       // shoulderYaw
-    anatomy::JointLimits(-60.0f, 170.0f, 90.0f),  // shoulderPitch
-    anatomy::JointLimits(0.0f, 170.0f, 90.0f),    // shoulderRoll
-    std::nullopt,                                 // upperArmMesh
-    Vec3(3.0f, 6.0f, 3.0f) * PX,                  // forearmSize
-    anatomy::JointLimits(0.0f, 145.0f, 90.0f),    // elbowPitch
-    std::nullopt,                                 // forearmMesh
-};
-
-const anatomy::LegSpec ROBOT_LEG_SPEC = {
-    Vec3(4.0f, 6.0f, 4.0f) * PX,                  // thighSize
-    anatomy::JointLimits(0.0f, 45.0f, 90.0f),     // hipYaw
-    anatomy::JointLimits(-30.0f, 120.0f, 90.0f),  // hipPitch
-    anatomy::JointLimits(),                       // hipRoll
-    std::nullopt,                                 // thighMesh
-    Vec3(4.0f, 7.0f, 4.0f) * PX,                  // shinSize
-    anatomy::JointLimits(-140.0f, 0.0f, 90.0f),   // kneePitch
-    std::nullopt,                                 // shinMesh
-};
-
-const RobotBody ROBOT_BODY(ROBOT_TORSO_SPEC, ROBOT_NECK_SPEC, ROBOT_HEAD_SPEC, ROBOT_ARM_SPEC, ROBOT_LEG_SPEC);
+const RobotBody ROBOT_BODY(robot_spec::ROBOT_TORSO_SPEC, robot_spec::ROBOT_NECK_SPEC, robot_spec::ROBOT_HEAD_SPEC,
+                           robot_spec::ROBOT_ARM_SPEC, robot_spec::ROBOT_LEG_SPEC);
 
 // 機器人的相關物理參數，單位為國際單位制
 constexpr float ROBOT_MASS = 70.0f;    // kg

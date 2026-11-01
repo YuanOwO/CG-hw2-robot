@@ -12,7 +12,6 @@ void EntityRenderer::render(const world::entity::Entity& entity) const {
 
     glPushMatrix();
     glTranslatef(entity.position().x, entity.position().y, entity.position().z);
-
     glRotatef(entity.yaw(), 0.0f, 1.0f, 0.0f);
 
     graphics::drawAxes(0.5f);
