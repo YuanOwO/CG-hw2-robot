@@ -4,6 +4,7 @@
 
 #include "common/color.hpp"
 #include "geometry/mesh/mesh.hpp"
+#include "view/obstacle_renderer.hpp"
 #include "world/chunk/chunk.hpp"
 #include "world/chunk/chunk_manager.hpp"
 
@@ -16,6 +17,8 @@ class ChunkRenderer {
     void render(const world::chunk::ChunkManager& chunks) const;
 
    private:
+    ObstacleRenderer _obstacleRenderer;
+
     // 同一個位置重新載入時生成的地形相同，所以網格以位置為 key，卸載前不必重建。
     // 快取不影響畫出的結果，因此在 const 的 render 中也可以更新
     mutable std::unordered_map<world::chunk::ChunkPos, geometry::Mesh, world::chunk::ChunkPosHash> _meshes;

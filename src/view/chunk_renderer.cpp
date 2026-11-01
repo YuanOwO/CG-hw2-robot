@@ -124,9 +124,9 @@ void ChunkRenderer::render(const ChunkManager& chunks) const {
         }
         graphics::drawMesh(it->second);
 
-        // 畫出障礙物的碰撞箱
+        // 畫出障礙物
         for (const auto& obstacle : chunk.obstacles()) {
-            drawCollider(obstacle->collider());
+            _obstacleRenderer.render(*obstacle);
         }
     });
 }

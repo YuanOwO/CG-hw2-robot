@@ -1,5 +1,6 @@
 #pragma once
 
+#include "geometry/mesh/mesh.hpp"
 #include "math/random.hpp"
 #include "math/vec3.hpp"
 #include "world/collision/collider.hpp"
@@ -18,10 +19,14 @@ class Obstacle {
 
     collision::Collider collider() const;
 
+    const geometry::Mesh& mesh() const { return _mesh; }
+
    protected:
     Obstacle(Seed seed, Vec3 position, float yaw = 0.0f);
 
     virtual collision::Collider localCollider() const = 0;
+
+    void setMesh(geometry::Mesh&& mesh);
 
    private:
     Seed _seed;
@@ -29,6 +34,8 @@ class Obstacle {
 
     Vec3 _position;
     float _yaw = 0.0f;
+
+    geometry::Mesh _mesh;
 };
 
 }  // namespace robot::world::obstacle
