@@ -20,7 +20,7 @@ constexpr float ROBOT_HEIGHT = 1.75f;  // m
 constexpr float ROBOT_JUMP_HEIGHT = 0.5f;  // m
 constexpr float ROBOT_SNEAK_SPEED = 0.6f;  // m/s
 constexpr float ROBOT_WALK_SPEED = 1.2f;   // m/s
-constexpr float ROBOT_RUN_SPEED = 10.0f;   // m/s
+constexpr float ROBOT_RUN_SPEED = 3.0f;    // m/s
 
 const std::array<collision::UprightCylinder, anatomy::STANCE_COUNT> COLLIDERS = {
     collision::UprightCylinder(Vec3(0.0f, 0.0f, 0.0f), 0.44743190822739f, 1.75f),                  // Standing
