@@ -2,32 +2,40 @@
 
 namespace robot::game {
 
-world::entity::PlayerCommand PlayerController::read(const engine::Input& input, const CameraRig& camera) {
-    if (input.pressed(Key::L)) {
-        _followCamera = !_followCamera;
-    }
-
-    world::entity::PlayerCommand command;
+world::entity::brain::Intent PlayerController::read(const engine::Input& input) {
+    world::entity::brain::Intent intent;
 
     if (input.held(Key::W)) {
-        command.forward += 1.0f;
+        intent.surge += 1.0f;
     }
     if (input.held(Key::S)) {
-        command.forward -= 1.0f;
+        intent.surge -= 1.0f;
     }
     if (input.held(Key::D)) {
-        command.strafe += 1.0f;
+        intent.sway += 1.0f;
     }
     if (input.held(Key::A)) {
-        command.strafe -= 1.0f;
+        intent.sway -= 1.0f;
     }
 
-    if (_followCamera) {
-        // 相機 yaw 為 0 時看向 -z，實體則面向 +z；pitch 兩者都是正值抬頭
-        command.look = {camera.yaw() + 180.0f, camera.pitch()};
+    if (input.held(Key::LeftShift)) {
+        intent.run = true;
+    }
+    if (input.held(Key::Space)) {
+        intent.jump = true;
     }
 
-    return command;
+    if (input.pressed(Key::Digit1)) {
+        intent.stance = world::anatomy::Stance::Standing;
+    }
+    if (input.pressed(Key::Digit2)) {
+        intent.stance = world::anatomy::Stance::Sneaking;
+    }
+    if (input.pressed(Key::Digit3)) {
+        intent.stance = world::anatomy::Stance::Sitting;
+    }
+
+    return intent;
 }
 
 }  // namespace robot::game

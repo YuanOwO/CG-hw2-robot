@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 
@@ -51,6 +52,12 @@ T lerp(const T& a, const T& b, float t) {
     return a + (b - a) * t;
 }
 
+/// 平滑內插
+inline float smoothStep(float a, float b, float t) {
+    t = std::clamp((t - a) / (b - a), 0.0f, 1.0f);
+    return t * t * (3.0f - 2.0f * t);
+}
+
 /// 每秒以 rate 的比例縮小與目標的差距時，這一步要走掉差距的多少。
 /// tick 長短不同時結果仍一致，也不會衝過頭
 /// @return 介於 0 與 1 之間，乘上與目標的差距就是這一步的變化量
@@ -73,12 +80,54 @@ inline std::int64_t floorDiv(std::int64_t numerator, std::int64_t denominator) {
     return quotient;
 }
 
+/// 向負無窮取整的浮點數除法
+/// @param denominator 不可為 0
+inline float floorDiv(float numerator, float denominator) {
+    return std::floor(numerator / denominator);
+}
+
 /// 向正無窮取整的整數除法
 /// @param denominator 不可為 0
 inline std::int64_t ceilDiv(std::int64_t numerator, std::int64_t denominator) {
     return -floorDiv(-numerator, denominator);
 }
 
+/// 向正無窮取整的浮點數除法
+/// @param denominator 不可為 0
+inline float ceilDiv(float numerator, float denominator) {
+    return std::ceil(numerator / denominator);
+}
+
 #pragma endregion  // Integer division
+
+#pragma region Hash
+
+inline constexpr std::uint64_t fnv1a64(const char* str) {
+    const std::uint64_t OFFSET_BASIS = 0xcbf29ce484222325ULL;
+    const std::uint64_t FNV_PRIME = 0x100000001b3ULL;
+
+    std::uint64_t hash = OFFSET_BASIS;
+    for (const char* p = str; *p != '\0'; p++) {
+        hash ^= static_cast<unsigned char>(*p);
+        hash *= FNV_PRIME;
+    }
+
+    return hash;
+}
+
+inline constexpr std::uint32_t fnv1a32(const char* str) {
+    const std::uint32_t OFFSET_BASIS = 2166136261u;
+    const std::uint32_t FNV_PRIME = 16777619u;
+
+    std::uint32_t hash = OFFSET_BASIS;
+    for (const char* p = str; *p != '\0'; p++) {
+        hash ^= static_cast<unsigned char>(*p);
+        hash *= FNV_PRIME;
+    }
+
+    return hash;
+}
+
+#pragma endregion  // Hash
 
 }  // namespace robot

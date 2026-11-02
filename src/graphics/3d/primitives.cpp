@@ -28,13 +28,13 @@ void drawAxes(float length) {
     glPopAttrib();
 }
 
-void drawLines(const std::vector<LineSegment3D>& segments, const ColorRGBA& color, float width) {
+void drawLines(const std::vector<geometry::LineSegment3D>& segments, const ColorRGBA& color, float width) {
     glPushAttrib(GL_LINE_BIT | GL_CURRENT_BIT);
     glLineWidth(width);
     glColor4f(color.r, color.g, color.b, color.a);
 
     glBegin(GL_LINES);
-    for (const LineSegment3D& segment : segments) {
+    for (const auto& segment : segments) {
         const Vec3 start = segment.startPoint();
         const Vec3 end = segment.endPoint();
         glVertex3f(start.x, start.y, start.z);
@@ -75,6 +75,27 @@ void drawQuad(const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d, const 
     triangle(a, b, c);
     triangle(a, c, d);
     glEnd();
+    glPopAttrib();
+}
+
+void drawMesh(const geometry::Mesh& mesh) {
+    const auto& vertices = mesh.vertices();
+    const auto& indices = mesh.indices();
+
+    glPushAttrib(GL_CURRENT_BIT);
+
+    glBegin(GL_TRIANGLES);
+    for (std::uint32_t index : indices) {
+        const Vec3& position = vertices[index].position;
+        const Vec3& normal = vertices[index].normal;
+        const ColorRGBA& color = vertices[index].color;
+        const float shade = shadeOf(normal);
+        glColor4f(color.r * shade, color.g * shade, color.b * shade, color.a);
+        glNormal3f(normal.x, normal.y, normal.z);
+        glVertex3f(position.x, position.y, position.z);
+    }
+    glEnd();
+
     glPopAttrib();
 }
 

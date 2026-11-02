@@ -4,18 +4,18 @@ namespace robot::world::chunk {
 
 namespace {
 
-constexpr int CHUNK_LOAD_RADIUS = 4;
+constexpr int CHUNK_LOAD_RADIUS = 12;
 
 // 以 chunk 為單位的圓形範圍；比較平方，不必開根號。載入與卸載都用這個判斷，範圍才會一致
 bool withinLoadRadius(ChunkPos pos, ChunkPos center) {
     const int dx = pos.x - center.x;
     const int dz = pos.z - center.z;
-    return dx * dx + dz * dz <= CHUNK_LOAD_RADIUS * CHUNK_LOAD_RADIUS;
+    return dx * dx + dz * dz < CHUNK_LOAD_RADIUS * CHUNK_LOAD_RADIUS;
 }
 
 }  // namespace
 
-ChunkManager::ChunkManager(std::uint64_t seed) : _generator(seed) {}
+ChunkManager::ChunkManager(Seed seed) : _generator(seed) {}
 
 const Chunk* ChunkManager::chunkAt(ChunkPos pos) const {
     auto it = _chunks.find(pos);
@@ -42,6 +42,40 @@ void ChunkManager::update(ChunkPos center) {
             it++;
         }
     }
+}
+
+float ChunkManager::heightAt(float worldX, float worldZ) const {
+    const ChunkPos pos = ChunkPos::containing(worldX, worldZ);
+    const Chunk* chunk = chunkAt(pos);
+    if (chunk) {
+        // 如果該 chunk 已載入，就直接用它的高度資料
+        return chunk->heightAt(worldX, worldZ);
+    }
+    return _generator.heightAt(worldX, worldZ);
+}
+
+Vec3 ChunkManager::normalAt(float worldX, float worldZ) const {
+    const ChunkPos pos = ChunkPos::containing(worldX, worldZ);
+    const Chunk* chunk = chunkAt(pos);
+    if (chunk) {
+        // 如果該 chunk 已載入，就直接用它的法線資料
+        return chunk->normalAt(worldX, worldZ);
+    }
+    return Vec3(0.0f, 1.0f, 0.0f);  // 預設法線向上
+}
+
+const Biome ChunkManager::biomeAt(float worldX, float worldZ) const {
+    const ChunkPos pos = ChunkPos::containing(worldX, worldZ);
+    const Chunk* chunk = chunkAt(pos);
+    if (chunk) {
+        // 如果該 chunk 已載入，就直接用它的生態系資料
+        int localX = static_cast<int>(std::floor(worldX)) - pos.x * CHUNK_SIZE;
+        int localZ = static_cast<int>(std::floor(worldZ)) - pos.z * CHUNK_SIZE;
+
+        return chunk->biomeAt(localX, localZ);
+    }
+    // 否則回傳不知道
+    return Biome::Count;  // 這裡使用 Biome::Count 作為未知生態系的標記
 }
 
 }  // namespace robot::world::chunk

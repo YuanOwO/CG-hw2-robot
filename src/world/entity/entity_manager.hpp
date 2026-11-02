@@ -5,8 +5,9 @@
 #include <utility>
 #include <vector>
 
-#include "math/random.hpp"
 #include "world/entity/entity.hpp"
+#include "world/types.hpp"
+#include "world/utils.hpp"
 
 namespace robot::world::entity {
 
@@ -14,14 +15,15 @@ namespace robot::world::entity {
 // 存 unique_ptr：Entity 是抽象類別且禁止複製，不能直接放進 vector；spawn 回傳的參考也不會因 vector 擴充而失效。
 class EntityManager {
    public:
-    explicit EntityManager(std::uint64_t seed);
+    explicit EntityManager(Seed seed);
 
     void tick(float dt, const World& world);
 
     template <typename T, typename... Args>
     T& spawn(Args&&... args) {
         const EntityId id = _nextEntityId++;
-        auto entity = std::make_unique<T>(id, seedFor(id), std::forward<Args>(args)...);
+        Seed entitySeed = deriveSeed(_seed, ENTITY_SEED_STREAM, id);
+        auto entity = std::make_unique<T>(id, entitySeed, std::forward<Args>(args)...);
         T& ref = *entity;
         _entities.push_back(std::move(entity));
         return ref;
@@ -46,11 +48,9 @@ class EntityManager {
     }
 
    private:
-    Random _random;
+    Seed _seed;
     std::vector<std::unique_ptr<Entity>> _entities;
     EntityId _nextEntityId = 1;  // 0 保留給 "沒有實體"
-
-    std::uint64_t seedFor(EntityId id) const;
 };
 
 }  // namespace robot::world::entity

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <initializer_list>
+
 #include "math/vec3.hpp"
 
 namespace robot {
@@ -8,7 +10,11 @@ namespace robot {
 struct Mat4 {
     float m[16];  ///< 與 OpenGL 相同的 column-major 排列，可直接交給 glMultMatrixf
 
-    Mat4();  ///< 單位矩陣
+    /// 單位矩陣
+    Mat4();
+    explicit Mat4(const float* values);
+    explicit Mat4(std::initializer_list<float> values);
+    explicit Mat4(std::initializer_list<std::initializer_list<float>> mat);
 
     /// 第 row 列、第 col 行的元素
     float& at(int row, int col) { return m[col * 4 + row]; }
@@ -27,8 +33,6 @@ Mat4 translation(const Vec3& offset);
 Mat4 rotation(float degree, const Vec3& axis);
 /// 縮放 sx, sy, sz 的矩陣
 Mat4 scale(float sx, float sy, float sz);
-/// 縮放 s 的矩陣
-Mat4 scale(float s);
 
 /// 變換一個點（w = 1），會受平移影響
 Vec3 transformPoint(const Mat4& mat, const Vec3& point);

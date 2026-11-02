@@ -1,60 +1,88 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 
 #include "math/random.hpp"
 #include "math/vec3.hpp"
-
-namespace robot::world {
-class World;
-}
+#include "world/anatomy/gait.hpp"
+#include "world/anatomy/pose.hpp"
+#include "world/anatomy/skeleton.hpp"
+#include "world/anatomy/stance.hpp"
+#include "world/collision/collider.hpp"
+#include "world/entity/brain/brain.hpp"
+#include "world/physics/motion.hpp"
+#include "world/physics/rigid_body.hpp"
+#include "world/types.hpp"
 
 namespace robot::world::entity {
 
-using EntityId = std::uint32_t;
-
 class Entity {
    public:
-    Entity(EntityId id, std::uint64_t seed, const Vec3& position, float yaw, float pitch = 0.0f,
-           float eyeHeight = 0.0f);
     virtual ~Entity() = default;
 
-    // 禁止複製與移動
-    Entity(const Entity&) = delete;
-    Entity& operator=(const Entity&) = delete;
-    Entity(Entity&&) = delete;
-    Entity& operator=(Entity&&) = delete;
-
-    virtual void tick(float dt, const World& world) = 0;
+    void tick(float dt, const World& world);
 
     EntityId id() const { return _id; }
-    const Vec3& position() const { return _position; }
-    virtual Vec3 eyePosition() const { return _position + Vec3(0.0f, _eyeHeight, 0.0f); }
-    const Vec3& motion() const { return _motion; }
-    float yaw() const { return _yaw; }
-    float pitch() const { return _pitch; }
+    Seed seed() const { return _seed; }
+    const Random& random() const { return _random; }
+    std::uint32_t age() const { return _age; }  ///< 已經走過幾個 tick
+
+    float yaw() const { return _yaw; }  ///< 身體朝向，方向定義與 Look::yaw 相同
+    const Look& look() const { return _look; }
+
+    const Vec3& position() const { return _rigidBody.position(); }
+    const Vec3& velocity() const { return _rigidBody.velocity(); }
+    bool onGround() const { return _rigidBody.onGround(); }
+
+    const anatomy::StanceTransition& stance() const { return _stance; }
+    const anatomy::Gait& gait() const { return _gait; }
+
+    /// 世界座標的碰撞箱；stance 過渡中依進度內插
+    collision::UprightCylinder collider() const;
+
+    const anatomy::Skeleton& skeleton() const { return *_skeleton; }
+    const anatomy::Pose& pose() const { return _pose; }
+
+    Vec3 eyePosition() const;  ///< 眼睛位置，世界座標
 
    protected:
-    // 各實體獨立的亂數來源，同一個世界裡同一個 id 每次都相同
-    const Random& random() const { return _random; }
+    Entity(EntityId id, Seed seed, float mass, Vec3 position, const anatomy::Skeleton* skeleton,
+           std::unique_ptr<brain::Brain> brain);
 
-    void setPosition(const Vec3& position) { _position = position; }
-    void setYaw(float yaw);
-    void setPitch(float pitch);
-    void setMotion(const Vec3& motion) { _motion = motion; }
+    virtual float jumpHeight() const = 0;  /// 起跳高度，單位 m
+    virtual float sneakSpeed() const = 0;  /// 潛行速度，單位 m/s
+    virtual float walkSpeed() const = 0;   /// 走路速度，單位 m/s
+    virtual float runSpeed() const = 0;    /// 跑步速度，單位 m/s
 
-    void move(float dt) { _position += _motion * dt; }
+    virtual anatomy::MarkerIndex eyeMarker() const = 0;  /// 眼睛位置的 marker index
+
+    /// 以腳底為原點的碰撞箱
+    virtual collision::UprightCylinder localCollider(anatomy::Stance stance) const = 0;
+    virtual bool supportsStance(anatomy::Stance stance) const = 0;
+
+    /// 更新姿勢
+    virtual void updatePose(anatomy::Pose& pose) const = 0;
 
    private:
-    const EntityId _id;
+    EntityId _id;
+    Seed _seed;
     Random _random;
+    std::uint32_t _age = 0;
 
-    Vec3 _position;
-    Vec3 _motion;  // 公尺 / 秒
-    float _yaw;    // 度，[0, 360)
-    float _pitch;  // 度，[-90, 90]
+    float _yaw = 0.0f;
+    Look _look;
+    anatomy::StanceTransition _stance;
+    anatomy::Gait _gait;
+    physics::RigidBody _rigidBody;
 
-    float _eyeHeight;  // 公尺，眼睛相對於腳底的高度
+    const anatomy::Skeleton* _skeleton;
+    anatomy::Pose _pose;
+
+    std::unique_ptr<brain::Brain> _brain;
+
+    /// 依 intent 計算目標速度
+    physics::DriveInput steer(const brain::Intent& intent);
 };
 
 }  // namespace robot::world::entity

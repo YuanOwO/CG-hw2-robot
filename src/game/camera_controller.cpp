@@ -12,16 +12,18 @@ const float ZOOM_SPEED = 4.0f;        // 按住一秒放大或縮小的倍數
 
 }  // namespace
 
-void CameraController::update(float dt, const engine::Input& input, CameraRig& camera) {
+CameraController::CameraTurn CameraController::update(float dt, const engine::Input& input) {
+    CameraTurn result;
+
     // 用按住的狀態而不是按下事件：按住多久就轉多少，轉速與幀率無關
-    float direction = 0.0f;
+    float turnDirection = 0.0f;
     if (input.held(Key::Q)) {
-        direction += 1.0f;
+        turnDirection += 1.0f;
     }
     if (input.held(Key::E)) {
-        direction -= 1.0f;
+        turnDirection -= 1.0f;
     }
-    camera.turn(direction * TURN_SPEED * dt);
+    result.yaw += turnDirection * TURN_SPEED * dt;
 
     const auto& mouse = input.mouse();
     if (!mouse.isDown(MouseButton::MouseLeft)) {
@@ -29,8 +31,8 @@ void CameraController::update(float dt, const engine::Input& input, CameraRig& c
     } else {
         if (_dragFrom) {
             const auto delta = mouse.position() - *_dragFrom;
-            camera.turn(delta.x * DRAG_SENSITIVITY);
-            camera.tilt(delta.y * DRAG_SENSITIVITY);
+            result.yaw += delta.x * DRAG_SENSITIVITY;
+            result.pitch += delta.y * DRAG_SENSITIVITY;
         }
         _dragFrom = mouse.position();
     }
@@ -43,7 +45,9 @@ void CameraController::update(float dt, const engine::Input& input, CameraRig& c
         zoomDirection -= 1.0f;
     }
     // 以指數變化，不論目前的倍率，縮放的手感都一樣
-    camera.zoom(std::pow(ZOOM_SPEED, zoomDirection * dt));
+    result.zoom = std::pow(ZOOM_SPEED, zoomDirection * dt);
+
+    return result;
 }
 
 }  // namespace robot::game

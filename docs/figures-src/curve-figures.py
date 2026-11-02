@@ -1,4 +1,4 @@
-"""src/math/curve/README.md 的示意圖。
+"""src/geometry/curve/README.md 的示意圖。
 
 輸出 docs/figures/curve-*.png。執行：python3 docs/figures-src/curve-figures.py
 """

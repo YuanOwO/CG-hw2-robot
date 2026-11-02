@@ -174,9 +174,9 @@ enum class Color {
 struct ColorRGBA {
     float r, g, b, a;  // 0.0f <= r, g, b, a <= 1.0f
 
-    ColorRGBA() : r(0.0f), g(0.0f), b(0.0f), a(1.0f) {}
-    ColorRGBA(float red, float green, float blue) : r(red), g(green), b(blue), a(1.0f) {}
-    ColorRGBA(float red, float green, float blue, float alpha) : r(red), g(green), b(blue), a(alpha) {}
+    constexpr ColorRGBA() : r(0.0f), g(0.0f), b(0.0f), a(1.0f) {}
+    constexpr ColorRGBA(float red, float green, float blue) : r(red), g(green), b(blue), a(1.0f) {}
+    constexpr ColorRGBA(float red, float green, float blue, float alpha) : r(red), g(green), b(blue), a(alpha) {}
     ColorRGBA(Color color) {
         if (color == Color::Transparent) {
             r = g = b = a = 0.0f;

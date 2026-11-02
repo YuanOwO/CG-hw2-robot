@@ -3,7 +3,8 @@
 #include <vector>
 
 #include "common/color.hpp"
-#include "math/curve/line_segment.hpp"
+#include "geometry/curve/line_segment.hpp"
+#include "geometry/mesh/mesh.hpp"
 #include "math/vec3.hpp"
 
 // 呼叫當下直接用 glBegin 畫出的輔助圖形，不產生網格。
@@ -16,7 +17,7 @@ void drawAxes(float length);
 
 /// 一組相同顏色與粗細的線段
 /// @param width 線寬，像素，不隨縮放改變
-void drawLines(const std::vector<LineSegment3D>& segments, const ColorRGBA& color, float width);
+void drawLines(const std::vector<geometry::LineSegment3D>& segments, const ColorRGBA& color, float width);
 
 /// 一組相同顏色與大小的方形點
 /// @param size 邊長，像素，不隨縮放改變
@@ -26,5 +27,9 @@ void drawPoints(const std::vector<Vec3>& points, const ColorRGBA& color, float s
 /// @param a, b, c, d 從正面看為逆時針
 /// @param color 基本顏色
 void drawQuad(const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d, const ColorRGBA& color);
+
+/// 以目前的 MODELVIEW 畫出網格。顏色取自各頂點，再依法向量決定明暗；
+/// 法向量屬於網格自己的座標系，所以明暗會跟著物體轉
+void drawMesh(const geometry::Mesh& mesh);
 
 }  // namespace robot::graphics

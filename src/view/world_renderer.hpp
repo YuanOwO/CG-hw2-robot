@@ -1,7 +1,8 @@
 #pragma once
 
 #include "graphics/camera.hpp"
-#include "view/entity/skeleton_renderer.hpp"
+#include "view/chunk_renderer.hpp"
+#include "view/entity_renderer.hpp"
 #include "world/world.hpp"
 
 namespace robot::view {
@@ -13,7 +14,8 @@ class WorldRenderer {
                 int width, int height) const;
 
    private:
-    entity::SkeletonRenderer _skeletonRenderer;
+    ChunkRenderer _chunkRenderer;
+    EntityRenderer _entityRenderer;
 };
 
 }  // namespace robot::view

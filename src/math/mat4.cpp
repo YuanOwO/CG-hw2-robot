@@ -1,5 +1,6 @@
 #include "math/mat4.hpp"
 
+#include <algorithm>
 #include <cmath>
 
 #include "math/utils.hpp"
@@ -9,6 +10,28 @@ namespace robot {
 Mat4::Mat4() : m{} {
     for (int i = 0; i < 4; ++i) {
         at(i, i) = 1.0f;
+    }
+}
+
+Mat4::Mat4(const float* values) : m{} {
+    std::copy_n(values, 16, m);
+}
+
+Mat4::Mat4(std::initializer_list<float> values) : m{} {
+    std::copy_n(values.begin(), std::min(values.size(), 16ul), m);
+}
+
+Mat4::Mat4(std::initializer_list<std::initializer_list<float>> mat) : m{} {
+    int row = 0;
+    for (const auto& r : mat) {
+        int col = 0;
+        for (const auto& v : r) {
+            if (row < 4 && col < 4) {
+                at(row, col) = v;
+            }
+            col++;
+        }
+        row++;
     }
 }
 
@@ -60,10 +83,6 @@ Mat4 scale(float sx, float sy, float sz) {
     result.at(1, 1) = sy;
     result.at(2, 2) = sz;
     return result;
-}
-
-Mat4 scale(float s) {
-    return scale(s, s, s);
 }
 
 Vec3 transformPoint(const Mat4& mat, const Vec3& point) {

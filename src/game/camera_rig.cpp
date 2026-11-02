@@ -23,23 +23,24 @@ const float BASE_HALF_HEIGHT = 40.0f;
 
 }  // namespace
 
+void CameraRig::setYaw(float degree) {
+    _yaw = wrapDegrees(degree);
+}
+
+void CameraRig::setPitch(float degree) {
+    _pitch = std::clamp(degree, MIN_PITCH, MAX_PITCH);
+}
+
+void CameraRig::setDistance(float distance) {
+    _distance = std::max(distance, 0.0f);
+}
+
 void CameraRig::turn(float degree) {
-    _yaw = std::fmod(_yaw + degree, 360.0f);
-    if (_yaw < 0.0f) {
-        _yaw += 360.0f;  // fmod 保留被除數的正負號
-    }
+    _yaw = wrapDegrees(_yaw + degree);
 }
 
 void CameraRig::tilt(float degree) {
     _pitch = std::clamp(_pitch + degree, MIN_PITCH, MAX_PITCH);
-}
-
-void CameraRig::pan(float forward, float right) {
-    const float yaw = radians(_yaw);
-    // 只取視線的水平分量，目標點的高度不變
-    const Vec3 ahead(-std::sin(yaw), 0.0f, -std::cos(yaw));
-    const Vec3 side(std::cos(yaw), 0.0f, -std::sin(yaw));
-    _target += (ahead * forward + side * right) / _zoom;
 }
 
 void CameraRig::zoom(float factor) {
@@ -66,8 +67,10 @@ graphics::OrthoProjection CameraRig::projection() const {
     projection.bottom = -BASE_HALF_HEIGHT / _zoom;
     projection.top = BASE_HALF_HEIGHT / _zoom;
 
-    // 眼睛在目標點後方 _distance 處，farPlane 要比它遠，目標點之後的地形才畫得出來
-    projection.farPlane = 200.0f;
+    // 平行投影時眼睛的位置只決定裁切範圍：nearPlane 取負值，眼睛背後的高地才不會被切掉；
+    // 眼睛在目標點後方 _distance 處，farPlane 要涵蓋目標點之後整個載入範圍的地形
+    projection.nearPlane = -400.0f;
+    projection.farPlane = 400.0f;
     return projection;
 }
 
