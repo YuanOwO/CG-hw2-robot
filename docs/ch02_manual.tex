@@ -1,0 +1,52 @@
+\section{使用者操作說明}
+\label{sec:manual}
+
+\subsection{基本單位定義}
+\label{sec:unit-definition}
+
+在本作業中，為了方便描述與模擬真實世界的物理，
+世界坐標系的長度單位定義為 $1 \text{單位} = 1 \text{公尺}$，
+世界模擬時間單位定義為 $1 \text{Tick} = \frac{1}{60} \text{秒}$。
+
+\subsection{按鍵}
+\label{sec:controls}
+
+操控機器人與相機的按鍵如表~\ref{tab:controls}。移動方向以機器人的視線為準：W 往視線方向前進，A、D 往左右平移。
+各姿勢能做的動作不同：站立時可以走、跑、跳，潛行時只能慢慢走或跳，坐下時不能移動；變換姿勢需要 0.5 秒，此期間也不能移動。
+走路速度為 1.2 單位/秒，潛行時為 0.6 單位/秒，跑步時為 3 單位/秒。跳躍高度為 0.5 單位，需站立或潛行且著地才能跳躍。
+
+\begin{table}[htbp]
+    \centering
+    \caption{操控機器人與相機的按鍵}
+    \label{tab:controls}
+    \small
+    \begin{tabularx}{\textwidth}{>{\bfseries\raggedright\arraybackslash}p{.18\textwidth} X}
+        \toprule
+        按鍵        & 功能                                 \\
+        \midrule
+        W / S     & 往視線方向前進 / 後退                       \\
+        A / D     & 往左 / 右平移                           \\
+        左 Shift   & 按住時跑步                              \\
+        空白鍵       & 跳躍，高度；需站立或潛行且著地                    \\
+        1 / 2 / 3 & 切換為站立 / 潛行 / 坐下                    \\
+        左鍵拖曳      & 左右轉動、上下俯仰視角                        \\
+        Q / E     & 往左 / 右轉動視角                         \\
+        Tab       & 切換相機模式（第~\ref{sec:camera-modes} 節） \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+畫面左上角的 HUD 顯示幀率（FPS）與模擬頻率（TPS）、視線的 yaw 與 pitch、機器人的位置與速度等資訊。
+
+\subsection{相機模式}
+\label{sec:camera-modes}
+
+由於世界設定是一個無邊界的平面，為了方便觀察機器人的動作，提供三種相機模式。
+相機的關注點（Focus）是機器人的頭部，相機位置（Eye）則依模式不同而有所差異。
+按下 Tab 可以切換以下三種模式：
+
+\begin{itemize}
+    \item \textbf{正面}：相機在機器人前方，機器人看向相機，轉動視角時仍會帶動機器人轉身。
+    \item \textbf{背後}（預設）：相機在機器人後方，轉動視角時機器人跟著轉身，適合一般移動。
+    \item \textbf{自由}：機器人維持原本的視線，相機可以繞著機器人轉，適合從側面或正面觀察動作。
+\end{itemize}

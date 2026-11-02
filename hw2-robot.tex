@@ -21,24 +21,30 @@
 % 標題 & 目錄
 \maketitle
 
-\begingroup
+% \begingroup
 
-\hypersetup{linkcolor=black}
-\setlength{\columnsep}{2em}
-\setlength{\columnseprule}{0.2pt}
+% \hypersetup{linkcolor=black}
+% \setlength{\columnsep}{2em}
+% \setlength{\columnseprule}{0.2pt}
 
-\begin{multicols}{3}
-    \scriptsize
-    \tableofcontents
-\end{multicols}
+% % \begin{multicols}{3}
+% %     \scriptsize
+% %     \tableofcontents
+% % \end{multicols}
 
-\endgroup
+% \endgroup
 
 % 正文
 
-\clearpage
+% \clearpage
 
 \pagenumbering{arabic}
 
+\input{docs/ch02_manual.tex}
+\input{docs/ch03_robot.tex}
+\input{docs/ch04_motion.tex}
+\input{docs/ch05_collision.tex}
+\input{docs/ch06_world.tex}
+\input{docs/ch07_reflection.tex}
 
 \end{document}
