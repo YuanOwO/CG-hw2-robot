@@ -35,6 +35,8 @@ world::anatomy::Pose RobotAnimator::animate(const world::entity::Entity& entity)
 
     world::anatomy::Pose pose = entity.pose();
 
+    pose[body.head.head()].pitch = entity.look().pitch;
+
     float phase = 2.0f * PI * gait.distance / cycleLength();
     float s = std::sin(phase);
     float c = std::cos(phase);
