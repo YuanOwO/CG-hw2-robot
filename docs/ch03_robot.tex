@@ -31,7 +31,7 @@
     \label{fig:robot-look}
 \end{figure}
 
-每個部位都是一組三角形網格（mesh）。我先用直線、圓弧與 Bézier 曲線在 $+xy$ 半平面畫出 2D 剖面，
+每個部位都是一組三角形網格（mesh）。我先用直線、圓弧與 Bézier 曲線在 $x$-$y$ 平面上 $x > 0$ 的半平面畫出 2D 剖面，
 再透過 \lstinline|MeshBuilder| 將剖面繞 $y$ 軸旋轉成旋轉體（lathe）。
 部位的平移、旋轉與縮放則使用 $4 \times 4$ 齊次矩陣處理。
 
@@ -93,7 +93,7 @@ $$
 \subsection{階層繪製}
 
 階層模型的變換順序是先移到關節位置，再套用關節旋轉；所有子節點都會繼承這個變換。
-程式用相同順序計算骨頭 $i$ 的矩陣：
+程式用相同順序計算骨頭 $i$ 在機器人模型空間中的矩陣 $M_i$：
 $$
     \begin{cases}
         M_{\text{root}} = M_0 = T(\text{rootOffset}), \\
@@ -106,8 +106,17 @@ $$
 
 繪製時先以 \lstinline|glTranslatef|、\lstinline|glRotatef| 移到機器人的位置與朝向，
 再對每根骨頭 \lstinline|glPushMatrix|、\lstinline|glMultMatrixf(|$M_i$\lstinline|)|、畫出網格、\lstinline|glPopMatrix|。
-矩陣採用 OpenGL 的 column-major 排列，可以直接交給 \lstinline|glMultMatrixf|。
+由於矩陣採用 OpenGL 的 column-major 排列，可以直接交給 \lstinline|glMultMatrixf|。
 
-這組矩陣不只用來繪圖。眼睛在頭部上是一個標記點（marker），
-將它的局部座標乘上頭部矩陣 $M_{\text{head}}$ 後，就能得到世界座標，相機再以該位置為焦點。
+這組矩陣不只用來繪圖。若機器人的世界位置為 $\mathbf{p}$、朝向為 $\psi$，骨頭 $i$ 的世界空間矩陣為
+$$
+    M_{\text{world},i}=T(\mathbf{p})R_y(\psi)M_i.
+$$
+眼睛在頭部上是一個標記點（marker）。將其局部座標 $\mathbf{p}_{\text{eye,local}}$ 轉成齊次座標後，可由
+$$
+    \mathbf{p}_{\text{eye,world}}
+    =M_{\text{world,head}}
+    \begin{bmatrix}\mathbf{p}_{\text{eye,local}}\\1\end{bmatrix}
+$$
+取得眼睛的世界座標，相機再以該位置為焦點。
 骨架矩陣的計算放在不依賴 OpenGL 的 \lstinline|world| 模組中，模擬端與繪圖端使用的是同一份結果。
