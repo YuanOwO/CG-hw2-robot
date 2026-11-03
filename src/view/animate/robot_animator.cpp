@@ -35,6 +35,7 @@ world::anatomy::Pose RobotAnimator::animate(const world::entity::Entity& entity)
 
     world::anatomy::Pose pose = entity.pose();
 
+    pose[body.head.head()].yaw = wrapSignedDegrees(entity.look().yaw - entity.yaw());
     pose[body.head.head()].pitch = entity.look().pitch;
 
     float phase = 2.0f * PI * gait.distance / cycleLength();

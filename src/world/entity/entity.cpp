@@ -25,18 +25,21 @@ Entity::Entity(EntityId id, Seed seed, float mass, Vec3 position, const anatomy:
 }
 
 void Entity::tick(float dt, const World& world) {
+    constexpr float STANCE_TRANSITION_DURATION = 0.5f;  // 轉換姿勢的時間固定為 0.5 秒
+    constexpr float BODY_TURN_RATIO = 0.5f;             // 身體朝向轉向視線方向的程度，0 表示不轉，1 表示完全轉向
+    constexpr float BODY_YAW_RATE = 10.0f;              // 身體朝向轉向視線方向的速度
+
     const auto intent = _brain->think(*this, world, dt);
 
     if (intent.look.has_value()) {
         _look = intent.look.value();
-        _yaw = _look.yaw;  // 身體朝向與視線一致
     }
 
     if (intent.stance.has_value() && supportsStance(intent.stance.value())) {
         _stance.request(intent.stance.value());
     }
 
-    _stance.advance(dt, 0.5f);  // 轉換姿勢的時間固定為 0.5 秒
+    _stance.advance(dt, STANCE_TRANSITION_DURATION);
     updatePose(_pose);
 
     auto driveInput = steer(intent);
@@ -45,9 +48,19 @@ void Entity::tick(float dt, const World& world) {
 
     Vec3 displacement = _rigidBody.position() - before;
     displacement.y = 0.0f;
-    const Vec3 forward = rotateAroundY(Vec3(0.0f, 0.0f, 1.0f), _yaw);
-    const float moved = dot(displacement, forward) < 0.0f ? -length(displacement) : length(displacement);
+
+    const float moved = intent.surge < 0.0f ? -length(displacement) : length(displacement);
     _gait.advance(moved, walkSpeed(), dt);
+
+    // 如果有水平移動，身體朝向會慢慢轉向視線方向
+    if (std::abs(intent.surge) > 0.0f || std::abs(intent.sway) > 0.0f) {
+        // 如果往後走，身體偏向走向的反方向
+        const float sign = intent.surge < 0.0f ? -1.0f : 1.0f;
+        // 側著走時身體會稍微轉向側邊
+        float offset = degrees(std::atan2(sign * intent.sway, sign * intent.surge)) * BODY_TURN_RATIO;
+        float delta = wrapSignedDegrees(_look.yaw - offset - _yaw);
+        _yaw = wrapDegrees(_yaw + delta * approach(BODY_YAW_RATE, dt));
+    }
 
     _age++;
 }
