@@ -1,11 +1,13 @@
-\section{世界與相機}
+\section{世界生成}
 \label{sec:world}
 
 \subsection{地形與 Chunk}
 
-原本的作業規格使用 $[0,0,0]$ 到 $[50,0,50]$ 的平面。我將地板改成依 seed 生成的起伏地形，並切成邊長 16 m 的 chunk。程式只保留機器人周圍半徑 12 個 chunk，移動時會釋放遠處區塊並生成新區塊，因此地形可以持續向外延伸（圖~\ref{fig:terrain}）。
+原本的作業規格使用 $[0,0,0]$ 到 $[50,0,50]$ 的平面。我將地板改成依 seed 生成的起伏地形，並切成邊長 16 m 的 chunk。
+程式只保留機器人周圍半徑 12 個 chunk，移動時會釋放遠處區塊並生成新區塊，因此地形可以持續向外延伸（圖~\ref{fig:terrain}）。
 
-地形高度由自行實作的 Perlin noise 與 fBm 產生，再依高度與環境參數決定地表顏色。各 chunk 的內容由世界 seed 和座標決定，相同 seed 會得到相同結果。地形網格只在 chunk 第一次繪製時建立並快取，避免每幀重新取樣雜訊。
+地形高度由自行實作的 Perlin noise 與 fBm 產生，再依高度與環境參數決定地表顏色。
+各 chunk 的內容由世界 seed 和座標決定，相同 seed 會得到相同結果。地形網格只在 chunk 第一次繪製時建立並快取，避免每幀重新取樣雜訊。
 
 \subsection{障礙物}
 
@@ -28,15 +30,3 @@
     \caption{地形與障礙物}
     \label{fig:terrain}
 \end{figure}
-
-\subsection{相機與投影}
-
-相機使用 eye、focus、up 三個參數，交給 \lstinline|gluLookAt|；投影方式沿用作業給定的 \lstinline|glOrtho| 平行投影。
-focus 取機器人眼睛的世界座標，計算方式見第~\ref{sec:scene-graph} 節。eye 則依相機的 yaw、pitch，從 focus 沿反方向移動一段距離：
-\begin{equation*}
-    \mathbf{f} = (-\sin\psi\cos\theta,\; \sin\theta,\; -\cos\psi\cos\theta), \qquad \text{eye} = \text{focus} - d\,\mathbf{f},
-\end{equation*}
-其中 $\psi$、$\theta$ 分別是 yaw 與 pitch，$\mathbf{f}$ 是向量 $(0,0,-1)$ 先俯仰、再繞 $y$ 軸旋轉後的結果。pitch 限制在 $\pm89.9^\circ$，避免視線方向與 up 平行。
-
-\lstinline|glOrtho| 的左右範圍會配合視窗長寬比調整，避免改變視窗大小時畫面變形。
-near 與 far 分別設為 $-400$ 和 $400$，以免 eye 後方的高地或載入範圍邊緣被裁掉。每幀先繪製 3D 場景，接著切換成以像素為單位的 \lstinline|glOrtho|，再畫出 HUD。
