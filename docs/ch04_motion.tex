@@ -3,12 +3,10 @@
 
 \subsection{從輸入到動作}
 
-程式的主迴圈是一個固定約 60 Hz 的 \lstinline|glutTimerFunc|。
-會定期推進世界的時間，並且處理玩家的輸入、更新機器人的狀態、模擬世界的物理、以及繪製畫面。
+主迴圈透過 \lstinline|glutTimerFunc| 以約 60 Hz 更新。每次更新會讀取輸入、更新機器人狀態、進行物理模擬，最後重畫畫面。
 
-每個 tick 中，玩家的按鍵先被轉成一個 \lstinline|Intent|，描述「想做什麼」：
-前後左右的移動量、是否跑步、是否跳躍、想切換的姿勢，以及視線方向。
-機器人收到 \lstinline|Intent| 後依序處理：
+按鍵狀態不會直接改變位置，而是先轉成 \lstinline|Intent|。其中記錄前後左右的移動量、跑步與跳躍狀態、要切換的姿勢及視線方向。
+機器人每個 tick 依下列順序處理：
 
 \begin{enumerate}
     \item 身體朝向設為視線的 yaw，轉彎因此由視角控制
@@ -17,23 +15,23 @@
     \item 以實際移動的距離推進走路的步伐
 \end{enumerate}
 
-繪製時再依姿勢與步伐算出各關節的角度。
-這樣的分工讓「想做什麼」與「能做到什麼」分開：鍵盤只產生意圖，速度上限、姿勢限制與碰撞都由機器人本身決定。
+關節角度等到繪製前才由姿勢與目前步伐算出。輸入端只記錄玩家想做的動作；速度、姿勢限制與碰撞仍由模擬端判斷。
 
 \subsection{姿勢切換}
 
-機器人有站立、潛行、坐下三種姿勢（圖~\ref{fig:stances}），每種姿勢是一組關節角度加上 rootOffset：
+機器人有站立、潛行與坐下三種姿勢（圖~\ref{fig:stances}）。每種姿勢包含一組關節角度和 rootOffset：
 \begin{itemize}
     \item \textbf{站立}：所有關節為 $0^\circ$，髖部高度等於腿長 $L = 13$ px。
-    \item \textbf{潛行}：大腿往前抬 $60^\circ$、膝蓋彎 $60^\circ$，軀幹前傾 $30^\circ$、脖子回抬 $30^\circ$ 讓視線維持水平；髖部降到 $\frac{\sqrt{3}}{2} L$。
+    \item \textbf{潛行}：軀幹前傾 $30^\circ$、脖子回抬 $30^\circ$ 讓視線維持水平，大腿往前抬 $60^\circ$、膝蓋彎 $60^\circ$；
+          髖部降到 $\frac{\sqrt{3}}{2} L$。
     \item \textbf{坐下}：大腿往前抬 $90^\circ$ 並向外張開 $15^\circ$，髖部降到大腿厚度的一半，正好坐在地上。
 \end{itemize}
 
-姿勢的轉換記錄為起點 \lstinline|from|、終點 \lstinline|to| 與進度 $t \in [0, 1]$，固定花 0.5 秒完成；
-轉換中每個關節角度與 rootOffset 都以 $t$ 在兩個姿勢間線性內插。
-轉換途中只接受「折返」：若要求回到起點，就交換 \lstinline|from| 與 \lstinline|to| 並把進度改為 $1 - t$，
-動作會從目前的位置原路退回而不會跳動；要求第三種姿勢則忽略，直到這次轉換結束。
-轉換中機器人不能移動，碰撞箱的大小也隨 $t$ 內插（第~\ref{sec:collision} 節）。
+切換姿勢固定要花費 0.5 秒。
+轉換狀態記錄起點 \lstinline|from|、終點 \lstinline|to| 與進度 $t \in [0, 1]$，所有關節角度和 rootOffset 都依 $t$ 線性內插。
+如果途中要求回到原姿勢，程式會交換 \lstinline|from| 與 \lstinline|to|，並將進度改成 $1-t$，讓動作直接從目前位置倒回去。
+此時若要求第三種姿勢，輸入會先被忽略，等目前的轉換結束後才能再次切換。
+轉換期間不能移動，碰撞箱也會以相同進度改變大小（第~\ref{sec:collision} 節）。
 
 \begin{figure}[htbp]
     \centering
@@ -58,49 +56,48 @@
 
 \subsection{走路與跑步}
 
-手腳擺動是參考 Minecraft 動畫，依照水平移動距離長度計算相位。
-機器人著地時累積水平移動距離 $d$，並以此計算相位
+走路動畫參考 Minecraft 的手腳擺動方式，動畫相位是由機器人累積水平移動距離 $d$ 決定：
 $$
     \phi = 2\pi \frac{d}{C}, \qquad C = 2 \cdot 2L \sin 25^\circ \approx 1.37 \text{ m},
 $$
-其中 $C$ 是左右各跨一步走過的距離：大腿前後各擺 $25^\circ$ 時，兩腳張開的前後距離為 $2L \sin 25^\circ$。
-另外定義兩個係數：$a$ 是擺動幅度，目標值為「目前速度 / 走路速度」，上限 1.2，停下時為 0；$r \in [0, 1]$ 是跑步的程度，速度超過走路速度時開始增加，達到兩倍時為 1。
+其中 $C$ 代表左右腳各跨一步的距離。大腿前後各擺 $25^\circ$ 時，兩腳在前後方向相距 $2L\sin25^\circ$，所以一個完整週期取其兩倍。
+擺動幅度 $a$ 的目標值為「目前速度／走路速度」，上限為 1.2，停下時則為 0。
+另一個係數 $r\in[0,1]$ 表示跑步程度；速度超過走路速度後開始增加，達到兩倍走路速度時為 1。
 各關節在站立姿勢上疊加的 pitch 角度為
 \begin{align*}
     \text{髖} & = \pm 25^\circ \sin\phi \cdot a,               & \text{膝} & = -40^\circ \max(0, \pm\cos\phi) \cdot a, \\
     \text{肩} & = \mp 20^\circ \sin\phi \cdot a + 180^\circ r, & \text{肘} & = 15^\circ \cdot a \, (1 - r),
 \end{align*}
-其中 $\pm$、$\mp$ 的上方符號用於左側、下方用於右側，pitch 正值為往前抬，因此兩腳交替、手與同側的腳反向擺動。
-$\cos\phi$ 是 $\sin\phi$ 的變化方向，膝蓋只在大腿正往前擺的那隻腳彎曲，讓腳尖離地。
-支撐腳是直的，髖角度為 $\theta = 25^\circ \sin\phi \cdot a$ 時髖部降低 $L(1 - \cos\theta)$，扣在 rootOffset 上，身體就隨步伐起伏。
+其中 $\pm$、$\mp$ 的上方符號用於身體左側關節、下方用於身體右側關節，pitch 正值為往前抬，因此兩腳交替、手與同側的腳反向擺動。
+$\cos\phi$ 用來判斷大腿擺動方向，只有往前擺的那條腿會彎曲膝蓋，支撐腿保持伸直。
+當髖關節角度為 $\theta = 25^\circ \sin\phi \cdot a$ 時，rootOffset 會再扣掉 $L(1-\cos\theta)$，使髖部隨步伐上下移動。
 
-跑步時雙臂伸直高舉過頭，並向外張開 $20^\circ r$ 成 V 字。
-$a$ 與 $r$ 都不直接跳到目標值，而是每個 tick 以 $x \leftarrow x + (x^\ast - x)(1 - e^{-k\,\Delta t})$ 逼近，停下或起跑時手腳會平順地收回或展開；這個式子連續套用兩次 $\Delta t$ 與套用一次 $2\Delta t$ 的結果相同，因此與 tick 頻率無關。
+跑步時，雙臂會逐漸伸直並舉過頭，再向外張開 $20^\circ r$ 成 V 字。
+$a$ 與 $r$ 不會立刻跳到目標值，而是在每個 tick 以 $x \leftarrow x + (x^\ast - x)(1 - e^{-k\,\Delta t})$ 逼近。
+因此起跑與停下時，四肢會逐漸展開或回到原位。這個更新式不受 tick 頻率影響：連續更新兩次 $\Delta t$ 與一次更新 $2\Delta t$ 的結果相同。
 
 \subsection{轉向與視線}
 
-視線由 yaw 與 pitch 組成。拖曳滑鼠或按 Q、E 改變視線，機器人的身體朝向直接跟著視線的 yaw，這就是轉彎；前進與平移的方向也以視線為準。
-視線的 pitch 則交給頭部的 pitch 關節，機器人抬頭、低頭看向相機注視的方向，超過頭部的角度範圍時由關節限制截斷。
-自由相機模式下視線不再更新，機器人維持原本的朝向，方便從其他角度觀察。
+視線由 yaw 與 pitch 組成，可用滑鼠拖曳。
+身體朝向直接使用視線的 yaw，移動方向也以此為基準；視線的 pitch 則交給頭部關節，超出活動範圍的部分會被截斷。
+切換到自由相機後，相機的旋轉不再改變機器人視線，機器人會維持原本的方向。
 
 \subsection{跳躍與重力}
 
-以數值積分模擬重力，每個 tick 先更新速度再更新位移：
+重力使用半隱式 Euler 法積分，每個 tick 先更新速度，再用新速度更新位置：
 \begin{equation*}
-    \mathbf{v} \leftarrow \mathbf{v} + \mathbf{a}\,\Delta t, \qquad \mathbf{x} \leftarrow \mathbf{x} + \mathbf{v}\,\Delta t, \qquad \mathbf{a} = (0, -g, 0),\; g = 9.80665 \text{ m/s}^2 .
+    \mathbf{v} \leftarrow \mathbf{v} + \mathbf{a} \Delta t, \qquad
+    \mathbf{x} \leftarrow \mathbf{x} + \mathbf{v} \Delta t, \qquad
+    \mathbf{a} = [0, -g, 0],\; g = 9.80665 \text{ m/s}^2 .
 \end{equation*}
-著地時假設摩擦力足夠大，水平速度直接等於目標速度；在空中則只受重力影響，維持起跳時的水平速度，因此在空中無法改變移動方向或加速。
-跳躍高度 $h = 0.5$ m，由 $v^2 = 2gh$ 得到起跳的鉛直速度 $v_y = \sqrt{2gh}$。
+著地時假設摩擦力足夠，水平速度可直接改成目標速度。離地後只受重力影響，因此會保留起跳瞬間的水平速度，不能在空中轉向或加速。
+設定跳躍高度 $h=0.5$ m，再由 $v^2=2gh$ 算出鉛直起跳速度 $v_y=\sqrt{2gh}$。
 
 \subsection{動作限制}
 
 \begin{itemize}[nosep]
-    \item \textbf{速度}：站立時走路 1.2 m/s、跑步 3 m/s，潛行 0.6 m/s，坐下或轉換姿勢時為 0；前後與左右同時按下時，合成方向的長度會被限制在 1，斜走不會比直走快。
-    \item \textbf{關節角度}：每次計算骨架矩陣前，所有角度都會被截斷到表~\ref{tab:dof} 的範圍；擺動幅度的上限 1.2 也是依髖關節往後的極限 $-30^\circ$ 決定的。
+    \item \textbf{速度}：站立時走路 1.2 m/s、跑步 3 m/s，潛行 0.6 m/s，坐下或轉換姿勢時為 0；
+          前後與左右同時按下時，合成方向的長度會被限制在 1，斜走不會比直走快。
+    \item \textbf{關節角度}：每次計算骨架矩陣前，所有角度都會被截斷到表~\ref{tab:dof} 的範圍。
     \item \textbf{姿勢}：只有站立能跑，坐下不能移動或跳躍。
 \end{itemize}
-
-\subsection{抓東西}
-
-% TODO: 功能完成後補上
-（尚未實作。）
