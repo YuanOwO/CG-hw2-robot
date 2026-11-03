@@ -1,0 +1,24 @@
+flowchart TB
+    W[世界座標] -->|"T(position) R<sub>y</sub>(yaw)"| R[root]
+    R -->|"T(rootOffset)"| TORSE["軀幹<br/><small>髖部中央：pitch</small>"]
+
+    TORSE --> NECK["脖子<br/><small>頸根：pitch</small>"]
+    NECK --> HEAD["頭<br/><small>頸：yaw, pitch</small>"]
+
+    TORSE --> LUA["左上臂<br/><small>左肩：pitch, roll</small>"]
+    LUA --> LFA["左前臂<br/><small>手肘：pitch</small>"]
+
+    TORSE --> RUA["右上臂<br/><small>右肩：pitch, roll</small>"]
+    RUA --> RFA["右前臂<br/><small>手肘：pitch</small>"]
+
+    TORSE --> LTH["左大腿<br/><small>左髖：yaw, pitch</small>"]
+    LTH --> LSH["左小腿<br/><small>膝蓋：pitch</small>"]
+
+    TORSE --> RTH["右大腿<br/><small>右髖：yaw, pitch</small>"]
+    RTH --> RSH["右小腿<br/><small>膝蓋：pitch</small>"]
+
+    classDef frame fill:#f3f3f3,stroke:#666,color:#111,stroke-width:1px;
+    classDef bone fill:#e8f0fb,stroke:#3a5f8f,color:#111,stroke-width:1px;
+
+    class W,R frame;
+    class TORSE,NECK,HEAD,LUA,LFA,RUA,RFA,LTH,LSH,RTH,RSH bone;

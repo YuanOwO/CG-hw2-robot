@@ -1,0 +1,98 @@
+\section{動作與控制}
+\label{sec:motion}
+
+\subsection{從輸入到動作}
+
+主迴圈由 \lstinline|glutTimerFunc| 約每 16 ms 觸發一次，依經過時間執行固定 $\frac{1}{60}$ 秒的 tick，最後重畫畫面。
+每個 tick 會讀取輸入、更新機器人狀態並進行物理模擬。
+
+按鍵狀態不會直接改變位置，而是先轉成 \lstinline|Intent|。其中記錄前後左右的移動量、跑步與跳躍狀態、要切換的姿勢及視線方向。
+機器人每個 tick 依下列順序處理：
+
+\begin{enumerate}
+    \item 身體朝向設為視線的 yaw，轉彎因此由視角控制；視線的 pitch 交給頭部關節，超出活動範圍的部分會被截斷
+    \item 處理姿勢切換的請求，並推進轉換的進度
+    \item 依目前的姿勢決定目標速度，交給物理模擬器計算位移與碰撞（第~\ref{sec:collision} 節）
+    \item 以實際移動的距離推進走路的步伐
+\end{enumerate}
+
+關節角度等到繪製前才由姿勢與目前步伐算出。輸入端只記錄玩家想做的動作；速度、姿勢限制與碰撞仍由模擬端判斷。
+
+\subsection{姿勢切換}
+
+機器人有站立、潛行與坐下三種姿勢（圖~\ref{fig:stances}）。每種姿勢包含一組關節角度和 rootOffset：
+\begin{itemize}
+    \item \textbf{站立}：所有關節為 $0^\circ$，髖部高度等於腿長 $L = 13$ px。
+    \item \textbf{潛行}：軀幹前傾 $30^\circ$、脖子回抬 $30^\circ$ 讓視線維持水平，大腿往前抬 $60^\circ$、膝蓋彎 $60^\circ$；
+          雙腿接在軀幹下會一起前傾，大腿與小腿都和鉛直方向夾 $30^\circ$，因此髖部降到 $\frac{\sqrt{3}}{2} L$。
+    \item \textbf{坐下}：大腿往前抬 $90^\circ$ 並向外張開 $15^\circ$，髖部降到大腿厚度的一半，正好坐在地上。
+\end{itemize}
+
+切換姿勢固定要花費 0.5 秒。
+轉換狀態記錄起點 \lstinline|from|、終點 \lstinline|to| 與進度 $t \in [0, 1]$，所有關節角度和 rootOffset 都依 $t$ 線性內插。
+如果途中要求回到原姿勢，程式會交換 \lstinline|from| 與 \lstinline|to|，並將進度改成 $1-t$，讓動作直接從目前位置倒回去。
+轉換途中若要求第三種姿勢，輸入會先被忽略，等目前的轉換結束後才能再次切換。
+轉換期間不能移動，碰撞箱也會以相同進度改變大小（第~\ref{sec:collision} 節）。
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[t]{.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{docs/figures/stance-standing.png}
+        \caption{站立}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{docs/figures/stance-sneaking.png}
+        \caption{潛行}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{docs/figures/stance-sitting.png}
+        \caption{坐下}
+    \end{subfigure}
+    \caption{三種姿勢；線框為碰撞箱}
+    \label{fig:stances}
+\end{figure}
+
+\subsection{走路與跑步}
+
+走路動畫參考 Minecraft 的手腳擺動方式，動畫相位是由機器人累積水平移動距離 $d$ 決定：
+$$
+    \phi = 2\pi \frac{d}{C}, \qquad C = 2 \cdot 2L \sin 25^\circ \approx 1.37 \text{ m},
+$$
+其中 $C$ 代表左右腳各跨一步的距離。大腿前後各擺 $25^\circ$ 時，兩腳在前後方向相距 $2L\sin25^\circ$，所以一個完整週期取其兩倍。
+擺動幅度 $a$ 的目標值為「目前速度／走路速度」，上限為 1.2，停下時則為 0。
+另一個係數 $r\in[0,1]$ 表示跑步程度；速度超過走路速度後開始增加，達到兩倍走路速度時為 1。
+各關節在站立姿勢上疊加的 pitch 角度為
+\begin{align*}
+    \text{髖} & = \pm 25^\circ \sin\phi \cdot a,               & \text{膝} & = -40^\circ \max(0, \pm\cos\phi) \cdot a, \\
+    \text{肩} & = \mp 20^\circ \sin\phi \cdot a + 180^\circ r, & \text{肘} & = 15^\circ \cdot a \, (1 - r),
+\end{align*}
+其中 $\pm$、$\mp$ 的上方符號用於身體左側關節、下方用於身體右側關節，pitch 正值為往前抬，因此兩腳交替、手與同側的腳反向擺動。
+$\cos\phi$ 的正負代表髖關節角度正在增加或減少，用來區分兩腿的前擺階段。腿從中立位置開始往前擺時膝蓋彎曲，接近前方端點時再逐漸伸直，讓腳尖在擺動期間離地。
+當髖關節角度為 $\theta = 25^\circ \sin\phi \cdot a$ 時，rootOffset 會再扣掉 $L(1-\cos\theta)$，使髖部隨步伐上下移動。
+
+跑步時，雙臂會逐漸伸直並舉過頭，再向外張開 $20^\circ r$ 成 V 字。
+$a$ 與 $r$ 不會立刻跳到目標值，而是在每個 tick 以 $x \leftarrow x + (x^\ast - x)(1 - e^{-k\,\Delta t})$ 逼近。
+因此起跑與停下時，四肢會逐漸展開或回到原位。
+
+\subsection{跳躍與重力}
+
+重力使用半隱式 Euler 法積分，每個 tick 先更新速度，再用新速度更新位置：
+\begin{equation*}
+    \mathbf{v} \leftarrow \mathbf{v} + \mathbf{a} \Delta t, \qquad
+    \mathbf{x} \leftarrow \mathbf{x} + \mathbf{v} \Delta t, \qquad
+    \mathbf{a} = [0, -g, 0],\; g = 9.80665 \text{ m/s}^2 .
+\end{equation*}
+著地時假設摩擦力足夠大，水平速度可直接改成目標速度。離地後只受重力影響，因此會保留起跳瞬間的水平速度，無法在空中改變移動方向或速度。
+設定目標跳躍高度 $h=0.5$ m，再由連續時間的關係 $v^2=2gh$ 算出鉛直起跳速度 $v_y=\sqrt{2gh}$。實際位置以固定時間步長積分，因此模擬得到的最高點會有些微離散誤差。
+
+\subsection{動作限制}
+
+\begin{itemize}[nosep]
+    \item \textbf{速度}：站立時走路 1.2 m/s、跑步 3 m/s，潛行 0.6 m/s，坐下或轉換姿勢時為 0；
+          前後與左右同時按下時，合成方向的長度會被限制在 1，斜走不會比直走快。
+    \item \textbf{關節角度}：每次計算骨架矩陣前，所有角度都會被截斷到表~\ref{tab:dof} 的範圍。
+    \item \textbf{姿勢}：只有站立能跑，坐下不能移動或跳躍；跳躍還需雙腳著地。
+\end{itemize}

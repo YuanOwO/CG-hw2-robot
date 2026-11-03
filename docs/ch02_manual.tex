@@ -1,0 +1,43 @@
+\section{使用者操作說明}
+\label{sec:manual}
+
+\subsection{按鍵說明}
+\label{sec:controls}
+
+表~\ref{tab:controls} 列出機器人與相機的操作方式。移動方向以機器人的視線為準：W、S 控制前後移動，A、D 控制左右平移。
+站立時可以走路、跑步或跳躍；潛行時只能慢走或跳躍；坐下時不能移動。姿勢切換需要 0.5 秒，切換途中同樣不能移動。
+走路、潛行與跑步的速度分別為 1.2、0.6 與 3 m/s。機器人只有在站立或潛行且雙腳著地時才能跳躍，目標跳躍高度為 0.5 m。
+
+\begin{table}[htbp]
+    \centering
+    \caption{操控機器人與相機的按鍵}
+    \label{tab:controls}
+    \small
+    \begin{tabularx}{\textwidth}{>{\bfseries\raggedright\arraybackslash}p{.18\textwidth} X}
+        \toprule
+        按鍵        & 功能                                 \\
+        \midrule
+        W / S     & 往視線方向前進 / 後退                       \\
+        A / D     & 往左 / 右平移                           \\
+        左 Shift   & 按住時跑步                              \\
+        空白鍵       & 跳躍（目標高度 0.5 m）；需站立或潛行且著地           \\
+        1 / 2 / 3 & 切換為站立 / 潛行 / 坐下                    \\
+        左鍵拖曳      & 左右轉動、上下俯仰視角                        \\
+        Q / E     & 往左 / 右轉動視角                         \\
+        Tab       & 切換相機模式（第~\ref{sec:camera-modes} 節） \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+畫面左上角的 HUD 會顯示幀率（FPS）、模擬頻率（TPS）、視線的 yaw 與 pitch，以及機器人的位置和速度。
+
+\subsection{相機模式}
+\label{sec:camera-modes}
+
+相機固定以機器人的頭部為關注點（focus），但會依模式改變位置（eye）。按下 Tab 可以在三種模式之間切換：
+
+\begin{itemize}
+    \item \textbf{正面}：相機在機器人前方，機器人看向相機，轉動視角時仍會帶動機器人轉身。
+    \item \textbf{背後}（預設）：相機在機器人後方，轉動視角時機器人跟著轉身，適合一般移動。
+    \item \textbf{自由}：機器人維持原本的視線，相機可以繞著機器人轉，適合從側面或正面觀察動作。
+\end{itemize}

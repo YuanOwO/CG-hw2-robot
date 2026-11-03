@@ -13,9 +13,8 @@ namespace {
 const float MIN_PITCH = -89.9f;
 const float MAX_PITCH = 89.9f;
 
-// 畫面寬度最近約 4 公尺，最遠約 190 公尺
-const float MIN_ZOOM = 0.5f;
-const float MAX_ZOOM = 24.0f;
+const float MIN_ZOOM = 0.2f;
+const float MAX_ZOOM = 25.0f;
 
 // 倍率為 1 時 view volume 的半寬與半高
 const float BASE_HALF_WIDTH = 48.0f;
@@ -48,11 +47,8 @@ void CameraRig::zoom(float factor) {
 }
 
 graphics::Camera CameraRig::camera() const {
-    const float yaw = radians(_yaw);
-    const float pitch = radians(_pitch);
-
     // (0, 0, -1) 先依 pitch 抬頭或低頭，再繞 y 軸轉 yaw
-    const Vec3 forward(-std::sin(yaw) * std::cos(pitch), std::sin(pitch), -std::cos(yaw) * std::cos(pitch));
+    const Vec3 forward = rotateAroundY(rotateAroundX(Vec3(0.0f, 0.0f, -1.0f), _pitch), _yaw);
 
     graphics::Camera camera;
     camera.focus = _target;
