@@ -26,8 +26,8 @@ Entity::Entity(EntityId id, Seed seed, float mass, Vec3 position, const anatomy:
 
 void Entity::tick(float dt, const World& world) {
     constexpr float STANCE_TRANSITION_DURATION = 0.5f;  // 轉換姿勢的時間固定為 0.5 秒
-    constexpr float BODY_TURN_RATIO = 0.5f;             // 身體朝向轉向視線方向的程度，0 表示不轉，1 表示完全轉向
-    constexpr float BODY_YAW_RATE = 10.0f;              // 身體朝向轉向視線方向的速度
+    constexpr float MOVE_FACING_RATIO = 0.5f;  // 身體偏向移動方向的比例，0 時一直朝視線，1 時完全朝移動方向
+    constexpr float BODY_TURN_RATE = 10.0f;    // 身體朝向收斂到目標的速率 (1/s)，越大轉得越快
 
     const auto intent = _brain->think(*this, world, dt);
 
@@ -52,14 +52,13 @@ void Entity::tick(float dt, const World& world) {
     const float moved = intent.surge < 0.0f ? -length(displacement) : length(displacement);
     _gait.advance(moved, walkSpeed(), dt);
 
-    // 如果有水平移動，身體朝向會慢慢轉向視線方向
+    // 有移動輸入時，身體才會慢慢轉向視線並偏向移動方向；站著不動只轉頭
     if (std::abs(intent.surge) > 0.0f || std::abs(intent.sway) > 0.0f) {
-        // 如果往後走，身體偏向走向的反方向
+        // 往後走時左右反向，讓身體背對移動方向而不是轉過去面對它
         const float sign = intent.surge < 0.0f ? -1.0f : 1.0f;
-        // 側著走時身體會稍微轉向側邊
-        float offset = degrees(std::atan2(sign * intent.sway, sign * intent.surge)) * BODY_TURN_RATIO;
+        float offset = degrees(std::atan2(sign * intent.sway, sign * intent.surge)) * MOVE_FACING_RATIO;
         float delta = wrapSignedDegrees(_look.yaw - offset - _yaw);
-        _yaw = wrapDegrees(_yaw + delta * approach(BODY_YAW_RATE, dt));
+        _yaw = wrapDegrees(_yaw + delta * approach(BODY_TURN_RATE, dt));
     }
 
     _age++;
