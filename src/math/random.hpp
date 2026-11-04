@@ -29,7 +29,7 @@ class Random {
     /// 把 valueAt 的結果換成 [minimum, maximum] 內的整數，分布均勻
     static std::uint32_t uniformInt(Value value, std::uint32_t minimum, std::uint32_t maximum);
     /// 把 valueAt 的結果換成 [minimum, maximum) 內的浮點數
-    static double uniformFloat(Value value, double minimum, double maximum);
+    static float uniformFloat(Value value, float minimum, float maximum);
 
    private:
     Seed _seed;

@@ -82,7 +82,7 @@ std::uint32_t Random::uniformInt(Value value, std::uint32_t minimum, std::uint32
     return minimum + static_cast<std::uint32_t>(candidate % range);
 }
 
-double Random::uniformFloat(Value value, double minimum, double maximum) {
+float Random::uniformFloat(Value value, float minimum, float maximum) {
     assert(std::isfinite(minimum));
     assert(std::isfinite(maximum));
     assert(minimum <= maximum);
@@ -91,11 +91,11 @@ double Random::uniformFloat(Value value, double minimum, double maximum) {
         return minimum;
     }
 
-    // double 的尾數有 53 位元；取高位形成 2^-53 間距的 [0, 1) 小數
-    constexpr double UNIT_SCALE = 0x1.0p-53;
-    const double unit = static_cast<double>(value >> 11) * UNIT_SCALE;
+    // float 的尾數有 24 位元；取高位形成 2^-24 間距的 [0, 1) 小數
+    constexpr float UNIT_SCALE = 0x1.0p-24f;
+    const float unit = static_cast<float>(value >> 40) * UNIT_SCALE;
 
-    const double result = minimum + (maximum - minimum) * unit;
+    const float result = minimum + (maximum - minimum) * unit;
 
     // 浮點四捨五入可能使接近 maximum 的值碰到上界，退回前一個可表示值
     return result < maximum ? result : std::nextafter(maximum, minimum);
