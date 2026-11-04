@@ -107,7 +107,7 @@ endif()
 # -------------------------
 
 target_compile_options(main PRIVATE
-    $<$<CONFIG:Debug>:-g -O1 -fsanitize=undefined>
+    $<$<CONFIG:Debug>:-g -O1 -Wall -Wextra -Wshadow -Wconversion -Wsign-conversion -fsanitize=undefined>
     $<$<CONFIG:Release>:-O2 -DNDEBUG>
 )
 
