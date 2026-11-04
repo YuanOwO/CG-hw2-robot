@@ -49,11 +49,11 @@ void drawCollider(const world::collision::UprightCylinder& collider) {
     constexpr int segments = 32;
     std::vector<geometry::LineSegment3D> edges;
 
-    float lastX = radius * cos(2.0f * PI * (segments - 1) / segments);
-    float lastZ = radius * sin(2.0f * PI * (segments - 1) / segments);
+    float lastX = radius * cos(2.0f * PI * static_cast<float>(segments - 1) / segments);
+    float lastZ = radius * sin(2.0f * PI * static_cast<float>(segments - 1) / segments);
 
     for (int i = 0; i < segments; ++i) {
-        float rad = 2.0f * PI * i / segments;
+        float rad = 2.0f * PI * static_cast<float>(i) / segments;
 
         float x = radius * cos(rad);
         float z = radius * sin(rad);
@@ -89,14 +89,14 @@ void drawCollider(const world::collision::Sphere& collider) {
     std::vector<geometry::LineSegment3D> edges;
 
     for (int i = 0; i < vRings; i++) {
-        float theta = 2.0f * PI * i / vRings;
+        float theta = 2.0f * PI * static_cast<float>(i) / vRings;
 
         float x0 = radius * cos(theta);
         float z0 = radius * sin(theta);
 
         for (int j = 1; j <= segments; j++) {
-            float phi1 = PI * (j - 1) / segments - 0.5f * PI;
-            float phi2 = PI * j / segments - 0.5f * PI;
+            float phi1 = PI * static_cast<float>(j - 1) / segments - 0.5f * PI;
+            float phi2 = PI * static_cast<float>(j) / segments - 0.5f * PI;
 
             float y1 = radius * sin(phi1);
             float x1 = x0 * cos(phi1);
@@ -111,16 +111,16 @@ void drawCollider(const world::collision::Sphere& collider) {
     }
 
     for (int i = 0; i < hRings; i++) {
-        float phi = PI * (i + 1) / (hRings + 1) - 0.5f * PI;
+        float phi = PI * static_cast<float>(i + 1) / (hRings + 1) - 0.5f * PI;
 
         float y = radius * sin(phi);
         float r = radius * cos(phi);
 
-        float lastX = r * cos(2.0f * PI * (segments - 1) / segments);
-        float lastZ = r * sin(2.0f * PI * (segments - 1) / segments);
+        float lastX = r * cos(2.0f * PI * static_cast<float>(segments - 1) / segments);
+        float lastZ = r * sin(2.0f * PI * static_cast<float>(segments - 1) / segments);
 
         for (int j = 0; j < segments; j++) {
-            float theta = 2.0f * PI * j / segments;
+            float theta = 2.0f * PI * static_cast<float>(j) / segments;
 
             float x = r * cos(theta);
             float z = r * sin(theta);

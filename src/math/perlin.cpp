@@ -35,8 +35,8 @@ const Mat4 ROTATION_3D = Mat4({
 // 預先建表，取樣時就不必計算三角函數。單位向量使內插結果的範圍約為 [-0.71, 0.71]
 const auto GRADIENTS_2D = [] {
     std::array<Vec2, GRADIENT_COUNT> table;
-    for (int i = 0; i < GRADIENT_COUNT; ++i) {
-        const float angle = 2.0f * PI * i / GRADIENT_COUNT;
+    for (std::size_t i = 0; i < GRADIENT_COUNT; ++i) {
+        const float angle = 2.0f * PI * static_cast<float>(i) / GRADIENT_COUNT;
         table[i] = {std::cos(angle), std::sin(angle)};
     }
     return table;
@@ -88,7 +88,7 @@ float Perlin1D::gradientAt(std::int64_t x) const {
 
 float Perlin1D::noise(float x) const {
     const std::int64_t x0 = static_cast<std::int64_t>(std::floor(x));
-    const float t = x - x0;
+    const float t = x - static_cast<float>(x0);
 
     const float n0 = gradientAt(x0) * t;
     const float n1 = gradientAt(x0 + 1) * (t - 1.0f);
@@ -130,8 +130,8 @@ Vec2 Perlin2D::gradientAt(std::int64_t x, std::int64_t y) const {
 float Perlin2D::noise(float x, float y) const {
     const std::int64_t x0 = static_cast<std::int64_t>(std::floor(x));
     const std::int64_t y0 = static_cast<std::int64_t>(std::floor(y));
-    const float tx = x - x0;
-    const float ty = y - y0;
+    const float tx = x - static_cast<float>(x0);
+    const float ty = y - static_cast<float>(y0);
 
     const float u = fade(tx);
     const float v = fade(ty);
@@ -186,9 +186,9 @@ float Perlin3D::noise(float x, float y, float z) const {
     const std::int64_t x0 = static_cast<std::int64_t>(std::floor(x));
     const std::int64_t y0 = static_cast<std::int64_t>(std::floor(y));
     const std::int64_t z0 = static_cast<std::int64_t>(std::floor(z));
-    const float tx = x - x0;
-    const float ty = y - y0;
-    const float tz = z - z0;
+    const float tx = x - static_cast<float>(x0);
+    const float ty = y - static_cast<float>(y0);
+    const float tz = z - static_cast<float>(z0);
 
     const float u = fade(tx);
     const float v = fade(ty);

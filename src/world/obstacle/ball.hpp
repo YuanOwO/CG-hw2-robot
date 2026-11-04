@@ -14,7 +14,6 @@ class Ball : public Obstacle {
     collision::Collider localCollider() const override;
 
    private:
-    float _radius;
     collision::Sphere _collider;
 };
 

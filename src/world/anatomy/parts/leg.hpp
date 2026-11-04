@@ -29,7 +29,7 @@ struct LegSpec {
 
 class Leg final : public Part {
    public:
-    Leg(const std::string& name, Side side, const LegSpec& spec) : Part(name), _side(side), _legSpec(spec) {
+    Leg(const std::string& name, Side side, const LegSpec& spec) : Part(name), _legSpec(spec) {
         if (spec.thighSize.x <= 0.0f || spec.thighSize.y <= 0.0f || spec.thighSize.z <= 0.0f) {
             throw std::invalid_argument("LegSpec thighSize must be positive");
         }
@@ -87,7 +87,6 @@ class Leg final : public Part {
     }
 
    private:
-    Side _side;
     LegSpec _legSpec;
 
     BoneIndex _thigh = NO_BONE;

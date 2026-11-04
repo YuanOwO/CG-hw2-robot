@@ -74,14 +74,14 @@ class BiomeClassifier {
 
     using ClimatePointArray = std::array<ClimatePoints, static_cast<size_t>(Biome::Count) - 8>;
     static constexpr ClimatePointArray _biomeClimatePoints = {
-        {{0.545, 0.354, Biome::Plains},
-         {0.145, 0.274, Biome::SnowyPlains},
-         {0.818, 0.548, Biome::Savanna},
-         {0.818, 0.224, Biome::Desert},
-         {0.582, 0.612, Biome::Forest},
-         {0.364, 0.500, Biome::Taiga},
-         {0.236, 0.418, Biome::SnowyTaiga},
-         {0.836, 0.908, Biome::Jungle}}
+        {{0.545f, 0.354f, Biome::Plains},
+         {0.145f, 0.274f, Biome::SnowyPlains},
+         {0.818f, 0.548f, Biome::Savanna},
+         {0.818f, 0.224f, Biome::Desert},
+         {0.582f, 0.612f, Biome::Forest},
+         {0.364f, 0.500f, Biome::Taiga},
+         {0.236f, 0.418f, Biome::SnowyTaiga},
+         {0.836f, 0.908f, Biome::Jungle}}
     };
 
     /// 根據高度、濕度、隨機抖動等因素調整 BiomeInput 的值，使其更適合用於生物群落分類。

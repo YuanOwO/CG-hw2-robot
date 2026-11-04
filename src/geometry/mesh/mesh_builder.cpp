@@ -12,7 +12,7 @@
 
 namespace robot::geometry {
 
-MeshBuilder::MeshBuilder(int segments, float tolerance) : _segments(segments), _tolerance(tolerance) {}
+MeshBuilder::MeshBuilder(std::size_t segments, float tolerance) : _segments(segments), _tolerance(tolerance) {}
 
 Mesh MeshBuilder::build() const {
     return _mesh;
@@ -140,15 +140,15 @@ MeshBuilder& MeshBuilder::frustum(float bottomRadius, float topRadius, float hei
 
 #pragma region Prism, Pyramid
 
-MeshBuilder& MeshBuilder::prism(float radius, float height, int sides) {
+MeshBuilder& MeshBuilder::prism(float radius, float height, std::size_t sides) {
     return frustum(radius, radius, height, sides);
 }
 
-MeshBuilder& MeshBuilder::pyramid(float radius, float height, int sides) {
+MeshBuilder& MeshBuilder::pyramid(float radius, float height, std::size_t sides) {
     return frustum(radius, 0.0f, height, sides);
 }
 
-MeshBuilder& MeshBuilder::frustum(float bottomRadius, float topRadius, float height, int sides) {
+MeshBuilder& MeshBuilder::frustum(float bottomRadius, float topRadius, float height, std::size_t sides) {
     Path2D profile = Path2D(Vec2(0.0f, 0.0f));
     if (bottomRadius > EPSILON) {
         profile = profile.lineTo(Vec2(bottomRadius, 0.0f));
@@ -184,7 +184,7 @@ MeshBuilder& MeshBuilder::triangle(const Vec3& a, const Vec3& b, const Vec3& c) 
 
 #pragma region Lathe Implementation
 
-void MeshBuilder::addLathe(const Path2D& profile, int segments, bool smooth) {
+void MeshBuilder::addLathe(const Path2D& profile, std::size_t segments, bool smooth) {
     // 剖面須在 x >= 0 的一側，前進方向的右手邊為外側，三角形從外側看才是逆時針。
     // 兩端落在軸上時那一圈縮成一點，自然封口
 
@@ -201,7 +201,7 @@ void MeshBuilder::addLathe(const Path2D& profile, int segments, bool smooth) {
     std::vector<Mat4> vTransform(segments);  // 第 j 欄的位置變換
     std::vector<Mat4> nTransform(segments);  // 第 j 欄的法向量變換
 
-    float halfAngle = 180.0f / segments;  // 相鄰兩欄夾角的一半
+    float halfAngle = 180.0f / static_cast<float>(segments);  // 相鄰兩欄夾角的一半
     Mat4 fixNormalY;
     if (!smooth) {
         // 平面的面在中間角度只到弦的中點，離軸 x cos(halfAngle)，高度不變，
@@ -209,10 +209,10 @@ void MeshBuilder::addLathe(const Path2D& profile, int segments, bool smooth) {
         fixNormalY = scale(1.0f, std::cos(radians(halfAngle)), 1.0f);
     }
 
-    for (int i = 0; i < segments; i++) {
+    for (std::size_t i = 0; i < segments; i++) {
         // 先在自己的座標系裡繞 y 軸轉，再套用 _transform 擺到位置上。
         // 平滑時法向量用頂點所在的角度；不平滑時用整個面的法向量，也就是兩欄中間的角度
-        float vertexDegree = 360.0f * i / segments;
+        float vertexDegree = 360.0f * static_cast<float>(i) / static_cast<float>(segments);
         float normalDegree = vertexDegree + halfAngle * (!smooth);
         vTransform[i] = _transform * rotation(vertexDegree, Y);
         nTransform[i] = _transform * fixNormalY * rotation(normalDegree, Y);
@@ -222,7 +222,7 @@ void MeshBuilder::addLathe(const Path2D& profile, int segments, bool smooth) {
         Vec3 p(vertices[i].point.x, vertices[i].point.y, 0.0f);  // 剖面放在 xy 平面上
         Vec3 n(vertices[i].normal.x, vertices[i].normal.y, 0.0f);
 
-        for (int j = 0; j < segments; j++) {
+        for (std::size_t j = 0; j < segments; j++) {
             Vec3 p_trans = transformPoint(vTransform[j], p);
             Vec3 n_trans = normalize(transformVector(nTransform[j], n));
 

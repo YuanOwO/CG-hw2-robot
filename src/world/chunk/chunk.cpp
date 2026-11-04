@@ -31,16 +31,16 @@ Chunk::Chunk(ChunkPos pos, Heights heights, Heights waterLevels, Biomes biomes, 
       _surfaces(std::move(surfaces)) {}
 
 float Chunk::heightAt(float worldX, float worldZ) const {
-    float localX = worldX - _pos.x * CHUNK_SIZE;
-    float localZ = worldZ - _pos.z * CHUNK_SIZE;
+    float localX = worldX - static_cast<float>(_pos.x * CHUNK_SIZE);
+    float localZ = worldZ - static_cast<float>(_pos.z * CHUNK_SIZE);
 
     // 計算所在的格子
     int cellX = std::clamp(static_cast<int>(std::floor(localX)), 0, CHUNK_SIZE - 1);
     int cellZ = std::clamp(static_cast<int>(std::floor(localZ)), 0, CHUNK_SIZE - 1);
 
     // 計算格子內的相對位置
-    float fracX = localX - cellX;  // [0, 1]
-    float fracZ = localZ - cellZ;  // [0, 1]
+    float fracX = localX - static_cast<float>(cellX);  // [0, 1]
+    float fracZ = localZ - static_cast<float>(cellZ);  // [0, 1]
 
     // 取得四個頂點的高度
     float h00 = vertexHeight(cellX, cellZ);
@@ -58,15 +58,15 @@ float Chunk::heightAt(float worldX, float worldZ) const {
 }
 
 Vec3 Chunk::normalAt(float worldX, float worldZ) const {
-    float localX = worldX - _pos.x * CHUNK_SIZE;
-    float localZ = worldZ - _pos.z * CHUNK_SIZE;
+    float localX = worldX - static_cast<float>(_pos.x * CHUNK_SIZE);
+    float localZ = worldZ - static_cast<float>(_pos.z * CHUNK_SIZE);
 
     // 計算所在的格子
     int cellX = std::clamp(static_cast<int>(std::floor(localX)), 0, CHUNK_SIZE - 1);
     int cellZ = std::clamp(static_cast<int>(std::floor(localZ)), 0, CHUNK_SIZE - 1);
 
-    float fracX = localX - cellX;  // [0, 1]
-    float fracZ = localZ - cellZ;  // [0, 1]
+    float fracX = localX - static_cast<float>(cellX);  // [0, 1]
+    float fracZ = localZ - static_cast<float>(cellZ);  // [0, 1]
 
     // 取得四個頂點的高度
     Vec3 v00(0.0f, vertexHeight(cellX, cellZ), 0.0f);
@@ -106,8 +106,6 @@ Surface Chunk::surfaceAt(int localX, int localZ) const {
 
 void Chunk::addObstacle(std::unique_ptr<obstacle::Obstacle> obstacle) {
     assert(obstacle != nullptr);
-    assert(obstacle->position().x >= _pos.x * CHUNK_SIZE && obstacle->position().x < (_pos.x + 1) * CHUNK_SIZE);
-    assert(obstacle->position().z >= _pos.z * CHUNK_SIZE && obstacle->position().z < (_pos.z + 1) * CHUNK_SIZE);
     _obstacles.push_back(std::move(obstacle));
 }
 

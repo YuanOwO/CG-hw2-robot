@@ -14,8 +14,7 @@ const RobotBody ROBOT_BODY(robot_spec::ROBOT_TORSO_SPEC, robot_spec::ROBOT_NECK_
                            robot_spec::ROBOT_ARM_SPEC, robot_spec::ROBOT_LEG_SPEC);
 
 // 機器人的相關物理參數，單位為國際單位制
-constexpr float ROBOT_MASS = 70.0f;    // kg
-constexpr float ROBOT_HEIGHT = 1.75f;  // m
+constexpr float ROBOT_MASS = 70.0f;  // kg
 
 constexpr float ROBOT_JUMP_HEIGHT = 0.5f;  // m
 constexpr float ROBOT_SNEAK_SPEED = 0.6f;  // m/s

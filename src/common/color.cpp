@@ -27,7 +27,7 @@ ColorRGBA hsv2rgb(const ColorHSV& hsv) {
     int sector = static_cast<int>(h);
 
     // sector 內的位置，範圍 [0, 1)
-    h -= sector;
+    h -= static_cast<float>(sector);
 
     float tab[4];
 

@@ -14,7 +14,7 @@ class World {
     explicit World(Seed seed);
     void tick(float dt);
 
-    const chunk::Biome biomeAt(float worldX, float worldZ) const;
+    chunk::Biome biomeAt(float worldX, float worldZ) const;
 
     Vec3 spawnPosition() const;
 

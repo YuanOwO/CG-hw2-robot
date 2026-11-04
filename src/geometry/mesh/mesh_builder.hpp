@@ -15,7 +15,7 @@ class MeshBuilder {
    public:
     /// @param segments 圓形的形狀繞一圈切成幾欄，須至少為 3
     /// @param tolerance 剖面切成折線時容許的最大距離，須大於 0
-    explicit MeshBuilder(int segments = 32, float tolerance = 0.01f);
+    explicit MeshBuilder(std::size_t segments = 32, float tolerance = 0.01f);
     ~MeshBuilder() = default;
 
     /// 目前累積的網格。builder 可以繼續加入形狀，不影響已取出的網格
@@ -48,15 +48,15 @@ class MeshBuilder {
     /// 正稜柱，底面中心在原點。每個側面是一片平面，相鄰的面明暗分明
     /// @param radius 外接圓半徑，即中心到頂點的距離；第一個頂點在 +x 方向
     /// @param sides 側面數，須至少為 3
-    MeshBuilder& prism(float radius, float height, int sides);
+    MeshBuilder& prism(float radius, float height, std::size_t sides);
     /// 正角錐，底面中心在原點，尖端在 (0, height, 0)
     /// @param radius 底面的外接圓半徑；第一個頂點在 +x 方向
     /// @param sides 側面數，須至少為 3
-    MeshBuilder& pyramid(float radius, float height, int sides);
+    MeshBuilder& pyramid(float radius, float height, std::size_t sides);
     /// 正角台，底面中心在原點；topRadius 為 0 時即角錐
     /// @param bottomRadius, topRadius 底面與頂面的外接圓半徑；第一個頂點在 +x 方向
     /// @param sides 側面數，須至少為 3
-    MeshBuilder& frustum(float bottomRadius, float topRadius, float height, int sides);
+    MeshBuilder& frustum(float bottomRadius, float topRadius, float height, std::size_t sides);
 
     /// 剖面繞 y 軸轉一圈得到的旋轉體，表面平滑。
     /// 剖面須在 x >= 0 的一側，沿前進方向的右手邊為外側，例如由下往上畫；
@@ -70,12 +70,12 @@ class MeshBuilder {
     Mesh _mesh;
     Mat4 _transform = Mat4();
     ColorRGBA _currentColor = Color::White;
-    int _segments;
+    std::size_t _segments;
     float _tolerance;
 
     /// lathe 的實作，可指定欄數
     /// @param smooth false 時每個面各自使用面的法向量，用於稜柱等平面組成的形狀；剖面須由直線組成
-    void addLathe(const Path2D& profile, int segments, bool smooth = true);
+    void addLathe(const Path2D& profile, std::size_t segments, bool smooth = true);
 };
 
 }  // namespace robot::geometry

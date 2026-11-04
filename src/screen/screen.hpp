@@ -72,7 +72,7 @@ class Screen {
     int _width = 0;
     int _height = 0;
     std::vector<gui::Button> _buttons;
-    int _focusedButton = -1;  // -1：尚未用鍵盤選擇
+    std::size_t _focusedButton = static_cast<std::size_t>(-1);  // -1：尚未用鍵盤選擇
 };
 
 }  // namespace robot::screen

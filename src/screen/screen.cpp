@@ -24,8 +24,8 @@ void Screen::init(int width, int height) {
     build();
 
     // 改變視窗大小時保留鍵盤選擇；按鈕數量變少時才放棄
-    if (_focusedButton >= static_cast<int>(_buttons.size())) {
-        _focusedButton = -1;
+    if (_focusedButton >= _buttons.size()) {
+        _focusedButton = static_cast<std::size_t>(-1);
     }
 }
 
@@ -54,7 +54,7 @@ int Screen::titleBottom() const {
 }
 
 bool Screen::keyDown(Key key, bool repeat) {
-    const int count = static_cast<int>(_buttons.size());
+    const auto count = _buttons.size();
 
     // 導覽鍵即使沒有按鈕也回報已處理：畫面打開時，按鍵不應穿透到後面的遊戲
     switch (key) {

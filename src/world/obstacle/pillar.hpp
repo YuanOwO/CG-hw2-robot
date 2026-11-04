@@ -14,8 +14,6 @@ class Pillar : public Obstacle {
     collision::Collider localCollider() const override;
 
    private:
-    float _radius;
-    float _height;
     collision::UprightCylinder _collider;
 };
 

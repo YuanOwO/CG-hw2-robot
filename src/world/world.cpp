@@ -23,7 +23,7 @@ void World::tick(float dt) {
     _entityManager.tick(dt, *this);
 }
 
-const chunk::Biome World::biomeAt(float worldX, float worldZ) const {
+chunk::Biome World::biomeAt(float worldX, float worldZ) const {
     return _chunkManager.biomeAt(worldX, worldZ);
 }
 
@@ -39,7 +39,9 @@ Vec3 World::spawnPosition() const {
         }
 
         int direction = ++count % 4;
-        float step = Random::uniformFloat(random.valueAt1D(count), 1.0f, 5.0f) * static_cast<float>(count);
+        float step = static_cast<float>(Random::uniformFloat(random.valueAt1D(count), 1.0f, 5.0f));
+        step *= static_cast<float>(count);
+
         if (direction == 0) {
             z += step;
         } else if (direction == 1) {

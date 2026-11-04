@@ -25,7 +25,7 @@ class ChunkManager {
 
     float heightAt(float worldX, float worldZ) const;
     Vec3 normalAt(float worldX, float worldZ) const;
-    const Biome biomeAt(float worldX, float worldZ) const;
+    Biome biomeAt(float worldX, float worldZ) const;
 
     void forEach(ChunkHandler&& visit) const {
         for (const auto& [pos, chunk] : _chunks) {

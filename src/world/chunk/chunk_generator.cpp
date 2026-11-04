@@ -38,7 +38,9 @@ std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
     Chunk::Surfaces surfaces;
     std::array<VertexSample, CHUNK_VERTEX_COUNT * CHUNK_VERTEX_COUNT> vertices;
 
-    auto indexOf = [&](int localX, int localZ) { return localZ * CHUNK_VERTEX_COUNT + localX; };
+    auto indexOf = [&](int localX, int localZ) {
+        return static_cast<std::size_t>(localZ) * CHUNK_VERTEX_COUNT + static_cast<std::size_t>(localX);
+    };
 
     auto cellAverage = [&](int x, int z, auto field) {
         float a = field(vertices[indexOf(x, z)]);
@@ -74,6 +76,8 @@ std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
         for (int z = 0; z < CHUNK_SIZE; z++) {
+            std::size_t index = static_cast<std::size_t>(z * CHUNK_SIZE + x);
+
             BiomeInput biomeInput;
             biomeInput.worldX = static_cast<float>(originX + x) + 0.5f;
             biomeInput.worldZ = static_cast<float>(originZ + z) + 0.5f;
@@ -88,15 +92,15 @@ std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
             biomeInput.mountainMask = cellAverage(x, z, [](const VertexSample& v) { return v.terrain.mountainMask; });
             biomeInput.ridge = cellAverage(x, z, [](const VertexSample& v) { return v.terrain.ridge; });
 
-            biomes[z * CHUNK_SIZE + x] = _biomeClassifier.classify(biomeInput);
+            biomes[index] = _biomeClassifier.classify(biomeInput);
 
             SurfaceInput surfaceInput;
-            surfaceInput.biome = biomes[z * CHUNK_SIZE + x];
+            surfaceInput.biome = biomes[index];
             surfaceInput.height = biomeInput.height;
             surfaceInput.waterLevel = biomeInput.waterLevel;
             surfaceInput.slope = biomeInput.slope;
 
-            surfaces[z * CHUNK_SIZE + x] = _surfaceResolver.resolve(surfaceInput);
+            surfaces[index] = _surfaceResolver.resolve(surfaceInput);
         }
     }
 
@@ -107,7 +111,7 @@ std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
         float blockZ = static_cast<float>(originZ) + 3.0f;
         Vec3 blockPosition(blockX, chunk->heightAt(blockX, blockZ), blockZ);
 
-        auto blockSeed = _random.valueAt2D(blockX, blockZ, fnv1a32("OBSTACLE_BLOCK"));
+        auto blockSeed = _random.valueAt2D(originX + 3, originZ + 3, fnv1a32("OBSTACLE_BLOCK"));
         Random blockRandom(blockSeed);
         float blockYaw = Random::uniformFloat(blockRandom.valueAt(fnv1a32("BLOCK_YAW")), 0.0f, 360.0f);
         Vec3 blockSize(Random::uniformFloat(blockRandom.valueAt(fnv1a32("BLOCK_SIZE_X")), 0.5f, 2.0f),
@@ -122,7 +126,7 @@ std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
         float ballZ = static_cast<float>(originZ) + 8.0f;
         Vec3 ballPosition(ballX, chunk->heightAt(ballX, ballZ), ballZ);
 
-        auto ballSeed = _random.valueAt2D(ballX, ballZ, fnv1a32("OBSTACLE_BALL"));
+        auto ballSeed = _random.valueAt2D(originX + 8, originZ + 8, fnv1a32("OBSTACLE_BALL"));
         Random ballRandom(ballSeed);
         float ballRadius = Random::uniformFloat(ballRandom.valueAt(fnv1a32("SPHERE_RADIUS")), 0.1f, 2.0f);
 
@@ -134,7 +138,7 @@ std::unique_ptr<Chunk> ChunkGenerator::generate(ChunkPos pos) const {
         float pillarZ = static_cast<float>(originZ) + 13.0f;
         Vec3 pillarPosition(pillarX, chunk->heightAt(pillarX, pillarZ), pillarZ);
 
-        auto pillarSeed = _random.valueAt2D(pillarX, pillarZ, fnv1a32("OBSTACLE_PILLAR"));
+        auto pillarSeed = _random.valueAt2D(originX + 13, originZ + 13, fnv1a32("OBSTACLE_PILLAR"));
         Random pillarRandom(pillarSeed);
         float pillarRadius = Random::uniformFloat(pillarRandom.valueAt(fnv1a32("PILLAR_RADIUS")), 0.5f, 1.5f);
         float pillarHeight = Random::uniformFloat(pillarRandom.valueAt(fnv1a32("PILLAR_HEIGHT")), 0.1f, 2.0f);
