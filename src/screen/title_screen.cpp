@@ -1,9 +1,7 @@
 #include "screen/title_screen.hpp"
 
-#include <memory>
 #include <string>
 
-#include "screen/help_screen.hpp"
 #include "screen/style.hpp"
 
 namespace robot::screen {
@@ -20,9 +18,7 @@ TitleScreen::TitleScreen(ScreenHost& host) : Screen(host) {}
 void TitleScreen::build() {
     const int top = height() / 2;
     addButton(buttonSlot(0, top), "開始", [this]() { host().startWorld(); });
-    addButton(buttonSlot(1, top), "操作說明",
-              [this]() { host().openChildScreen(std::make_unique<HelpScreen>(host())); });
-    addButton(buttonSlot(2, top), "離開", [this]() { host().quit(); });
+    addButton(buttonSlot(1, top), "離開", [this]() { host().quit(); });
 }
 
 void TitleScreen::renderContent(graphics::Canvas& canvas) const {
