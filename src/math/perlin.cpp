@@ -5,6 +5,7 @@
 #include <cstdint>
 
 #include "math/constants.hpp"
+#include "math/mat3.hpp"
 #include "math/mat4.hpp"
 #include "math/utils.hpp"
 #include "math/vec3.hpp"
@@ -21,13 +22,17 @@ constexpr int GRADIENT_COUNT = 1 << GRADIENT_BITS;
 
 // 錯開各 octave 的取樣位置，否則各層在原點同為 0，格點也會互相對齊
 constexpr float OCTAVE_OFFSET = 17.31f;
-constexpr float ROTATION_2D_COS = 0.8f;
-constexpr float ROTATION_2D_SIN = 0.6f;
+
+const Mat3 ROTATION_2D = Mat3({
+    {0.8f,  0.6f, 0.0f},
+    {-0.6f, 0.8f, 0.0f},
+    {0.0f,  0.0f, 1.0f},
+});
 
 const Mat4 ROTATION_3D = Mat4({
-    {0.8f,   -0.48f, 0.36f,  0.0f},
-    {0.48f,  0.872f, 0.096f, 0.0f},
-    {-0.36f, 0.096f, 0.928f, 0.0f},
+    {0.8f,   0.48f,  -0.36f, 0.0f},
+    {-0.48f, 0.872f, 0.096f, 0.0f},
+    {0.36f,  0.096f, 0.928f, 0.0f},
     {0.0f,   0.0f,   0.0f,   1.0f},
 });
 
@@ -157,15 +162,16 @@ float Perlin2D::fbm(float x, float y, int octaves, float lacunarity, float gain)
     float amplitude = 1.0f;
     float amplitudeSquaredSum = 0.0f;
 
+    const Mat3 trans = ROTATION_2D * scale(lacunarity, lacunarity);
+
     for (int i = 0; i < octaves; i++) {
         sum += noise(x + offset, y + offset) * amplitude;
         offset += OCTAVE_OFFSET;
         amplitudeSquaredSum += amplitude * amplitude;
         amplitude *= gain;
-        const float rx = ROTATION_2D_COS * x + ROTATION_2D_SIN * y;
-        const float ry = -ROTATION_2D_SIN * x + ROTATION_2D_COS * y;
-        x = rx * lacunarity;
-        y = ry * lacunarity;
+        const auto v = transformPoint(trans, Vec2(x, y));
+        x = v.x;
+        y = v.y;
     }
 
     // 各層互不相關，變異數按振幅平方相加；除以其平方根，分布寬度才不隨層數改變
