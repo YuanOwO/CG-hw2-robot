@@ -40,20 +40,11 @@ class Canvas {
     /// @param width, height 寬高，像素
     void fillRect(int x, int y, int width, int height, const ColorRGBA& color);
 
-    /// 填滿圓角矩形，邊緣逐像素對齊；寬或高不大於 0、或完全透明時不畫
-    /// @param x, y 左上角
-    /// @param width, height 寬高，像素
-    /// @param radius 圓角半徑，像素；超過能放下的大小時自動縮小，0 為直角
-    void fillRoundedRect(int x, int y, int width, int height, int radius, const ColorRGBA& color);
-
-    /// 畫圓角矩形的外框，內部不畫；寬、高或粗細不大於 0、或完全透明時不畫。
-    /// 內框與 fillRoundedRect(x + thickness, y + thickness, ...) 的邊緣正好相接
+    /// 畫矩形的外框，內部不畫；寬、高或粗細不大於 0、或完全透明時不畫
     /// @param x, y 左上角
     /// @param width, height 外框的寬高，像素
-    /// @param radius 外框的圓角半徑，像素；超過能放下的大小時自動縮小，0 為直角。
-    ///               內框的圓角半徑為 radius - thickness
     /// @param thickness 框線粗細，像素
-    void strokeRoundedRect(int x, int y, int width, int height, int radius, int thickness, const ColorRGBA& color);
+    void strokeRect(int x, int y, int width, int height, int thickness, const ColorRGBA& color);
 
     /// 畫多行文字，以 '\n' 換行，每行靠文字框左緣。
     /// 位置與文字框大小都是整數像素，字形才不會落在像素之間而模糊或抖動

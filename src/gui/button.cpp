@@ -43,11 +43,10 @@ void Button::render(graphics::Canvas& canvas, bool focused) const {
     const ColorRGBA& fill = _armed && _hovered ? _style.pressed : _hovered ? _style.hovered : _style.fill;
     const ColorRGBA& border = focused ? _style.focusBorder : _style.border;
     const int borderWidth = focused ? 2 : 1;
-    const int radius = _style.cornerRadius;
 
-    canvas.fillRoundedRect(_bounds.x + borderWidth, _bounds.y + borderWidth, _bounds.width - 2 * borderWidth,
-                           _bounds.height - 2 * borderWidth, radius - borderWidth, fill);
-    canvas.strokeRoundedRect(_bounds.x, _bounds.y, _bounds.width, _bounds.height, radius, borderWidth, border);
+    canvas.fillRect(_bounds.x + borderWidth, _bounds.y + borderWidth, _bounds.width - 2 * borderWidth,
+                    _bounds.height - 2 * borderWidth, fill);
+    canvas.strokeRect(_bounds.x, _bounds.y, _bounds.width, _bounds.height, borderWidth, border);
 
     const Point center = _bounds.topLeft() + Point(_bounds.width / 2, _bounds.height / 2);
 

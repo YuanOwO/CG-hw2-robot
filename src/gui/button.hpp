@@ -19,7 +19,6 @@ struct ButtonStyle {
     ColorRGBA pressed;
     ColorRGBA border;
     ColorRGBA focusBorder;
-    int cornerRadius = 6;
 };
 
 // 按鈕。在按鈕內按下並在按鈕內放開才算點擊。
