@@ -1,4 +1,4 @@
-#include "view/world_renderer.hpp"
+#include "view/renderer/world_renderer.hpp"
 
 #include "graphics/3d/primitives.hpp"
 #include "graphics/render_mode.hpp"

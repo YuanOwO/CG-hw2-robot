@@ -1,8 +1,8 @@
 #pragma once
 
 #include "graphics/camera.hpp"
-#include "view/chunk_renderer.hpp"
-#include "view/entity_renderer.hpp"
+#include "view/renderer/chunk_renderer.hpp"
+#include "view/renderer/entity_renderer.hpp"
 #include "world/world.hpp"
 
 namespace robot::view {

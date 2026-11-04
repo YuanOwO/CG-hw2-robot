@@ -1,4 +1,4 @@
-#include "view/chunk_renderer.hpp"
+#include "view/renderer/chunk_renderer.hpp"
 
 #include <cstddef>
 #include <iterator>
@@ -6,7 +6,7 @@
 #include "geometry/mesh/mesh_builder.hpp"
 #include "graphics/3d/primitives.hpp"
 #include "math/vec3.hpp"
-#include "view/collider_renderer.hpp"
+#include "view/renderer/collider_renderer.hpp"
 #include "world/chunk/core/biome.hpp"
 #include "world/chunk/core/surface.hpp"
 

@@ -1,4 +1,4 @@
-#include "view/collider_renderer.hpp"
+#include "view/renderer/collider_renderer.hpp"
 
 #include <variant>
 #include <vector>

@@ -1,8 +1,8 @@
-#include "view/obstacle_renderer.hpp"
+#include "view/renderer/obstacle_renderer.hpp"
 
 #include "graphics/3d/primitives.hpp"
 #include "platform/glut.hpp"
-#include "view/collider_renderer.hpp"
+#include "view/renderer/collider_renderer.hpp"
 
 namespace robot::view {
 

@@ -4,7 +4,7 @@
 
 #include "common/color.hpp"
 #include "geometry/mesh/mesh.hpp"
-#include "view/obstacle_renderer.hpp"
+#include "view/renderer/obstacle_renderer.hpp"
 #include "world/chunk/chunk.hpp"
 #include "world/chunk/chunk_manager.hpp"
 
