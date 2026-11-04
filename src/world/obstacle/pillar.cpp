@@ -1,7 +1,6 @@
 #include "world/obstacle/pillar.hpp"
 
 #include "geometry/mesh/mesh_builder.hpp"
-#include "math/mat4.hpp"
 #include "world/utils.hpp"
 
 namespace robot::world::obstacle {

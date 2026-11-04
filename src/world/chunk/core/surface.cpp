@@ -1,10 +1,5 @@
 #include "world/chunk/core/surface.hpp"
 
-#include <algorithm>
-#include <cmath>
-
-#include "math/utils.hpp"
-
 namespace robot::world::chunk {
 
 Surface SurfaceResolver::resolve(const SurfaceInput& input) const {

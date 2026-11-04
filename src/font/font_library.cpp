@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 #include "font/gfnt_font.hpp"
 #include "font/gotl_font.hpp"

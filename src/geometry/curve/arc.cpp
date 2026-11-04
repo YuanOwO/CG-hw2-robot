@@ -1,6 +1,5 @@
 #include "geometry/curve/arc.hpp"
 
-#include <algorithm>
 #include <cassert>
 #include <cmath>
 

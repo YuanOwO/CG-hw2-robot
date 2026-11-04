@@ -6,7 +6,6 @@
 #include "geometry/mesh/mesh_builder.hpp"
 #include "graphics/3d/primitives.hpp"
 #include "math/vec3.hpp"
-#include "view/renderer/collider_renderer.hpp"
 #include "world/chunk/core/biome.hpp"
 #include "world/chunk/core/surface.hpp"
 

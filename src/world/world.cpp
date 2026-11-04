@@ -1,11 +1,9 @@
 #include "world/world.hpp"
 
-#include <memory>
+#include <cmath>
 
 #include "math/random.hpp"
 #include "math/utils.hpp"
-#include "world/entity/brain/player_brain.hpp"
-#include "world/entity/robot.hpp"
 #include "world/utils.hpp"
 
 namespace robot::world {

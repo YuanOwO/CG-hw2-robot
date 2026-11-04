@@ -1,5 +1,7 @@
 #include "graphics/3d/primitives.hpp"
 
+#include <cstdint>
+
 #include "graphics/3d/shading.hpp"
 #include "platform/glut.hpp"
 

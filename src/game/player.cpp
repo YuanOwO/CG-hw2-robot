@@ -1,5 +1,6 @@
 #include "game/player.hpp"
 
+#include <algorithm>
 #include <memory>
 #include <utility>
 

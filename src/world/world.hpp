@@ -1,12 +1,10 @@
 #pragma once
 
+#include "math/vec3.hpp"
 #include "world/chunk/chunk_manager.hpp"
 #include "world/chunk/core/biome.hpp"
-#include "world/entity/brain/player_brain.hpp"
 #include "world/entity/entity_manager.hpp"
-#include "world/entity/robot.hpp"
 #include "world/physics/simulator.hpp"
-#include "world/types.hpp"
 
 namespace robot::world {
 

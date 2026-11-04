@@ -1,5 +1,7 @@
 #include "view/renderer/entity_renderer.hpp"
 
+#include <cstddef>
+
 #include "graphics/3d/primitives.hpp"
 #include "platform/glut.hpp"
 #include "view/renderer/collider_renderer.hpp"

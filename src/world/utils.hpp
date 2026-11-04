@@ -5,7 +5,6 @@
 #include "common/color.hpp"
 #include "math/random.hpp"
 #include "math/utils.hpp"
-#include "world/types.hpp"
 
 namespace robot::world {
 

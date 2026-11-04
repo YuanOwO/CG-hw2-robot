@@ -1,5 +1,7 @@
 #include "world/chunk/chunk_manager.hpp"
 
+#include <cmath>
+
 namespace robot::world::chunk {
 
 namespace {

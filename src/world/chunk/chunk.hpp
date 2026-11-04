@@ -2,10 +2,10 @@
 
 #include <array>
 #include <cstddef>
-#include <functional>
 #include <memory>
 #include <vector>
 
+#include "math/vec3.hpp"
 #include "world/chunk/core/biome.hpp"
 #include "world/chunk/core/surface.hpp"
 #include "world/obstacle/obstacle.hpp"

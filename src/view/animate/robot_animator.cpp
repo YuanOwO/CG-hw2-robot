@@ -6,7 +6,6 @@
 #include "math/constants.hpp"
 #include "math/utils.hpp"
 #include "world/entity/robot.hpp"
-#include "world/entity/robot_spec.hpp"
 
 namespace robot::view::animate {
 

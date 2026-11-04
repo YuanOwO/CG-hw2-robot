@@ -1,7 +1,6 @@
 #pragma once
 
-#include <cstdlib>
-#include <vector>
+#include <cmath>
 
 #include "math/constants.hpp"
 #include "math/vec2.hpp"

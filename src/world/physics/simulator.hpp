@@ -1,5 +1,6 @@
 #pragma once
 
+#include "math/vec3.hpp"
 #include "world/chunk/chunk_manager.hpp"
 #include "world/collision/collider.hpp"
 #include "world/physics/motion.hpp"

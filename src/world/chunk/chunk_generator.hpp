@@ -2,11 +2,11 @@
 
 #include <memory>
 
-#include "math/perlin.hpp"
 #include "math/random.hpp"
 #include "world/chunk/chunk.hpp"
 #include "world/chunk/core/biome.hpp"
 #include "world/chunk/core/climate.hpp"
+#include "world/chunk/core/surface.hpp"
 #include "world/chunk/core/terrain.hpp"
 
 namespace robot::world::chunk {

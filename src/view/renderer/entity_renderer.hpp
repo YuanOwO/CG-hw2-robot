@@ -1,5 +1,6 @@
 #pragma once
 
+#include "view/animate/animator.hpp"
 #include "view/animate/robot_animator.hpp"
 #include "world/entity/entity.hpp"
 

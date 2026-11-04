@@ -3,6 +3,7 @@
 #include "engine/input.hpp"
 #include "game/player.hpp"
 #include "graphics/2d/canvas.hpp"
+#include "math/random.hpp"
 #include "view/hud.hpp"
 #include "view/renderer/world_renderer.hpp"
 #include "world/world.hpp"

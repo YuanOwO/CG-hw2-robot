@@ -1,7 +1,6 @@
 #include "game/camera_rig.hpp"
 
 #include <algorithm>
-#include <cmath>
 
 #include "math/utils.hpp"
 

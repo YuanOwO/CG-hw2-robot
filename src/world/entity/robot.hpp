@@ -1,13 +1,20 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <memory>
 
+#include "math/random.hpp"
+#include "math/vec3.hpp"
 #include "world/anatomy/parts/arm.hpp"
 #include "world/anatomy/parts/head.hpp"
 #include "world/anatomy/parts/leg.hpp"
 #include "world/anatomy/parts/neck.hpp"
 #include "world/anatomy/parts/torso.hpp"
+#include "world/anatomy/pose.hpp"
+#include "world/anatomy/skeleton.hpp"
+#include "world/anatomy/stance.hpp"
+#include "world/entity/brain/brain.hpp"
 #include "world/entity/entity.hpp"
 #include "world/types.hpp"
 

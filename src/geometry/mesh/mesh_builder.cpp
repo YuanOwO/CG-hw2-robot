@@ -2,6 +2,9 @@
 
 #include <cassert>
 #include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <vector>
 
 #include "math/constants.hpp"
 #include "math/mat4.hpp"

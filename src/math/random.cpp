@@ -3,8 +3,6 @@
 #include <cassert>
 #include <cmath>
 
-#include "math/utils.hpp"
-
 namespace robot {
 namespace {
 

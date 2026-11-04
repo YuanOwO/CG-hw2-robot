@@ -1,7 +1,5 @@
 #include "geometry/curve/bezier.hpp"
 
-#include <initializer_list>
-
 #include "geometry/curve/line_segment.hpp"
 #include "math/utils.hpp"
 

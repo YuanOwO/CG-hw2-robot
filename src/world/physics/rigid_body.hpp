@@ -1,7 +1,6 @@
 #pragma once
 
 #include "math/vec3.hpp"
-#include "world/physics/motion.hpp"
 
 namespace robot::world::physics {
 
