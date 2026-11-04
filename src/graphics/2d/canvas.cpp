@@ -88,8 +88,8 @@ void Canvas::popTransform() {
     glPopMatrix();
 }
 
-void Canvas::translate(float x, float y) {
-    glTranslatef(x, y, 0.0f);
+void Canvas::translate(int x, int y) {
+    glTranslatef(static_cast<GLfloat>(x), static_cast<GLfloat>(y), 0.0f);
 }
 
 void Canvas::fillRect(int x, int y, int width, int height, const ColorRGBA& color) {

@@ -31,8 +31,8 @@ CameraController::CameraTurn CameraController::update(float dt, const engine::In
     } else {
         if (_dragFrom) {
             const auto delta = mouse.position() - *_dragFrom;
-            result.yaw += delta.x * DRAG_SENSITIVITY;
-            result.pitch += delta.y * DRAG_SENSITIVITY;
+            result.yaw += static_cast<float>(delta.x) * DRAG_SENSITIVITY;
+            result.pitch += static_cast<float>(delta.y) * DRAG_SENSITIVITY;
         }
         _dragFrom = mouse.position();
     }

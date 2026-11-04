@@ -32,7 +32,7 @@ void Hud::render(graphics::Canvas& canvas, const HudInfo& info) const {
     const int textHeight = static_cast<int>(std::ceil(getFontHeight(HUD_FONT, text)));
 
     canvas.fillRect(8, 8, textWidth + 12, textHeight + 8, ColorRGBA{0.0f, 0.0f, 0.0f, 0.6f});
-    canvas.drawText(text, HUD_FONT, Color::White, Point(14.0f, 12.0f));
+    canvas.drawText(text, HUD_FONT, Color::White, Point(14, 12));
 }
 
 }  // namespace robot::view

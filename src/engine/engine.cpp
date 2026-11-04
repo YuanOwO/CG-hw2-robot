@@ -219,7 +219,7 @@ void Engine::onMouse(int button, int state, int x, int y) {
     }
 
     _input.moveMouse(x, y);
-    const Point position(static_cast<float>(x), static_cast<float>(y));
+    const Point position(x, y);
 
     if (state == GLUT_DOWN) {
         _input.mouseDown(mapped);
@@ -237,7 +237,7 @@ void Engine::onMouse(int button, int state, int x, int y) {
 void Engine::onMotion(int x, int y) {
     _input.moveMouse(x, y);
     if (_app != nullptr) {
-        _app->onMouseMove(Point(static_cast<float>(x), static_cast<float>(y)));
+        _app->onMouseMove(Point(x, y));
     }
 }
 

@@ -22,13 +22,13 @@ float alignOffset(TextAlign align, float size) {
     case TextAlign::END:
         return size;
     }
-    return 0.0f;
+    return 0.0f;  // unreachable
 }
 
-// 文字框的左上角。取整後，字形的位移也都是整數像素，每個像素都對齊螢幕像素
+// 文字框的左上角。字型以浮點數量測，在這裡取整到整數像素，之後字形的位移也是整數，每個像素都對齊螢幕像素
 Point alignedOrigin(const Point& position, TextAnchor anchor, float width, float height) {
-    return Point(std::round(position.x - alignOffset(anchor.horizontal, width)),
-                 std::round(position.y - alignOffset(anchor.vertical, height)));
+    return Point(static_cast<int>(std::lround(static_cast<float>(position.x) - alignOffset(anchor.horizontal, width))),
+                 static_cast<int>(std::lround(static_cast<float>(position.y) - alignOffset(anchor.vertical, height))));
 }
 
 #pragma endregion  // Alignment
@@ -95,12 +95,13 @@ class RasterCursor {
     // 移到相對於 origin 的 (x, y)，y 向下為正。
     // 每次都從目前實際的位置計算位移，因此 glutBitmapCharacter 畫完自行推進 raster position 也不影響；
     // 位置一律由呼叫端依字寬決定，與 getFontWidth 的量測一致
-    void moveTo(float x, float y) {
+    void moveTo(int x, int y) {
         GLfloat current[4];
         glGetFloatv(GL_CURRENT_RASTER_POSITION, current);
 
         // window 座標 y 向上，因此 y 反向
-        glBitmap(0, 0, 0.0f, 0.0f, _origin[0] + x - current[0], _origin[1] - y - current[1], nullptr);
+        glBitmap(0, 0, 0.0f, 0.0f, _origin[0] + static_cast<GLfloat>(x) - current[0],
+                 _origin[1] - static_cast<GLfloat>(y) - current[1], nullptr);
     }
 
    private:
@@ -151,7 +152,7 @@ class TextRenderer {
             const auto scale = static_cast<float>(glyph.scale);
             glPixelZoom(scale, -scale);
 
-            cursor.moveTo(placed.x, placed.y);
+            cursor.moveTo(static_cast<int>(std::lround(placed.x)), static_cast<int>(std::lround(placed.y)));
             glDrawPixels(glyph.bitmapWidth, glyph.bitmapHeight, GL_ALPHA, GL_UNSIGNED_BYTE, glyph.alpha);
         }
 
@@ -169,21 +170,21 @@ class TextRenderer {
 
         RasterCursor cursor(origin);
 
-        float x = 0.0f;
+        int x = 0;
         float y = baseline;
         for (const char ch : _text) {
             const auto c = static_cast<unsigned char>(ch);
 
             if (c == '\n') {
-                x = 0.0f;
+                x = 0;
                 y += lineHeight;
                 continue;
             }
 
-            cursor.moveTo(x, y);
+            cursor.moveTo(x, static_cast<int>(std::lround(y)));
             glutBitmapCharacter(font, c);
 
-            x += static_cast<float>(glutBitmapWidth(font, c));
+            x += glutBitmapWidth(font, c);
         }
     }
 
@@ -192,11 +193,12 @@ class TextRenderer {
 
         const Point origin = alignedOrigin(_position, _anchor, getFontWidth(style, _text), getFontHeight(style, _text));
 
+        // 在字型座標中累加 pen，每個字的位置才取整到整數像素，捨入誤差不會隨字數累積
         const float scale = style.scale;
-        const float lineHeight = getLineHeight(style.font) * scale;
+        const float lineHeight = getLineHeight(style.font);
 
-        float x = origin.x;
-        float y = origin.y + getAscent(style.font) * scale;
+        float penX = 0.0f;
+        float baseline = getAscent(style.font);
 
         glLineWidth(1.0f);
 
@@ -204,8 +206,8 @@ class TextRenderer {
             const auto c = static_cast<unsigned char>(ch);
 
             if (c == '\n') {
-                x = origin.x;
-                y += lineHeight;
+                penX = 0.0f;
+                baseline += lineHeight;
                 continue;
             }
 
@@ -215,17 +217,18 @@ class TextRenderer {
             }
 
             _canvas.pushTransform();
-            _canvas.translate(x, y);
+            _canvas.translate(origin.x + static_cast<int>(std::lround(penX * scale)),
+                              origin.y + static_cast<int>(std::lround(baseline * scale)));
 
             // Stroke 字型以 y 向上的字型座標繪製，翻轉 Y 配合畫布 y 向下的座標系
             glScalef(scale, -scale, 1.0f);
 
-            // glutStrokeCharacter 畫完會把矩陣平移字寬，因此每個字都恢復矩陣，由 x 自行累加
+            // glutStrokeCharacter 畫完會把矩陣平移字寬，因此每個字都恢復矩陣，由 penX 自行累加
             glutStrokeCharacter(font, c);
 
             _canvas.popTransform();
 
-            x += static_cast<float>(glutStrokeWidth(font, c)) * scale;
+            penX += static_cast<float>(glutStrokeWidth(font, c));
         }
     }
 

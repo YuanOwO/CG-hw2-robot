@@ -49,7 +49,8 @@ void Button::render(graphics::Canvas& canvas, bool focused) const {
                            _bounds.height - 2 * borderWidth, radius - borderWidth, fill);
     canvas.strokeRoundedRect(_bounds.x, _bounds.y, _bounds.width, _bounds.height, radius, borderWidth, border);
 
-    const Point center(_bounds.x + _bounds.width / 2.0f, _bounds.y + _bounds.height / 2.0f);
+    const Point center = _bounds.topLeft() + Point(_bounds.width / 2, _bounds.height / 2);
+
     canvas.drawText(_label, _style.font, _style.text, center,
                     {graphics::TextAlign::CENTER, graphics::TextAlign::CENTER});
 }

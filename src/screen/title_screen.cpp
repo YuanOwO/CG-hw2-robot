@@ -27,12 +27,12 @@ void TitleScreen::build() {
 
 void TitleScreen::renderContent(graphics::Canvas& canvas) const {
     // 標題底緣在畫面中央上方 80 px，副標題接在下方 16 px。
-    const float centerX = width() / 2.0f;
-    const float titleBottom = height() / 2.0f - 80.0f;
+    const int centerX = width() / 2;
+    const int titleBottom = height() / 2 - 80;
 
     canvas.drawText(TITLE, style::TitleFont, style::Text, Point(centerX, titleBottom),
                     {graphics::TextAlign::CENTER, graphics::TextAlign::END});
-    canvas.drawText(SUBTITLE, style::BodyFont, style::MutedText, Point(centerX, titleBottom + 16.0f),
+    canvas.drawText(SUBTITLE, style::BodyFont, style::MutedText, Point(centerX, titleBottom + 16),
                     {graphics::TextAlign::CENTER, graphics::TextAlign::START});
 }
 

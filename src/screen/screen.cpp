@@ -33,13 +33,13 @@ void Screen::render(graphics::Canvas& canvas) const {
     renderBackground(canvas);
 
     if (!_title.empty()) {
-        canvas.drawText(_title, style::HeadingFont, style::Text, Point(_width / 2.0f, _height / 4.0f),
+        canvas.drawText(_title, style::HeadingFont, style::Text, Point(_width / 2, _height / 4),
                         {graphics::TextAlign::CENTER, graphics::TextAlign::START});
     }
 
     renderContent(canvas);
 
-    for (int i = 0; i < static_cast<int>(_buttons.size()); i++) {
+    for (std::size_t i = 0; i < _buttons.size(); i++) {
         _buttons[i].render(canvas, i == _focusedButton);
     }
 }

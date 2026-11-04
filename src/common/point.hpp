@@ -1,25 +1,19 @@
 #pragma once
 
-#include <cmath>
-
-#include "math/constants.hpp"
-#include "math/vec2.hpp"
-
 namespace robot {
 
 // 點座標，必要時也可以用於表示向量（例如兩點之間的向量）。
 struct Point {
-    Point() : x(0.0f), y(0.0f) {}
-    Point(float x, float y) : x(x), y(y) {}
+    Point() : x(0), y(0) {}
+    Point(int x, int y) : x(x), y(y) {}
 
-    float x, y;
+    int x, y;
 
-    bool operator==(const Point& other) const {
-        return std::abs(x - other.x) < EPSILON && std::abs(y - other.y) < EPSILON;
-    }
+    bool operator==(const Point& other) const { return x == other.x && y == other.y; }
     bool operator!=(const Point& other) const { return !(*this == other); }
 
-    Vec2 operator-(const Point& other) const { return Vec2(x - other.x, y - other.y); }
+    Point operator+(const Point& other) const { return Point(x + other.x, y + other.y); }
+    Point operator-(const Point& other) const { return Point(x - other.x, y - other.y); }
 };
 
 }  // namespace robot

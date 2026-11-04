@@ -33,7 +33,7 @@ class Canvas {
     /// 恢復到上一次 pushTransform 時的座標轉換
     void popTransform();
     /// 平移之後的繪製，單位為像素
-    void translate(float x, float y);
+    void translate(int x, int y);
 
     /// 填滿矩形；寬或高不大於 0、或完全透明時不畫
     /// @param x, y 左上角
@@ -56,7 +56,7 @@ class Canvas {
     void strokeRoundedRect(int x, int y, int width, int height, int radius, int thickness, const ColorRGBA& color);
 
     /// 畫多行文字，以 '\n' 換行，每行靠文字框左緣。
-    /// 文字框的左上角會取整到整數像素，字形才不會落在像素之間而模糊或抖動
+    /// 位置與文字框大小都是整數像素，字形才不會落在像素之間而模糊或抖動
     /// @param position 文字框上由 anchor 指定的那一點
     /// @param anchor 預設 position 為文字框左上角
     void drawText(const std::string& text, const FontStyle& fontStyle, const ColorRGBA& color, const Point& position,
