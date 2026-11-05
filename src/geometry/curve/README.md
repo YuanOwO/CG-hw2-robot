@@ -70,7 +70,7 @@ $$
 \gamma(t) = O + r\,\bigl[\cos\theta(t),\ \sin\theta(t)\bigr]^{\mathsf T}
 $$
 
-![圓弧的參數、切線與弓形高](../../../docs/figures/curve-arc.png)
+![圓弧的參數、切線與弓形高](../../../docs/figures/curve/arc.png)
 
 ### 導數與切線
 
@@ -123,7 +123,7 @@ $$
 
 $b \times c = 0$ 時兩條中垂線平行，即三點共線或有兩點重合。$b \times c > 0$ 時 $A \to B \to C$ 為逆時針，圓弧也逆時針轉，這樣才會經過 via。
 
-![through：兩條中垂線的交點是圓心](../../../docs/figures/curve-arc-through.png)
+![through：兩條中垂線的交點是圓心](../../../docs/figures/curve/arc-through.png)
 
 **`tangentAtStart`**：圓在起點 $A$ 的切線是 $d$（direction），半徑垂直於切線，所以圓心在通過 $A$、垂直於 $d$ 的直線上。令 $\hat m$ 為 $d$ 往左轉 90° 的單位向量，圓心為 $A + s\,\hat m$。令 $w = E - A$（$E$ 為 end），由圓心到 $A$、$E$ 等距：
 
@@ -135,7 +135,7 @@ $$
 
 $\hat m \cdot w = 0$ 時 $E$ 在切線上，需要無限大的圓。$s > 0$ 時圓心在左邊，往左彎，為逆時針。
 
-![tangentAtStart：圓心在垂直於起始方向的直線上](../../../docs/figures/curve-arc-tangent.png)
+![tangentAtStart：圓心在垂直於起始方向的直線上](../../../docs/figures/curve/arc-tangent.png)
 
 **`tangentAtEnd`**：同樣的做法，改以終點 $E$ 為基準：圓心為 $E + s\,\hat m$，$w = A - E$。
 
@@ -157,7 +157,7 @@ $$
 
 `split(t)` 用的也是這些點：前半段的控制點是每一層的第一點 $(P_0, p_{01}, q_0, \gamma(t))$，後半段是每一層的最後一點 $(\gamma(t), q_1, p_{23}, P_3)$。
 
-![de Casteljau 與 split](../../../docs/figures/curve-bezier-casteljau.png)
+![de Casteljau 與 split](../../../docs/figures/curve/bezier-casteljau.png)
 
 ### 導數
 
@@ -182,7 +182,7 @@ $$
 
 貝茲曲線位於控制點圍成的凸包內。若中間的控制點到弦 $P_0 P_n$ 的距離都不超過 $\delta$，凸包內的每一點都是如此，曲線也就不會超出。`isFlat` 因此只需檢查中間控制點到弦的距離。
 
-![凸包與控制點到弦的距離](../../../docs/figures/curve-bezier-flat.png)
+![凸包與控制點到弦的距離](../../../docs/figures/curve/bezier-flat.png)
 
 ## 5. 切成折線：`flatten`
 
@@ -213,7 +213,7 @@ flatten(曲線, δ, t0, t1):
 
 圓弧每次對半切時轉角減半，段數是 2 的冪。例如 $\delta = 1$ mm 時，半徑 5 cm 的半圓切成 8 段，半徑 25 cm 的切成 32 段。
 
-![flatten：容許誤差越小切得越多，彎曲處較密](../../../docs/figures/curve-flatten.png)
+![flatten：容許誤差越小切得越多，彎曲處較密](../../../docs/figures/curve/flatten.png)
 
 ## 6. `Curve2D`
 
@@ -267,4 +267,4 @@ Path2D(Vec2(0, -r)).arcTo(Vec2(0, 0), Vec2(r, 0)).lineTo(Vec2(r, h)).arcTo(Vec2(
 
 柱切出 6 個頂點，法向量依序朝下、朝外、朝上；球與膠囊則沒有折角。
 
-![柱與膠囊的剖面、法向量與折角](../../../docs/figures/curve-path2d.png)
+![柱與膠囊的剖面、法向量與折角](../../../docs/figures/curve/path2d.png)
