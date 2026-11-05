@@ -1,6 +1,6 @@
 """繞任意軸 n 旋轉 θ：v 拆成沿軸與垂直於軸的分量，垂直分量在垂直於軸的平面上轉 θ。
 
-輸出 docs/figures/rotation-axis-angle.png。執行：python3 docs/figures-src/rotation-axis-angle.py
+輸出 docs/figures/math/rotation-axis-angle.png。執行：python3 docs/figures-src/rotation-axis-angle.py
 """
 
 from pathlib import Path
@@ -10,7 +10,7 @@ import numpy as np
 from matplotlib.ticker import MultipleLocator
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
-OUTPUT = Path(__file__).resolve().parent.parent / "figures" / "rotation-axis-angle.png"
+OUTPUT = Path(__file__).resolve().parent.parent / "figures" / "math" / "rotation-axis-angle.png"
 
 plt.rcParams.update({
     "font.family": "Noto Sans CJK TC",

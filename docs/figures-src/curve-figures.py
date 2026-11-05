@@ -1,6 +1,6 @@
 """src/geometry/curve/README.md 的示意圖。
 
-輸出 docs/figures/curve-*.png。執行：python3 docs/figures-src/curve-figures.py
+輸出 docs/figures/curve/*.png。執行：python3 docs/figures-src/curve-figures.py
 """
 
 from pathlib import Path
@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import Polygon
 
-FIGURES = Path(__file__).resolve().parent.parent / "figures"
+FIGURES = Path(__file__).resolve().parent.parent / "figures" / "curve"
 
 plt.rcParams.update({
     "font.family": "Noto Sans CJK TC",
@@ -123,7 +123,7 @@ def figure_arc():
     ax.set_xlim(-2.2, 2.2)
     ax.set_ylim(-0.5, 2.5)
 
-    save(fig, "curve-arc")
+    save(fig, "arc")
 
 
 # 2. through：兩條中垂線的交點是圓心
@@ -155,7 +155,7 @@ def figure_through():
     ax.text(-2.3, -0.9, r"$AC$ 的中垂線" "\n" r"$2\,u \cdot c = \Vert c \Vert^2$", color=PURPLE, fontsize=11)
     ax.set_xlim(-2.5, 3.2)
     ax.set_ylim(-1.7, 2.6)
-    save(fig, "curve-arc-through")
+    save(fig, "arc-through")
 
 
 # 3. tangentAtStart：圓心在垂直於起始方向的直線上
@@ -192,7 +192,7 @@ def figure_tangent():
     ax.text(*(e + [0.1, 0]), r"$E$（end）", va="center")
     ax.set_xlim(-1.8, 4.0)
     ax.set_ylim(-1.0, 3.6)
-    save(fig, "curve-arc-tangent")
+    save(fig, "arc-tangent")
 
 
 # 4. de Casteljau 與 split
@@ -230,7 +230,7 @@ def figure_casteljau():
     ax.text(2.3, -0.75, r"後半段：$\gamma(t),\ q_1,\ p_{23},\ P_3$", color=GREEN)
     ax.set_xlim(-0.6, 5.6)
     ax.set_ylim(-1.0, 2.9)
-    save(fig, "curve-bezier-casteljau")
+    save(fig, "bezier-casteljau")
 
 
 def point_to_segment(q, a, b):
@@ -263,7 +263,7 @@ def figure_flat():
             fontsize=11)
     ax.set_xlim(-0.4, 4.6)
     ax.set_ylim(-1.2, 1.4)
-    save(fig, "curve-bezier-flat")
+    save(fig, "bezier-flat")
 
 
 def flatten_cubic(p, tol, depth=0, out=None):
@@ -295,7 +295,7 @@ def figure_flatten():
         ax.plot(*pts.T, color=BLUE, lw=1.2)
         ax.plot(*pts.T, "o", color=RED, ms=3.5)
         ax.set_title(rf"$\delta = {tol}$：{len(pts) - 1} 段，彎曲處較密", fontsize=13)
-    save(fig, "curve-flatten")
+    save(fig, "flatten")
 
 
 # 7. Path2D：剖面、法向量與折角
@@ -338,11 +338,11 @@ def figure_path2d():
         ax.set_xlim(-0.8, 2.6)
         ax.set_ylim(-1.5, h + r + 0.8)
         ax.axis("off")
-    save(fig, "curve-path2d")
+    save(fig, "path2d")
 
 
 if __name__ == "__main__":
-    FIGURES.mkdir(exist_ok=True)
+    FIGURES.mkdir(parents=True, exist_ok=True)
     figure_arc()
     figure_through()
     figure_tangent()
